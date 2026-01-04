@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Шахматный квест</title>
 
   <link rel="stylesheet"
@@ -1411,6 +1412,161 @@
       text-align: center;
       min-height: 14px;
     }
+/* =========================
+   MOBILE / RESPONSIVE
+   ========================= */
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Чтобы “iOS safe area” не прятала контент */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Планшеты и узкие ноутбуки */
+@media (max-width: 900px) {
+  #layout {
+    max-width: 100%;
+    margin-left: 0;        /* Важно: убираем ваш margin-left:150px */
+    padding: 0 12px;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #toc {
+    width: 100%;
+    border-right: none;
+    padding-right: 0;
+  }
+
+  /* Оглавление можно сделать “аккордеоном” шириной 100% */
+  .toc-group {
+    margin: 10px 0;
+  }
+
+  #quest-container {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  #board-column {
+    width: 100%;
+  }
+
+  /* Доска и нотация — не фиксированные 420px, а резиновые */
+  #board {
+    width: 100%;
+  }
+
+  #notation-block {
+    width: 100%;
+  }
+
+  #question-block {
+    width: 100%;
+    padding: 10px 0; /* вместо 10px 20px */
+  }
+
+  /* Чуть компактнее кнопки управления ходами */
+  #move-controls {
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .move-btn {
+    min-width: 120px;
+  }
+
+  /* Варианты ответов — чуть компактнее */
+  #answers .answer-option {
+    padding: 10px 12px 10px 44px;
+  }
+
+  /* Экран приветствия */
+  #welcome-screen {
+    padding: 0 12px;
+  }
+}
+
+/* Телефоны */
+@media (max-width: 520px) {
+  h1 {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+
+  #board-wrapper {
+    margin: 12px 0;
+  }
+
+  /* Нотация поменьше по высоте */
+  #notation-content {
+    max-height: 120px;
+    font-size: 13px;
+  }
+
+  /* Кнопка переворота доски и хэндл — крупнее для пальца */
+  #flip-board-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    opacity: 0.7;
+  }
+
+  #resize-board-handle {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+  }
+
+  /* Вопросы/ответы */
+  #question-title {
+    font-size: 18px;
+  }
+  #question-text {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  /* Чтобы кнопки не были слишком маленькие */
+  .move-btn {
+    min-width: 46%;
+    flex: 1 1 auto;
+  }
+
+  #move-counter {
+    width: 100%;
+    text-align: center;
+    order: 3;
+    margin-top: 6px;
+  }
+
+  /* Оглавление: чуть компактнее текст */
+  #toc .toc-item-main {
+    font-size: 13px;
+  }
+  #toc .toc-item-sub {
+    font-size: 11px;
+  }
+}
+
+
+
+
+
+
+
+
   </style>
 </head>
 <body>
@@ -3771,6 +3927,41 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
       const resizeHandleEl = document.getElementById('resize-board-handle');
       const boardEl = document.getElementById('board');
       const notationBlockEl = document.getElementById('notation-block');
+      function autoFitBoard() {
+      if (!boardEl) return;
+      // В мобильной раскладке доска должна занимать ширину контейнера
+      // Оставим небольшой “воздух” по бокам.
+      const padding = 24;
+      // Берём ширину layout / quest-container, иначе body.
+      const container =
+      document.getElementById('quest-container') ||
+      document.getElementById('layout') ||
+      document.body;
+
+    const containerWidth = container.getBoundingClientRect().width || window.innerWidth;
+
+  // Целевой размер доски:
+  // - не больше 520 на телефоне (приятная величина)
+  // - не меньше 260 (чтобы не была слишком мелкой)
+  let size = Math.floor(containerWidth - padding);
+  size = Math.max(260, Math.min(size, 520));
+
+  boardEl.style.width = size + 'px';
+
+  if (notationBlockEl) {
+    notationBlockEl.style.width = size + 'px';
+  }
+
+  // Важно: chessboard-js нужно явно попросить пересчитать размеры
+  try {
+    board.resize();
+  } catch (e) {}
+
+  // Обновим стрелки (у вас есть SVG-стрелки)
+  try {
+    updateAllArrowsPositions();
+  } catch (e) {}
+}
 
       const progressContainerEl = document.getElementById('progress-container');
       const progressBarEl = document.getElementById('progress-bar');
@@ -4188,7 +4379,7 @@ function goToNextQuest() {
         updateBoardAndNotation();
 
         updateProgress();
-
+        autoFitBoard();
         prevMoveBtn.disabled = false;
         nextMoveBtn.disabled = false;
 
@@ -4954,6 +5145,7 @@ if (nextIndex < gamesData.length) {
         }
         welcomeScreen.style.display = 'none';
         layout.style.display = 'flex';
+        setTimeout(() => autoFitBoard(), 0);
         board.orientation('white');
 
         if (eraProgressEl) {
@@ -4975,6 +5167,15 @@ if (nextIndex < gamesData.length) {
       renderLives();
 
       setEraProgressForGame(0);
+      window.addEventListener('resize', () => {
+      autoFitBoard();
+      });
+      window.addEventListener('orientationchange', () => {
+      setTimeout(() => autoFitBoard(), 150);
+      });
+
+
+
     });
   </script>
 </body>
