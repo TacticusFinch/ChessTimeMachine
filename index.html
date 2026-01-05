@@ -1434,7 +1434,9 @@ body {
 
 /* Планшеты и узкие ноутбуки */
 @media (max-width: 900px) {
- 
+  h1 {
+    display: none;
+  }
   #notation-block {
     display: none;
   }
@@ -1546,16 +1548,30 @@ body {
     font-size: 16px;
     margin: 8px 0 6px;
   }
-  #question-text {
+ #question-text {
     font-size: 12px;
     line-height: 1.35;
     margin: 0 0 8px;
   }
-  #answers .answer-option {
-    font-size: 13px;
-    line-height: 1.3;
-    padding: 9px 10px 9px 42px;
+ #answers {
+    gap: 6px;
+    margin-top: 8px;
   }
+
+  #answers .answer-option {
+    padding: 8px 10px 8px 40px;
+    border-radius: 8px;
+  }
+
+  #answers .answer-option::before {
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    left: 10px;
+  }
+
+  #status { margin-top: 6px; }
+  #explanation { margin-top: 4px; }
 
   #answers .answer-option::before {
     width: 20px;
@@ -1566,12 +1582,12 @@ body {
 
   /* Волшебник/пузырь — компактнее */
   #toc-wizard img {
-    width: 56px;
+    width: 44px;
   }
 
   #wizard-bubble {
-    font-size: 12px;
-    padding: 7px 9px;
+    font-size: 10px;
+    padding: 6px 8px;
   }
   /* Чтобы кнопки не были слишком маленькие */
   .move-btn {
@@ -1581,6 +1597,12 @@ body {
 
   #move-counter {
    display: none;
+  }
+#intro-text p {
+    margin: 6px 0;
+    font-size: 12px;
+    line-height: 1.3;
+    text-indent: 0;
   }
 
   /* Оглавление: чуть компактнее текст */
@@ -1679,7 +1701,7 @@ body {
 <body>
   <h1>Машина времени</h1>
 <button id="toc-toggle-btn" class="toc-toggle-btn" aria-controls="toc" aria-expanded="false">
-  Оглавление
+  Выбрать квест
 </button>
 <div id="toc-overlay" class="toc-overlay" hidden></div>
 
