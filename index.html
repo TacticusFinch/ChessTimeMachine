@@ -1560,7 +1560,82 @@ body {
   }
 }
 
+/* ===== MOBILE TOC: скрыто, но доступно через кнопку ===== */
+.toc-toggle-btn {
+  display: none; /* на десктопе не показываем */
+}
 
+/* Оверлей (затемнение фона) */
+.toc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+}
+
+/* Мобильная логика: оглавление становится выезжающей панелью */
+@media (max-width: 900px) {
+  .toc-toggle-btn {
+    display: inline-flex;
+    position: sticky;
+    top: 8px;
+    z-index: 9999;
+    margin: 8px 12px 0;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.18);
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Превращаем #toc в выезжающее меню */
+  #toc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;      /* корректнее на мобилках */
+    width: min(92vw, 420px);
+    max-width: 420px;
+
+    background: #f7f7fb;
+    border-right: 1px solid #e5e7eb;
+    padding: 12px 12px 16px;
+
+    z-index: 9999;
+
+    /* скрыто по умолчанию */
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* когда открыто */
+  body.toc-open #toc {
+    transform: translateX(0);
+  }
+
+  body.toc-open .toc-overlay {
+    display: block;
+  }
+
+  /* overlay виден только когда toc-open, иначе скрываем */
+  .toc-overlay[hidden] {
+    display: none;
+  }
+
+  /* чтобы остальной контент не “ездил” под меню */
+  body.toc-open {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
 
 
 
@@ -1571,6 +1646,10 @@ body {
 </head>
 <body>
   <h1>Машина времени</h1>
+<button id="toc-toggle-btn" class="toc-toggle-btn" aria-controls="toc" aria-expanded="false">
+  Оглавление
+</button>
+<div id="toc-overlay" class="toc-overlay" hidden></div>
 
   <div id="victory-effect"></div>
 
@@ -3927,42 +4006,50 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
       const resizeHandleEl = document.getElementById('resize-board-handle');
       const boardEl = document.getElementById('board');
       const notationBlockEl = document.getElementById('notation-block');
-      function autoFitBoard() {
-      if (!boardEl) return;
-      // В мобильной раскладке доска должна занимать ширину контейнера
-      // Оставим небольшой “воздух” по бокам.
-      const padding = 24;
-      // Берём ширину layout / quest-container, иначе body.
-      const container =
-      document.getElementById('quest-container') ||
-      document.getElementById('layout') ||
-      document.body;
+// === FIX: не увеличиваем доску на десктопе ===
+// На широких экранах оставляем "дизайнерский" размер из макета,
+// на узких (<=900px) включаем авто-подгон.
+function autoFitBoard() {
+  if (!boardEl) return;
 
-    const containerWidth = container.getBoundingClientRect().width || window.innerWidth;
+  const isNarrow = window.matchMedia('(max-width: 900px)').matches;
 
-  // Целевой размер доски:
-  // - не больше 520 на телефоне (приятная величина)
-  // - не меньше 260 (чтобы не была слишком мелкой)
+  if (!isNarrow) {
+    // Десктоп: фиксированные размеры как в CSS/макете
+    const desktopBoardSize = 380;
+    const desktopNotationSize = 420;
+
+    boardEl.style.width = desktopBoardSize + 'px';
+    if (notationBlockEl) {
+      notationBlockEl.style.width = desktopNotationSize + 'px';
+    }
+
+    try { board.resize(); } catch (e) {}
+    try { updateAllArrowsPositions(); } catch (e) {}
+    return;
+  }
+
+  // Мобильные/планшеты: резиновый размер под контейнер
+  const padding = 24;
+  const container =
+    document.getElementById('quest-container') ||
+    document.getElementById('layout') ||
+    document.body;
+
+  const containerWidth =
+    container.getBoundingClientRect().width || window.innerWidth;
+
   let size = Math.floor(containerWidth - padding);
   size = Math.max(260, Math.min(size, 520));
 
   boardEl.style.width = size + 'px';
-
   if (notationBlockEl) {
     notationBlockEl.style.width = size + 'px';
   }
 
-  // Важно: chessboard-js нужно явно попросить пересчитать размеры
-  try {
-    board.resize();
-  } catch (e) {}
-
-  // Обновим стрелки (у вас есть SVG-стрелки)
-  try {
-    updateAllArrowsPositions();
-  } catch (e) {}
+  try { board.resize(); } catch (e) {}
+  try { updateAllArrowsPositions(); } catch (e) {}
 }
-
       const progressContainerEl = document.getElementById('progress-container');
       const progressBarEl = document.getElementById('progress-bar');
       const progressLabelEl = document.getElementById('progress-label');
@@ -3971,6 +4058,56 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
       const livesContainerEl = document.getElementById('lives-container');
 
       const tocButtons = document.querySelectorAll('#toc .toc-item');
+
+// === MOBILE TOC toggle ===
+const tocToggleBtn = document.getElementById('toc-toggle-btn');
+const tocOverlay = document.getElementById('toc-overlay');
+
+function isMobileLayout() {
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function openToc() {
+  document.body.classList.add('toc-open');
+  if (tocOverlay) tocOverlay.hidden = false;
+  if (tocToggleBtn) tocToggleBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeToc() {
+  document.body.classList.remove('toc-open');
+  if (tocOverlay) tocOverlay.hidden = true;
+  if (tocToggleBtn) tocToggleBtn.setAttribute('aria-expanded', 'false');
+}
+
+function toggleToc() {
+  if (document.body.classList.contains('toc-open')) closeToc();
+  else openToc();
+}
+
+if (tocToggleBtn) {
+  tocToggleBtn.addEventListener('click', () => {
+    if (!isMobileLayout()) return; // на десктопе кнопка и так скрыта, но на всякий случай
+    toggleToc();
+  });
+}
+
+if (tocOverlay) {
+  tocOverlay.addEventListener('click', () => {
+    closeToc();
+  });
+}
+
+// Закрывать меню по ESC (удобно на планшетах/клавиатурах)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeToc();
+});
+
+// При смене ориентации/resize: если вышли на десктоп — снять блокировки
+window.addEventListener('resize', () => {
+  if (!isMobileLayout()) closeToc();
+});
+
+
 
       const boardArrowLayerEl = document.getElementById('board-arrow-layer');
 
@@ -4458,6 +4595,9 @@ function goToNextQuest() {
         btn.addEventListener('click', () => {
           if (!Number.isNaN(idx)) {
             loadGame(idx);
+	      if (window.matchMedia('(max-width: 900px)').matches) {
+      		closeToc();
+    		}
           }
         });
       });
