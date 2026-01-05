@@ -1440,6 +1440,9 @@ body {
   #notation-block {
     display: none;
   }
+   #survival-controls {
+    display: none;
+  }
   #layout {
     max-width: 100%;
     margin-left: 0;        /* Важно: убираем ваш margin-left:150px */
@@ -1463,7 +1466,7 @@ body {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 6px;
   }
 
   #board-column {
@@ -1480,8 +1483,7 @@ body {
   }
 
   #question-block {
-    width: 100%;
-    padding: 10px 0; /* вместо 10px 20px */
+   padding-top: 0;
   }
 
   /* Чуть компактнее кнопки управления ходами */
@@ -1493,7 +1495,9 @@ body {
   .move-btn {
     min-width: 120px;
   }
-
+#board-wrapper {
+    margin: 8px 0 4px;   /* было 20px 0 (десктоп) и 12px 0 (<=520) */
+  }
   /* Варианты ответов — чуть компактнее */
   #answers .answer-option {
     padding: 10px 12px 10px 44px;
@@ -1542,7 +1546,8 @@ body {
   #question-block {
     padding: 6px 0;
   }
-
+  #quest-container { gap: 4px; }
+  #board-wrapper { margin: 6px 0 2px; }
   /* Вопросы/ответы */
   #question-title {
     font-size: 16px;
@@ -1631,8 +1636,9 @@ body {
 /* Мобильная логика: оглавление становится выезжающей панелью */
 @media (max-width: 900px) {
   .toc-toggle-btn {
-    display: inline-flex;
+    display: flex;
     position: sticky;
+    width: calc(100% - 32px); /* чтобы совпасть с вашим padding: 0 12px у #layout */
     top: 8px;
     z-index: 9999;
     margin: 8px 12px 0;
