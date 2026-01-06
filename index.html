@@ -7,24 +7,32 @@
 
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f7f7fb;
-      color: #111827;
-    }
+    html, body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body{
+  text-align: center; /* можно оставить, но лучше убрать и центрировать контейнер */
+}
 
     /* Общий лейаут: слева оглавление, справа квест */
-    #layout {
-      max-width: 1100px;
-      margin: 0;
-      margin-left: 150px;
-      display: flex;
-      align-items: flex-start;
-      gap: 20px;
-    }
-
+   #layout{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 16px 16px 28px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+  align-items: start;
+}
     /* Оглавление – минимализм и пастельные тона */
     #toc {
       width: 350px;
@@ -43,26 +51,41 @@
     }
 
     /* === ГРУППЫ В ОГЛАВЛЕНИИ === */
-    .toc-group {
-      margin: 10px 0 14px;
-      padding: 0;
-      border-radius: 12px;
-      background: #f4f5fb;
-      box-shadow:
-        0 0 0 1px rgba(148, 163, 184, 0.25);
-      overflow: hidden;
-      transition:
-        box-shadow 0.18s ease,
-        transform 0.12s ease,
-        background-color 0.18s ease;
-    }
+   .toc-group{
+  background: rgba(255,255,255,0.48);
+  border: 1px solid rgba(255,255,255,0.34);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
 
-    .toc-group:hover {
-      box-shadow:
-        0 4px 12px rgba(148, 163, 184, 0.28);
-      transform: translateY(-1px);
-      background: #f0f2fb;
-    }
+.toc-group.has-active{
+  border-color: rgba(10, 132, 255, 0.30);
+  box-shadow:
+    0 0 0 1px rgba(10, 132, 255, 0.18),
+    0 18px 40px rgba(10, 132, 255, 0.14),
+    0 14px 34px rgba(0,0,0,0.10);
+}
+
+.toc-group.has-active .toc-group-title{
+  background: rgba(10, 132, 255, 0.10);
+}
+
+.toc-group.has-active .toc-group-toggle-icon{
+  border-color: rgba(10, 132, 255, 0.55);
+  color: rgba(29, 78, 216, 1);
+  background: rgba(10, 132, 255, 0.10);
+}
+
+
+  .toc-group:hover{
+  box-shadow:
+    0 0 0 1px rgba(124,58,237,0.18),
+    0 20px 48px rgba(124,58,237,0.16),
+    0 14px 34px rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.52);
+}
+
 
     .toc-group-title {
       margin: 0;
@@ -131,7 +154,7 @@
     }
 
     .toc-group-title:hover {
-      background: rgba(135, 227, 14, 0.6);
+      background: rgba(0, 0, 255, 0.1);
     }
 
     .toc-group ol {
@@ -205,6 +228,7 @@
       font-weight: 600;
       line-height: 1.25;
       margin-bottom: 1px;
+      letter-spacing: 0.2px;
     }
 
     #toc .toc-item-sub {
@@ -216,12 +240,11 @@
     }
 
     #toc .toc-item:hover {
-      background: #dbeafe;
-      box-shadow:
-        0 0 0 1px rgba(59, 130, 246, 0.65),
-        0 4px 14px rgba(59, 130, 246, 0.3);
-      transform: translateY(-1px);
-      color: #0f172a;
+     background: rgba(10, 132, 255, 0.10);
+  box-shadow:
+    0 0 0 1px rgba(10, 132, 255, 0.35),
+    0 10px 24px rgba(10, 132, 255, 0.14);
+  transform: translateY(-1px);
     }
 
     #toc .toc-item:hover .toc-item-number {
@@ -335,7 +358,7 @@
 
     #board-wrapper {
       position: relative;
-      margin: 20px 0;
+      margin: 10px 0 6px;
       transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
@@ -385,11 +408,14 @@
 
     #board {
       width: 380px;
-      box-shadow:
-        0 0 18px rgba(0, 0, 0, 0.9),
-        0 0 18px rgba(90, 150, 255, 0.7);
-      border-radius: 8px;
-      overflow: hidden;
+  border-radius: 14px;
+  overflow: hidden;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.14),
+    0 18px 50px rgba(0,0,0,0.35),
+    0 0 34px rgba(124,58,237,0.18),
+    0 0 26px rgba(14,165,233,0.14);
     }
 
     #board .square-55d63.hover-highlight-from {
@@ -446,8 +472,8 @@
 
     #resize-board-handle {
       position: absolute;
-      right: 4px;
-      bottom: 40px;
+      right: 6px;
+      bottom: 60px;
       width: 14px;
       height: 14px;
       border-radius: 3px;
@@ -462,7 +488,7 @@
       box-shadow:
         0 0 0 1px rgba(148, 163, 184, 0.2),
         0 0 6px rgba(15, 23, 42, 0.35);
-      z-index: 2;
+      z-index: 3;
       transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
     }
 
@@ -506,7 +532,7 @@
 
     #notation-block {
       width: 420px;
-      margin: 10px 0 0;
+      margin: 6px 0 0;
       text-align: left;
       border: 1px solid #d1d5db;
       padding: 8px 10px;
@@ -537,7 +563,7 @@
     #question-block {
       width: 340px;
       text-align: left;
-      padding: 10px 20px;
+      padding: 0px 10px;
     }
 
     #intro-text h2 {
@@ -627,12 +653,12 @@
     }
 
     #survival-controls {
-      margin-top: 10px;
+      margin: 14px auto 6px;
+      width: 100%;
       display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+      align-items: center;           /* центр по ширине TOC */
+  justify-content: center;
+  gap: 10px;    }
 
     #survival-btn{
       position: relative;
@@ -846,29 +872,28 @@
       gap: 8px;
     }
 
-    .move-btn {
-      min-width: 90px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      background-color: #ffffff;
-      color: #374151;
-      font-size: 13px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      box-shadow:
-        0 0 0 0 rgba(59, 130, 246, 0),
-        0 1px 2px rgba(15, 23, 42, 0.04);
-      transition:
-        background-color 0.12s ease,
-        border-color 0.12s ease,
-        color 0.12s ease,
-        transform 0.08s ease;
-    }
+ /* move buttons become square minimal */
+.move-btn{
+  border-radius: 12px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  box-shadow: var(--btn-shadow);
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  color: var(--btn-text);
+  animation: none !important;
+}
+
+.move-btn:hover:not(:disabled){
+  animation: none !important;
+  transform: translateY(-1px);
+  box-shadow: var(--btn-shadow-hover);
+  border-color: rgba(79, 70, 229, 0.30);
+}
 
     .move-btn .icon {
       font-size: 14px;
@@ -1546,8 +1571,7 @@ body {
   #question-block {
     padding: 6px 0;
   }
-  #quest-container { gap: 4px; }
-  #board-wrapper { margin: 6px 0 2px; }
+
   /* Вопросы/ответы */
   #question-title {
     font-size: 16px;
@@ -1646,12 +1670,15 @@ body {
     justify-content: center;
 
     padding: 10px 14px;
-    border-radius: 999px;
+    border-radius: 12px;
     border: 1px solid rgba(15, 23, 42, 0.18);
     background: #ffffff;
-    color: #0f172a;
+    text-transform: uppercase;
+    color: var(--btn-text);
+    letter-spacing: 0.06em;
     font-weight: 700;
     cursor: pointer;
+
   }
 
   /* Превращаем #toc в выезжающее меню */
@@ -1697,8 +1724,83 @@ body {
   }
 }
 
+:root{
+  /* Neutral “Apple-like” palette */
+  --bg: #f5f5f7;
+  --surface: rgba(255, 255, 255, 0.72);      /* glass surface */
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --text: #0b0b0f;
+  --muted: rgba(11, 11, 15, 0.58);
+  --hairline: rgba(11, 11, 15, 0.10);
 
+  /* Accent */
+  --accent: #0a84ff;                         /* iOS blue */
+  --accent-weak: rgba(10, 132, 255, 0.16);
 
+  /* Status */
+  --good: #16a34a;
+  --bad: #dc2626;
+
+  /* Radii & spacing */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+
+  /* Shadows: very soft */
+  --shadow-1: 0 1px 1px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-2: 0 2px 2px rgba(0,0,0,0.06), 0 16px 36px rgba(0,0,0,0.10);
+
+  /* Typography */
+  --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+
+  /* Focus ring */
+  --focus: 0 0 0 3px var(--accent-weak);
+
+/* === Glass + Arcana tokens (add to the end of your existing :root) === */
+  --glass: rgba(255,255,255,0.62);
+  --glass-strong: rgba(255,255,255,0.78);
+  --glass-dark: rgba(17, 24, 39, 0.28);
+
+  --blur: 14px;
+  --sat: 140%;
+
+  --stroke: rgba(255,255,255,0.40);
+  --stroke-2: rgba(15, 23, 42, 0.10);
+
+  --arcana-1: #7c3aed;   /* violet */
+  --arcana-2: #0ea5e9;   /* cyan/sky */
+  --arcana-3: #22c55e;   /* green spark */
+  --arcana-glow: rgba(124, 58, 237, 0.35);
+  --arcana-glow-2: rgba(14, 165, 233, 0.28);
+
+  --bg-0: #070A12;
+  --bg-1: #0b1020;
+  --bg-2: #0b1224;
+
+  --shadow-glass: 0 10px 30px rgba(0,0,0,0.18);
+  --shadow-glow: 0 0 0 1px rgba(124,58,237,0.18), 0 14px 40px rgba(124,58,237,0.18);
+
+  --radius-xl: 22px;
+
+}
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  /* very subtle "arcana dust" pattern */
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08) 0 1px, transparent 2px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 0 1px, transparent 2px);
+  background-size: 240px 240px;
+  opacity: 0.25;
+  mix-blend-mode: screen;
+  filter: blur(0.2px);
+}
 
 
 
@@ -2072,7 +2174,18 @@ body {
     </li>
   </ol>
 </div>
+<div id="survival-controls">
+          <button id="survival-btn">
+            <span class="survival-text">Режим выживания</span>
+            <span class="survival-ecg"></span>
+          </button>
 
+          <div id="lives-container" aria-label="Жизни">
+            <span class="life-heart" data-life="1">♥</span>
+            <span class="life-heart" data-life="2">♥</span>
+            <span class="life-heart" data-life="3">♥</span>
+          </div>
+        </div>
 
 
 
@@ -2081,6 +2194,7 @@ body {
       <!-- Остальные партии (пока пусто, резерв для будущих добавлений) -->
       <ol id="toc-list"></ol>
     </div>
+
 
     <div id="quest-container">
       <div id="board-column">
@@ -2115,6 +2229,7 @@ body {
           <button id="flip-board-btn" title="Перевернуть доску">⇄</button>
           <div id="resize-board-handle" title="Потяните, чтобы изменить размер доски"></div>
         </div>
+	
         <div id="notation-block">
           <h3>Ходы и комментарии</h3>
           <div id="notation-content"></div>
@@ -2124,18 +2239,7 @@ body {
       <div id="question-block">
         <div id="intro-text"></div>
 
-        <div id="survival-controls">
-          <button id="survival-btn">
-            <span class="survival-text">Режим выживания</span>
-            <span class="survival-ecg"></span>
-          </button>
-
-          <div id="lives-container" aria-label="Жизни">
-            <span class="life-heart" data-life="1">♥</span>
-            <span class="life-heart" data-life="2">♥</span>
-            <span class="life-heart" data-life="3">♥</span>
-          </div>
-        </div>
+        
 
         <h2 id="question-title" style="display:none;"></h2>
         <p id="question-text" style="display:none;"></p>
@@ -3856,7 +3960,7 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
       const board = Chessboard('board', {
         draggable: true,
         position: 'start',
-        pieceTheme: 'img/chesspieces/wikipedia/{piece}.png',
+        pieceTheme: 'img/chesspieces/alpha/{piece}.png',
         onDragStart: onDragStart,
         onDrop: onDrop,
         onSnapEnd: onSnapEnd
@@ -4653,12 +4757,21 @@ function goToNextQuest() {
         });
 
         btn.addEventListener('click', () => {
-          if (!Number.isNaN(idx)) {
-            loadGame(idx);
-	      if (window.matchMedia('(max-width: 900px)').matches) {
-      		closeToc();
-    		}
-          }
+if (Number.isNaN(idx)) return;
+
+  /* 1) сворачиваем группу, где был выбран пункт */
+  const parentGroup = btn.closest('.toc-group');
+  if (parentGroup) {
+    parentGroup.classList.add('collapsed');
+  }
+
+  /* 2) закрываем мобильную панель */
+  if (isMobileLayout()) {
+    closeToc();
+  }
+
+  /* 3) грузим квест */
+  loadGame(idx);
         });
       });
 
