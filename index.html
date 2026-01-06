@@ -1803,6 +1803,76 @@ body::before{
 }
 
 
+next-quest-btn.is-shimmering{
+  position: relative;
+  border-color: rgba(47, 128, 255, 0.40);
+  box-shadow:
+    0 0 0 1px rgba(47, 128, 255, 0.20),
+    0 14px 34px rgba(47, 128, 255, 0.22);
+  animation: nextQuestGlow 1.25s ease-in-out infinite;
+}
+
+.next-quest-btn.is-shimmering::before{
+  opacity: 1;
+  animation: nextQuestShine 0.85s ease-out infinite;
+}
+
+@keyframes nextQuestGlow{
+  0%{
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  50%{
+    transform: translateY(-1px);
+    filter: brightness(1.12);
+  }
+  100%{
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
+
+
+#board .square-55d63.tap-selected{
+  box-shadow: inset 0 0 0 3px rgba(10, 132, 255, 0.85);
+  background: radial-gradient(circle, rgba(10,132,255,0.18), transparent 70%);
+}
+
+#board .square-55d63.tap-legal{
+  position: relative;
+}
+
+#board .square-55d63.tap-legal::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%,-50%);
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.92);
+  box-shadow:
+    0 0 0 3px rgba(34, 197, 94, 0.18),
+    0 0 14px rgba(34, 197, 94, 0.35);
+  pointer-events: none;
+}
+
+/ если это взятие — точка "кольцом" (необязательно, но удобно) /
+#board .square-55d63.tap-capture::after{
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: 3px solid rgba(239, 68, 68, 0.90);
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.12),
+    0 0 14px rgba(239, 68, 68, 0.25);
+}
+
+
+
+
+
 
   </style>
 </head>
@@ -4037,12 +4107,203 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
         return { from: mv.from, to: mv.to };
       }
 
-      function onDragStart(source, piece, position, orientation) {
-        if (game.game_over()) return false;
-        if (questionActive && !manualQuestionActive) return false;
-        if (game.turn() === 'w' && piece[0] === 'b') return false;
-        if (game.turn() === 'b' && piece[0] === 'w') return false;
+
+let tapSelectedSquare = null;
+let tapLegalTargets = new Set();
+const boardElLocal = document.getElementById('board');
+function isMobileTapMode(){
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+function clearTapHints(){
+  tapSelectedSquare = null;
+  tapLegalTargets.clear();
+  const all = document.querySelectorAll('#board .square-55d63');
+  all.forEach(sq => sq.classList.remove('tap-selected','tap-legal','tap-capture'));
+}
+
+function showTapHints(fromSquare){
+  clearTapHints();
+  tapSelectedSquare = fromSquare;
+
+  const fromEl = document.querySelector('#board .square-55d63[data-square="' + fromSquare + '"]');
+  if (fromEl) fromEl.classList.add('tap-selected');
+
+  const legal = game.moves({ verbose: true });
+  legal
+    .filter(m => m.from === fromSquare)
+    .forEach(m => {
+      tapLegalTargets.add(m.to);
+      const toEl = document.querySelector('#board .square-55d63[data-square="' + m.to + '"]');
+      if (!toEl) return;
+      toEl.classList.add('tap-legal');
+      if (m.flags && m.flags.includes('c')) {
+        toEl.classList.add('tap-capture');
       }
+    });
+}
+
+function tryTapMove(toSquare){
+  if (!tapSelectedSquare) return false;
+  if (!tapLegalTargets.has(toSquare)) return false;
+
+  const move = game.move({
+    from: tapSelectedSquare,
+    to: toSquare,
+    promotion: 'q'
+  });
+
+  if (!move) return false;
+
+  // обработка "manual" вопроса (важно: повторяем вашу логику из onDrop)
+  if (manualQuestionActive && activeManualMoment) {
+    const san = move.san;
+    const correctSan = activeManualMoment.correctMoveSan;
+
+    if (san === correctSan) {
+      const delta = getMomentPoints(activeManualMoment);
+      score += delta;
+      updateScoreDisplay(delta);
+
+      if (delta === 3) {
+        playDiamondSound();
+        triggerHitImpact();
+        diamondMoves.add(activeManualMoment.index);
+      } else {
+        playRightSound();
+      }
+
+      statusEl.style.color = 'green';
+      statusEl.textContent = 'Верно!';
+
+      const expl =
+        activeManualMoment.explanations &&
+        activeManualMoment.explanations[correctSan]
+          ? activeManualMoment.explanations[correctSan]
+          : '';
+
+      if (explanationEl) {
+        explanationEl.textContent = expl;
+        explanationEl.style.color = '#333';
+      } wizardCommentForAnswer(activeManualMoment, san, true);
+
+      answeredMoments.add(activeManualMoment.index);
+      updateProgress();
+
+      manualQuestionActive = false;
+      activeManualMoment = null;
+      questionActive = false;
+
+      prevMoveBtn.disabled = false;
+      nextMoveBtn.disabled = false;
+
+      syncCurrentIndexWithGame();
+      board.position(game.fen());
+      updateBoardAndNotation();
+
+      clearTapHints();
+      return true;
+    } else {
+      // откатываем ход
+      game.undo();
+
+      loseLife();
+
+      statusEl.style.color = 'red';
+      statusEl.textContent = 'Неправильно, попробуй найти более сильное продолжение.';
+
+      const delta = -1;
+      score += delta;
+      updateScoreDisplay(delta);
+
+      playWrongSound();
+
+      const explWrong =
+        activeManualMoment.explanations &&
+        activeManualMoment.explanations[san]
+          ? activeManualMoment.explanations[san]
+          : '';
+
+      if (explanationEl) {
+        explanationEl.textContent = explWrong;
+        explanationEl.style.color = '#333';
+      }
+
+      wizardCommentForAnswer(activeManualMoment, san, false);
+
+      // остаёмся в режиме подсказок
+      board.position(game.fen());
+      showTapHints(tapSelectedSquare);
+      return false;
+    }
+  }
+
+  // обычный режим
+  wizardSay(`Выбран ход: ${move.san}`);
+  syncCurrentIndexWithGame();
+  board.position(game.fen());
+  updateBoardAndNotation();
+
+  clearTapHints();
+  return true;
+}
+
+/* Делегирование кликов по клеткам */
+if (boardElLocal) {
+  boardElLocal.addEventListener('click', (e) => {
+    if (!isMobileTapMode()) return;
+    if (questionActive && !manualQuestionActive) return;
+
+    const sqEl = e.target.closest('#board .square-55d63');
+    if (!sqEl) return;
+
+    const square = sqEl.getAttribute('data-square');
+    if (!square) return;
+
+    // 1) если есть выбранная фигура — пробуем сделать ход
+    if (tapSelectedSquare) {
+      if (square === tapSelectedSquare) {
+        clearTapHints();
+        return;
+      }
+      if (tryTapMove(square)) return;
+      // если не получилось — продолжаем (возможно, хотим выбрать другую фигуру)
+    }
+
+    // 2) выбираем фигуру, если она наша и сейчас её ход
+    const piece = game.get(square);
+    if (!piece) {
+      clearTapHints();
+      return;
+    }
+
+    const myColor = game.turn(); // 'w' or 'b'
+    if (piece.color !== myColor) {
+      clearTapHints();
+      return;
+    }
+    showTapHints(square);
+  }, { passive: true });
+}
+
+/* при перелистывании ходов/перезагрузке/ресайзе — чистим точки */
+window.addEventListener('resize', () => {
+  if (!isMobileTapMode()) clearTapHints();
+});
+
+
+
+
+
+
+
+     function onDragStart(source, piece, position, orientation) {
+  if (window.matchMedia('(max-width: 900px)').matches) return false; // mobile: only tap-to-move
+  if (game.game_over()) return false;
+  if (questionActive && !manualQuestionActive) return false;
+  if (game.turn() === 'w' && piece[0] === 'b') return false;
+  if (game.turn() === 'b' && piece[0] === 'w') return false;
+}
 
       function onDrop(source, target) {
         if (questionActive && !manualQuestionActive) return 'snapback';
@@ -4556,6 +4817,7 @@ window.addEventListener('resize', () => {
 
       function updateBoardAndNotation() {
         applyMovesUpTo(currentMoveIndex);
+	clearTapHints();
         if (moveCounterEl) {
           moveCounterEl.textContent = `Ход: ${currentMoveIndex}/${movesList.length}`;
         }
@@ -5040,7 +5302,7 @@ if (nextIndex < gamesData.length) {
   const nextQuestBtn = document.createElement('button');
   nextQuestBtn.textContent = 'Следующий квест';
   nextQuestBtn.className = 'next-quest-btn';
-
+  nextQuestBtn.classList.add('is-shimmering');
   nextQuestBtn.addEventListener('click', () => {
     goToNextQuest();
   });
