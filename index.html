@@ -1959,13 +1959,37 @@ body::before{
 
 
 /* ===== WELCOME AS MODAL ===== */
+/* FIX: welcome-screen всегда на весь экран (и blur тоже) */
 #welcome-screen{
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+
+  max-width: none;     /* важно: снимаем старое ограничение */
+  margin: 0;           /* важно: убираем auto-центрирование */
+  padding: 0;
+
   z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
+}
+
+#welcome-screen::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  / светлая вуаль + лёгкая дымка /
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.70), rgba(255,255,255,0.35) 55%, rgba(255,255,255,0.22) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.18));
+backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
+-webkit-backdrop-filter: blur(28px) saturate(140%) brightness(1.08);
+
 }
 
 /* сама карточка */
@@ -2036,6 +2060,7 @@ body::before{
   color: #0f172a;
 }
 
+/* Яркая синяя пульсация (привлекает внимание), с "аурой" вокруг */
 #welcome-screen button{
   display: block;
   margin: 18px auto 0;
@@ -2055,20 +2080,114 @@ body::before{
   text-shadow: none;
 
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  animation: none; /* убираем "неоновую магию", чтобы совпадало со стилем карточки */
+  position: relative;
+  isolation: isolate;
+
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.15s ease, border-color 0.2s ease;
+  animation: ctaPulse 1.8s ease-in-out infinite;
+}
+
+/* Внешняя аура */
+#welcome-screen button::before{
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 20px;
+  background: radial-gradient(closest-side,
+    rgba(59, 130, 246, 0.55),
+    rgba(59, 130, 246, 0.00) 70%
+  );
+  filter: blur(12px);
+  opacity: 0.55;
+  z-index: -1;
+  pointer-events: none;
+  animation: auraPulse 1.8s ease-in-out infinite;
+}
+
+/* Лёгкая "искринка" по краю */
+#welcome-screen button::after{
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 15px;
+  background: linear-gradient(135deg,
+    rgba(96, 165, 250, 0.00) 0%,
+    rgba(96, 165, 250, 0.55) 45%,
+    rgba(96, 165, 250, 0.00) 70%
+  );
+  opacity: 0.0;
+  filter: blur(0.3px);
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+@keyframes ctaPulse{
+  0%, 100%{
+    border-color: rgba(148, 163, 184, 0.55);
+    box-shadow:
+      0 8px 22px rgba(15, 23, 42, 0.14),
+      0 0 0 1px rgba(59, 130, 246, 0.12),
+      0 0 18px rgba(59, 130, 246, 0.22);
+    transform: translateY(0) scale(1);
+  }
+  50%{
+    border-color: rgba(59, 130, 246, 0.70);
+    box-shadow:
+      0 12px 30px rgba(15, 23, 42, 0.18),
+      0 0 0 2px rgba(59, 130, 246, 0.26),
+      0 0 34px rgba(59, 130, 246, 0.55);
+    transform: translateY(-1px) scale(1.02);
+  }
+}
+
+@keyframes auraPulse{
+  0%, 100%{
+    opacity: 0.45;
+    filter: blur(12px);
+    transform: scale(0.98);
+  }
+  50%{
+    opacity: 0.95;
+    filter: blur(16px);
+    transform: scale(1.03);
+  }
 }
 
 #welcome-screen button:hover{
-  transform: translateY(-1px);
   background: rgba(255,255,255,0.98);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  transform: translateY(-1px) scale(1.02);
+  border-color: rgba(59, 130, 246, 0.85);
+  box-shadow:
+    0 14px 34px rgba(15, 23, 42, 0.20),
+    0 0 0 2px rgba(59, 130, 246, 0.30),
+    0 0 42px rgba(59, 130, 246, 0.65);
+}
+
+#welcome-screen button:hover::before{
+  opacity: 1;
+}
+
+#welcome-screen button:hover::after{
+  opacity: 0.75;
 }
 
 #welcome-screen button:active{
-  transform: translateY(0px);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  transform: translateY(0px) scale(0.99);
+  box-shadow:
+    0 6px 16px rgba(15, 23, 42, 0.12),
+    0 0 0 2px rgba(59, 130, 246, 0.22),
+    0 0 28px rgba(59, 130, 246, 0.45);
 }
+
+/* На всякий случай: уважение к "уменьшить анимации" */
+@media (prefers-reduced-motion: reduce){
+  #welcome-screen button,
+  #welcome-screen button::before{
+    animation: none;
+  }
+}
+	
 
 
   </style>
@@ -2145,10 +2264,11 @@ body::before{
         В ключевые моменты партии тебе будут заданы вопросы на позиционное понимание и на тактику.
         В конце каждой партии мы посчитаем итоговое количество очков. В путь!
       </div>
-    </div>
-  </div>
-    <button id="start-quest-btn">Начать квест</button>
+
+    <button id="start-quest-btn" class="start-quest-btn">Начать квест</button>
    </div>
+  </div>
+    </div>
   </div>
 
   <div id="layout" style="display:grid;">
