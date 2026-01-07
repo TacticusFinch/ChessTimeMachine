@@ -40,14 +40,17 @@ body{
       border-right: 1px solid #e5e7eb;
       padding-right: 14px;
       box-sizing: border-box;
-      padding-top: 4px;
+      padding-top: 10px;
     }
 
     #toc h3 {
-      margin: 0 0 10px 0;
-      font-size: 15px;
-      font-weight: 600;
-      color: #111827;
+       position: sticky;
+  
+  margin: 0;
+  background: linear-gradient(180deg, rgba(247,247,251,0.95), rgba(247,247,251,0.65));
+  backdrop-filter: blur(10px);
+  padding: 10px 0 8px;
+  z-index: 1;
     }
 
     /* === ГРУППЫ В ОГЛАВЛЕНИИ === */
@@ -61,10 +64,6 @@ body{
 
 .toc-group.has-active{
   border-color: rgba(10, 132, 255, 0.30);
-  box-shadow:
-    0 0 0 1px rgba(10, 132, 255, 0.18),
-    0 18px 40px rgba(10, 132, 255, 0.14),
-    0 14px 34px rgba(0,0,0,0.10);
 }
 
 .toc-group.has-active .toc-group-title{
@@ -358,10 +357,13 @@ body{
 
     #board-wrapper {
       position: relative;
-      margin: 10px 0 6px;
+      margin: 0 0 6px; /* верх убрали */
       transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
-
+    #board-column,
+#question-block{
+  padding-top: 10px; /* одинаковый старт по вертикали */
+}
     #board-wrapper.hit-impact {
       animation: hitImpact 0.4s ease-out;
     }
@@ -395,6 +397,60 @@ body{
           0 0 18px rgba(90, 150, 255, 0.7);
       }
     }
+
+/* === DIAMOND IMPACT: “молния / level up” для 3 очков === */
+#board-wrapper.hit-impact-diamond{
+  animation: diamondImpact 0.65s ease-out;
+}
+
+@keyframes diamondImpact{
+  0%{
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.10),
+      0 18px 50px rgba(0,0,0,0.35);
+  }
+  12%{
+    transform: scale(1.035);
+    filter: brightness(1.5) saturate(1.25);
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,0.35),
+      0 0 24px rgba(255,255,255,0.95),
+      0 0 58px rgba(56,189,248,0.55),
+      0 22px 70px rgba(0,0,0,0.40);
+  }
+  30%{
+    transform: scale(1.01);
+    filter: brightness(1.2) saturate(1.15);
+    box-shadow:
+      0 0 0 2px rgba(255,255,255,0.22),
+      0 0 18px rgba(255,255,255,0.65),
+      0 0 44px rgba(124,58,237,0.35),
+      0 18px 55px rgba(0,0,0,0.38);
+  }
+  55%{
+    transform: scale(1.02);
+    filter: brightness(1.15) saturate(1.05);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.18),
+      0 0 14px rgba(255,255,255,0.40),
+      0 0 34px rgba(56,189,248,0.28),
+      0 18px 50px rgba(0,0,0,0.35);
+  }
+  100%{
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.14),
+      0 18px 50px rgba(0,0,0,0.35),
+      0 0 34px rgba(124,58,237,0.18),
+      0 0 26px rgba(14,165,233,0.14);
+  }
+}
+
+
+
 
     #board-arrow-layer {
       position: absolute;
@@ -974,71 +1030,7 @@ body{
       text-align: left;
     }
 
-    #welcome-screen button {
-      display: block;
-      margin: 40px auto 0;
-      padding: 14px 32px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #e8f3ff;
-      background: linear-gradient(135deg, #4b6fff, #7f5cff, #4bffff);
-      background-size: 200% 200%;
-      border: none;
-      border-radius: 999px;
-      box-shadow:
-        0 0 18px rgba(94, 180, 255, 0.9),
-        0 0 35px rgba(127, 92, 255, 0.7);
-      text-shadow: 0 0 8px rgba(0, 0, 40, 0.9);
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        filter 0.2s ease;
-      animation:
-        questGlow 1.8s ease-in-out infinite alternate,
-        magicGradient 4s ease-in-out infinite;
-    }
-
-    @keyframes questGlow {
-      0% {
-        transform: scale(1);
-        box-shadow:
-          0 0 14px rgba(120, 180, 255, 0.8),
-          0 0 32px rgba(100, 140, 255, 0.6);
-        filter: brightness(1);
-      }
-      100% {
-        transform: scale(1.06);
-        box-shadow:
-          0 0 24px rgba(150, 210, 255, 1),
-          0 0 48px rgba(130, 110, 255, 1);
-        filter: brightness(1.25);
-      }
-    }
-
-    @keyframes magicGradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    #welcome-screen button:hover {
-      transform: scale(1.08);
-      box-shadow:
-        0 0 26px rgba(170, 225, 255, 1),
-        0 0 55px rgba(150, 130, 255, 1);
-      filter: brightness(1.35);
-    }
-
-    #welcome-screen button:active {
-      transform: scale(0.97);
-      box-shadow:
-        0 0 10px rgba(110, 170, 235, 0.8),
-        0 0 24px rgba(90, 110, 210, 0.7);
-      filter: brightness(0.95);
-    }
+   
 
     #victory-effect {
       position: fixed;
@@ -1576,6 +1568,7 @@ body {
   #question-title {
     font-size: 16px;
     margin: 8px 0 6px;
+    margin-top: 0;
   }
  #question-text {
     font-size: 12px;
@@ -1803,7 +1796,7 @@ body::before{
 }
 
 
-next-quest-btn.is-shimmering{
+.next-quest-btn.is-shimmering{
   position: relative;
   border-color: rgba(47, 128, 255, 0.40);
   box-shadow:
@@ -1858,7 +1851,8 @@ next-quest-btn.is-shimmering{
   pointer-events: none;
 }
 
-/ если это взятие — точка "кольцом" (необязательно, но удобно) /
+/* если это взятие — точка "кольцом" (необязательно, но удобно) */
+
 #board .square-55d63.tap-capture::after{
   width: 14px;
   height: 14px;
@@ -1870,14 +1864,217 @@ next-quest-btn.is-shimmering{
 }
 
 
+/* Минималистичная кнопка "Режим выживания":
+   при hover текст исчезает, появляется пульсирующая кардиограмма (ECG) */
+
+#survival-btn{
+  --accent: #9ca3af;
+  --border: rgba(17, 24, 39, 0.14);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  padding: 10px 14px;
+  border-radius: 12px;
+
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #111827;
+
+  font: 700 13px/1 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  letter-spacing: .2px;
+
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+#survival-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(156, 163, 175, 0.55);
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
+}
+
+/* 1) На hover "прячем" текст (без изменения размеров кнопки) */
+#survival-btn:hover,
+#survival-btn:focus-visible{
+  color: transparent;
+}
+
+/* 2) Кардиограмма поверх текста */
+#survival-btn::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  opacity: 0;
+  transform: scaleY(0.9);
+
+  /* SVG-линия кардиограммы (data URI) */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20160%2040'%3E%3Cpath%20d='M0%2020%20L18%2020%20L26%2012%20L34%2028%20L44%2020%20L60%2020%20L68%205%20L78%2035%20L90%2020%20L110%2020%20L118%2014%20L126%2026%20L136%2020%20L160%2020'%20fill='none'%20stroke='%239ca3af'%20stroke-width='3'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 160px 40px;
+  background-position: 0 50%;
+
+  /* мягкая подсветка */
+  filter: drop-shadow(0 6px 10px rgba(156, 163, 175, 0.22));
+
+  transition: opacity 140ms ease;
+}
+
+#survival-btn:hover::after,
+#survival-btn:focus-visible::after{
+  opacity: 1;
+  animation: ecg-move 1500ms linear infinite, ecg-pulse 1500ms ease-in-out infinite;
+}
+
+/* Движение кардиограммы влево (как монитор) */
+@keyframes ecg-move{
+  from { background-position: 0 50%; }
+  to   { background-position: -160px 50%; }
+}
+
+/* Лёгкая "пульсация" */
+@keyframes ecg-pulse{
+  0%, 100% { transform: scaleY(0.88); opacity: 0.95; }
+  35%      { transform: scaleY(1.05); opacity: 1; }
+  70%      { transform: scaleY(0.92); opacity: 0.98; }
+}
+
+/* Фокус для клавиатуры */
+#survival-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+/* Уважение к prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  #survival-btn:hover::after,
+  #survival-btn:focus-visible::after{
+    animation: none;
+  }
+}
 
 
+
+/* ===== WELCOME AS MODAL ===== */
+#welcome-screen{
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* сама карточка */
+#welcome-screen .welcome-card{
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  padding: 18px 18px 22px;
+}
+
+/* можно чуть подправить текст внутри */
+#welcome-screen h2{
+  margin-top: 0;
+}
+
+/* Welcome wizard bubble */
+.welcome-wizard{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.welcome-wizard img{
+  width: 84px;
+  height: auto;
+  filter: drop-shadow(0 8px 14px rgba(15, 23, 42, 0.28));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.welcome-bubble{
+  position: relative;
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+}
+
+.welcome-bubble::before{
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 18px;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border-left: 1px solid rgba(148, 163, 184, 0.55);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.55);
+  transform: rotate(45deg);
+}
+
+.welcome-bubble-title{
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.welcome-bubble-text{
+  font-size: 14px;
+  line-height: 1.45;
+  color: #0f172a;
+}
+
+#welcome-screen button{
+  display: block;
+  margin: 18px auto 0;
+  padding: 12px 18px;
+
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: none;
+
+  color: #0f172a;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  border-radius: 14px;
+
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+  text-shadow: none;
+
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  animation: none; /* убираем "неоновую магию", чтобы совпадало со стилем карточки */
+}
+
+#welcome-screen button:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.98);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+#welcome-screen button:active{
+  transform: translateY(0px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
 
 
   </style>
 </head>
 <body>
-  <h1>Машина времени</h1>
+  <h1>Шахматные квесты</h1>
 <button id="toc-toggle-btn" class="toc-toggle-btn" aria-controls="toc" aria-expanded="false">
   Выбрать квест
 </button>
@@ -1938,18 +2135,24 @@ next-quest-btn.is-shimmering{
   </audio>
 
   <div id="welcome-screen">
-    <img src="wizard/wizard.png" alt="Мудрый волшебник"
-         style="display:block; margin:0 auto 10px; max-width:350px;">
-    <h2>Добро пожаловать, мой друг!</h2>
-    <p>
-      В этом интерактиве представлены разборы легендарных шахматных партий в формате квеста.
-      В ключевые моменты партии тебе будут заданы вопросы на позиционное понимание и на тактику.
-      В конце каждой партии мы посчитаем итоговое количество очков. В путь!
-    </p>
+<div class="welcome-card">
+  <div class="welcome-wizard">
+    <img src="wizard.png" alt="Маленький волшебник" />
+    <div class="welcome-bubble">
+      <div class="welcome-bubble-title">Добро пожаловать, мой друг!</div>
+      <div class="welcome-bubble-text">
+        В этом интерактиве представлены разборы легендарных шахматных партий в формате квеста.
+        В ключевые моменты партии тебе будут заданы вопросы на позиционное понимание и на тактику.
+        В конце каждой партии мы посчитаем итоговое количество очков. В путь!
+      </div>
+    </div>
+  </div>
     <button id="start-quest-btn">Начать квест</button>
+   </div>
   </div>
 
-  <div id="layout" style="display:none;">
+  <div id="layout" style="display:grid;">
+
     <div id="toc">
       <h3>Оглавление партий</h3>
 
@@ -2301,7 +2504,6 @@ next-quest-btn.is-shimmering{
         </div>
 	
         <div id="notation-block">
-          <h3>Ходы и комментарии</h3>
           <div id="notation-content"></div>
         </div>
       </div>
@@ -4074,6 +4276,15 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
         boardWrapperEl.classList.add('hit-impact');
       }
 
+function triggerDiamondImpact() {
+  if (!boardWrapperEl) return;
+  boardWrapperEl.classList.remove('hit-impact-diamond');
+  void boardWrapperEl.offsetWidth;
+  boardWrapperEl.classList.add('hit-impact-diamond');
+}
+
+
+
       function clearHoverHighlights() {
         const squares = document.querySelectorAll('#board .square-55d63');
         squares.forEach(sq => {
@@ -4167,7 +4378,7 @@ function tryTapMove(toSquare){
 
       if (delta === 3) {
         playDiamondSound();
-        triggerHitImpact();
+        triggerDiamondImpact();;
         diamondMoves.add(activeManualMoment.index);
       } else {
         playRightSound();
@@ -4326,7 +4537,7 @@ window.addEventListener('resize', () => {
 
             if (delta === 3) {
               playDiamondSound();
-              triggerHitImpact();
+              triggerDiamondImpact();
               diamondMoves.add(activeManualMoment.index);
             } else {
               playRightSound();
@@ -4839,9 +5050,9 @@ window.addEventListener('resize', () => {
           if (isCurrent) {
             html += '<span class="current-move">' + displaySan + '</span> ';
           } else {
-            html += displaySan + ' ';
+            html += displaySan + ' '; 
           }
-          if (i % 10 === 9) html += '\n';
+
         }
         notationContentEl.innerHTML = html;
         const currentSpan = notationContentEl.querySelector('.current-move');
@@ -4953,16 +5164,26 @@ function goToNextQuest() {
         wizardSay('Выбери партию и листай ходы. А в ключевые моменты я буду подсказывать смысл ходов!');
       }
 
-      function updateTocHighlight() {
-        tocButtons.forEach((btn) => {
-          const idx = parseInt(btn.dataset.gameIndex, 10);
-          if (!Number.isNaN(idx) && idx === currentGameIndex) {
-            btn.classList.add('active');
-          } else {
-            btn.classList.remove('active');
-          }
-        });
-      }
+     function updateTocHighlight() {
+  tocButtons.forEach((btn) => {
+    const idx = parseInt(btn.dataset.gameIndex, 10);
+    if (!Number.isNaN(idx) && idx === currentGameIndex) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Подсветка группы, где находится активный пункт
+  const groups = document.querySelectorAll('#toc .toc-group');
+  groups.forEach(g => g.classList.remove('has-active'));
+  const active = document.querySelector('#toc .toc-item.active');
+  if (active) {
+    const parent = active.closest('.toc-group');
+    if (parent) parent.classList.add('has-active');
+  }
+}
+
 
       prevMoveBtn.addEventListener('click', () => {
         if (questionActive) return;
@@ -5456,7 +5677,7 @@ if (nextIndex < gamesData.length) {
 
           if (delta === 3) {
             playDiamondSound();
-            triggerHitImpact();
+            triggerDiamondImpact();
             diamondMoves.add(moment.index);
           } else {
             playRightSound();
@@ -5708,30 +5929,33 @@ if (nextIndex < gamesData.length) {
       const layout = document.getElementById('layout');
       const startBtn = document.getElementById('start-quest-btn');
       
-      startBtn.addEventListener('click', () => {
-        playFullVictorySound();
+startBtn.addEventListener('click', () => {
+  playFullVictorySound();
 
-        if (gameoverRestartBtnEl) {
-          gameoverRestartBtnEl.addEventListener('click', () => {
-            hideGameoverOverlay();
-            stopGameoverSound();
-            loadGame(currentGameIndex);
-          });
-        }
-        welcomeScreen.style.display = 'none';
-        layout.style.display = 'flex';
-        setTimeout(() => autoFitBoard(), 0);
-        board.orientation('white');
+  if (gameoverRestartBtnEl) {
+    gameoverRestartBtnEl.addEventListener('click', () => {
+      hideGameoverOverlay();
+      stopGameoverSound();
+      loadGame(currentGameIndex);
+    });
+  }
 
-        if (eraProgressEl) {
-          eraProgressEl.style.display = 'block';
-        }
+  welcomeScreen.style.display = 'none';
+  layout.style.display = 'grid';
 
-        setSurvivalUIVisible(survivalMode);
-        renderLives();
-	
-        loadGame(0);
-      });
+  setTimeout(() => autoFitBoard(), 0);
+  board.orientation('white');
+
+  if (eraProgressEl) {
+    eraProgressEl.style.display = 'block';
+  }
+
+  setSurvivalUIVisible(survivalMode);
+  renderLives();
+
+  loadGame(0);
+});
+
 
       currentMoveIndex = 0;
       game.reset();
@@ -5742,12 +5966,13 @@ if (nextIndex < gamesData.length) {
       renderLives();
 
       setEraProgressForGame(0);
-      window.addEventListener('resize', () => {
-      autoFitBoard();
-      });
-      window.addEventListener('orientationchange', () => {
-      setTimeout(() => autoFitBoard(), 150);
-      });
+
+loadGame(0);
+setTimeout(() => autoFitBoard(), 0);
+
+window.addEventListener('resize', () => {
+  autoFitBoard();
+});
 
 
 
