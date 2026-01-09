@@ -19,6 +19,84 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Sand + plants (eye-friendly) theme for chessboard.js v1
+   Мягкий контраст, хорошая читаемость фигур, приятное тёплое свечение.
+   Вставь ПОСЛЕ chessboard.css */
+
+:root{
+  /* Клетки: “песок” + “шалфей/листья” (мягко, но различимо) */
+  --sq-light: #f3ecdf;  /* светлый песок */
+  --sq-dark:  #a9c1a8;  /* приглушённый шалфей */
+
+  --grid-line: rgba(35, 28, 18, 0.07);
+
+  /* Свечение: тёплое солнечное + лёгкий зелёный оттенок */
+  --glow-sun:  rgba(255, 205, 135, 0.18);
+  --glow-leaf: rgba(140, 210, 160, 0.12);
+}
+
+/* (Опционально) подложка вокруг доски, если есть контейнер #board */
+#board{
+  padding: 14px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 100% at 25% 10%, rgba(255,255,255,0.75), rgba(255,255,255,0.35) 60%),
+    linear-gradient(180deg, #f8f4ec 0%, #eee6d8 100%);
+}
+
+/* Контейнер доски: аккуратная рамка + мягкое “живое” свечение */
+.board-b72b1{
+  border-radius: 14px;
+  overflow: hidden;
+
+  border: 1px solid rgba(35, 28, 18, 0.16);
+  background: #0b1220; /* даёт глубину по краям */
+
+  box-shadow:
+    0 14px 38px rgba(17, 24, 39, 0.16),
+    0 0 18px var(--glow-sun),
+    0 0 40px var(--glow-leaf),
+    inset 0 0 0 1px rgba(255,255,255,0.22);
+}
+
+/* Клетки */
+.white-1e1d7{
+  background: var(--sq-light) !important;
+  /* лёгкая фактура “песка”, очень деликатно */
+  background-image:
+    radial-gradient(18px 14px at 28% 32%, rgba(255,255,255,0.25), rgba(255,255,255,0) 65%),
+    radial-gradient(16px 12px at 70% 74%, rgba(120, 90, 40, 0.06), rgba(120,90,40,0) 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.04));
+  background-blend-mode: screen, multiply, overlay;
+}
+
+.black-3c85d{
+  background: var(--sq-dark) !important;
+  /* лёгкий “листовой” оттенок + мягкий объём */
+  background-image:
+    radial-gradient(18px 14px at 32% 72%, rgba(255,255,255,0.16), rgba(255,255,255,0) 65%),
+    radial-gradient(16px 12px at 76% 28%, rgba(35, 60, 35, 0.08), rgba(35,60,35,0) 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(0,0,0,0.08));
+  background-blend-mode: screen, multiply, overlay;
+}
+
+/* Тонкие разделители — помогают видеть сетку, не “шумят” */
+.white-1e1d7, .black-3c85d{
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* Ненавязчивая реакция на наведение */
+.white-1e1d7:hover, .black-3c85d:hover{
+  filter: brightness(1.03) saturate(1.02);
+}
+
+/* Опционально: мягкая тень фигур для читаемости (актуально для PNG) */
+.board-b72b1 img{
+  filter: drop-shadow(0 2px 2px rgba(20, 14, 8, 0.18));
+}
+
+
+
 body{
   text-align: center; /* можно оставить, но лучше убрать и центрировать контейнер */
 }
@@ -150,10 +228,6 @@ body{
       background: #e5edff;
       border-color: #93c5fd;
       color: #1d4ed8;
-    }
-
-    .toc-group-title:hover {
-      background: rgba(0, 0, 255, 0.1);
     }
 
     .toc-group ol {
@@ -2190,6 +2264,356 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
 	
 
 
+
+/* === Apple-like minimal TOC (override) === */
+
+/* Токены (можно подстроить под твой :root) */
+:root{
+  --toc-bg: rgba(248, 248, 250, 0.92);
+  --toc-border: rgba(0, 0, 0, 0.10);
+  --toc-divider: rgba(0, 0, 0, 0.08);
+  --toc-text: rgba(17, 24, 39, 0.92);
+  --toc-muted: rgba(17, 24, 39, 0.58);
+
+  --toc-accent: #0A84FF;              /* системный “iOS blue” */
+  --toc-hover: rgba(10, 132, 255, 0.08);
+  --toc-active-bg: rgba(10, 132, 255, 0.12);
+
+  --toc-radius: 12px;
+}
+
+/* Контейнер TOC: меньше “карточности”, больше “sidebar” */
+#toc{
+  width: 320px;
+  padding: 12px 12px;
+  box-sizing: border-box;
+
+  background: var(--toc-bg);
+  border-right: 1px solid var(--toc-border);
+
+  /* Apple обычно без тяжёлых теней в сайдбаре */
+  box-shadow: none;
+
+  /* Системный шрифт */
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+  color: var(--toc-text);
+}
+
+/* Sticky заголовок: без градиента и сильного blur */
+#toc h3{
+  position: sticky;
+  top: 0;
+  margin: 0 0 10px;
+  padding: 10px 2px 10px;
+
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+
+  background: rgba(248, 248, 250, 0.88);
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  border-bottom: 1px solid var(--toc-divider);
+  z-index: 1;
+}
+
+/* Группа: убрать glass/box-shadow, оставить аккуратный блок */
+.toc-group{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-radius: var(--toc-radius);
+  overflow: hidden; /* чтобы hover/active выглядели “чисто” */
+}
+
+/* Заголовок группы: спокойный, без ярких заливок */
+.toc-group-title{
+  padding: 10px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--toc-muted);
+  background: transparent;
+}
+
+/* Бейдж: лучше сделать нейтральным или убрать совсем */
+.toc-group-title-badge{
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: none;
+}
+
+/* Иконка раскрытия: без “пилюли” и рамки */
+.toc-group-toggle-icon{
+  width: 18px;
+  height: 18px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: rgba(0,0,0,0.45);
+}
+
+/* Список внутри группы: тонкий разделитель */
+.toc-group ol{
+  margin: 0;
+  padding: 6px 4px 10px 4px;
+  list-style: none;
+  border-top: 1px solid var(--toc-divider);
+}
+
+/* Пункты: без теней и “подпрыгивания” */
+#toc .toc-item{
+  border-radius: 10px;
+  padding: 8px 10px;
+  gap: 10px;
+
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+
+  color: var(--toc-text);
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+/* Номер: вместо яркого круга — спокойный “secondary” */
+#toc .toc-item-number{
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.55);
+  font-weight: 600;
+}
+
+/* Текст: чуть спокойнее, без лишних акцентов */
+#toc .toc-item-main{
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+#toc .toc-item-sub{
+  font-size: 12px;
+  color: var(--toc-muted);
+}
+
+/* Hover: мягкая заливка, без glow/теней */
+#toc .toc-item:hover{
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: none;
+  transform: none;
+}
+
+#toc .toc-item:hover .toc-item-sub{
+  color: var(--toc-muted);
+}
+
+#toc .toc-item:hover .toc-item-number{
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.65);
+}
+
+/* Active: “Apple-паттерн” — тонкий индикатор + лёгкая заливка */
+#toc .toc-item.active{
+  background: var(--toc-active-bg);
+  position: relative;
+}
+
+#toc .toc-item.active::before{
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--toc-accent);
+}
+
+#toc .toc-item.active .toc-item-number{
+  background: rgba(10,132,255,0.18);
+  color: rgba(10,132,255,1);
+}
+
+#toc .toc-item.active .toc-item-sub{
+  color: rgba(10,132,255,0.95);
+}
+
+/* Группа с активным элементом: лучше не подсвечивать всю группу */
+.toc-group.has-active{
+  border-color: transparent;
+}
+
+.toc-group.has-active .toc-group-title{
+  color: rgba(0,0,0,0.65);
+  background: transparent;
+}
+
+
+/* =========================
+   APPLE-LIKE QUESTIONS UI
+   (add at the VERY END of <style>)
+   ========================= */
+
+:root{
+  --qa-bg: rgba(248, 248, 250, 0.92);
+  --qa-border: rgba(0, 0, 0, 0.10);
+  --qa-divider: rgba(0, 0, 0, 0.08);
+  --qa-text: rgba(17, 24, 39, 0.92);
+  --qa-muted: rgba(17, 24, 39, 0.58);
+
+  /* subtle iOS-like selection */
+  --qa-active: rgba(0, 0, 0, 0.055);
+}
+
+#question-block{
+  width: 340px;
+  padding: 12px 12px;
+  box-sizing: border-box;
+
+  background: var(--qa-bg);
+  border: 1px solid var(--qa-border);
+  border-radius: 12px;
+  box-shadow: none;
+
+  color: var(--qa-text);
+}
+
+#intro-text h2,
+#question-title{
+  margin: 6px 0 8px;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0.1px;
+  color: var(--qa-text);
+}
+
+#question-text{
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--qa-muted);
+}
+
+/* Answers list */
+#answers{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Answer button — Apple-like row */
+#answers .answer-option{
+  position: relative;
+  width: 100%;
+
+  padding: 10px 12px 10px 42px;
+  border-radius: 12px;
+
+  background: transparent;
+  border: 1px solid var(--qa-divider);
+
+  color: var(--qa-text);
+  font-size: 13px;
+  line-height: 1.35;
+
+  box-shadow: none;
+  transform: none;
+
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+/* Letter badge: neutral, not bright blue */
+#answers .answer-option::before{
+  content: attr(data-letter);
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+
+  background: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.60);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+/* Hover: same calm light gray as in Apple sidebar */
+#answers .answer-option:hover:not(:disabled),
+#answers .answer-option:focus-visible:not(:disabled){
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.12);
+  outline: none;
+}
+
+/* Correct/incorrect — subtle, not кислотный */
+#answers .answer-option.correct{
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(34, 197, 94, 0.28);
+}
+
+#answers .answer-option.incorrect{
+  background: rgba(239, 68, 68, 0.10);
+  border-color: rgba(239, 68, 68, 0.28);
+}
+
+#status{
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--qa-text);
+}
+
+#explanation{
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--qa-muted);
+}
+
+
+/* =========================
+   TOC ACTIVE: remove blue indicator, make Apple-like selection
+   (add at the VERY END of <style>)
+   ========================= */
+
+#toc .toc-item.active::before{
+  display: none !important;
+  content: none !important;
+}
+
+/* Replace blue selection with subtle Apple gray */
+#toc .toc-item.active{
+  background: rgba(0,0,0,0.055) !important;
+}
+
+#toc .toc-item.active .toc-item-number{
+  background: rgba(0,0,0,0.08) !important;
+  color: rgba(0,0,0,0.70) !important;
+}
+
+#toc .toc-item.active .toc-item-sub{
+  color: rgba(17, 24, 39, 0.58) !important;
+}
+
+
+
+
+
+
+
+
+
   </style>
 </head>
 <body>
@@ -2629,9 +3053,7 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
       </div>
 
       <div id="question-block">
-        <div id="intro-text"></div>
-
-        
+        <div id="intro-text"></div>        
 
         <h2 id="question-title" style="display:none;"></h2>
         <p id="question-text" style="display:none;"></p>
