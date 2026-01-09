@@ -10,6 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+
+
   <style>
     html, body{
   background: var(--bg);
@@ -2607,6 +2610,122 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
 }
 
 
+/* === SYMMETRY FIX: equal gaps toc↔️board and board↔️questions === */
+:root{
+  --layout-gap: 18px; /* один источник правды */
+}
+
+/* внешний грид */
+#layout{
+  grid-template-columns: 320px 1fr; /* раз #toc у тебя уже стилизован под 320 */
+  gap: var(--layout-gap) !important;
+}
+
+/* #toc пусть занимает ширину колонки грида, а не свою "width" */
+#toc{
+  width: auto !important;
+}
+
+/* внутренняя правая колонка: не центрируем, а выстраиваем слева */
+#quest-container{
+  justify-content: flex-start !important;
+  gap: var(--layout-gap) !important;
+}
+
+
+/* Question text is narrated by wizard only */
+#question-text{
+  display: none !important;
+}
+
+
+/* === ANSWERS: white magic glow + subtle Apple accents === */
+:root{
+  --magic-white: rgba(255,255,255,0.92);
+  --magic-glow: rgba(255,255,255,0.65);
+  --apple-blue: rgba(10, 132, 255, 0.55);
+}
+
+#answers .answer-option{
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+}
+
+/* Белое "волшебное" свечение по рамке */
+#answers .answer-option:hover:not(:disabled),
+#answers .answer-option:focus-visible:not(:disabled){
+  background: rgba(255,255,255,0.72) !important;
+  border-color: rgba(255,255,255,0.95) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.70),
+    0 0 18px rgba(255,255,255,0.55),
+    0 10px 26px rgba(0,0,0,0.08),
+    0 0 0 3px rgba(10, 132, 255, 0.12); /* тонкий Apple-акцент */
+}
+
+/* Акцент на "буквенный бейдж" */
+#answers .answer-option:hover:not(:disabled)::before,
+#answers .answer-option:focus-visible:not(:disabled)::before{
+  background:rgba(10,132,255,0.18) !important;
+  color: rgba(10,132,255,0.95) !important;
+  box-shadow:
+    0 0 0 1px rgba(10,132,255,0.18),
+    0 0 14px rgba(255,255,255,0.40);
+}
+
+/* Чуть “магии” для правильного/неправильного, но по-Apple мягко */
+#answers .answer-option.correct{
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.22),
+    0 0 18px rgba(255,255,255,0.35);
+}
+
+#answers .answer-option.incorrect{
+  box-shadow:
+    0 0 0 1px rgba(239, 68, 68, 0.22),
+    0 0 18px rgba(255,255,255,0.25);
+}
+
+
+
+/* === QUEST TYPOGRAPHY (TOC + Questions) === */
+:root{
+  --quest-title-font: "Cinzel", "Spectral", serif;
+  --quest-text-font: "Spectral", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Оглавление */
+#toc, #toc *{
+  font-family: var(--quest-text-font) !important;
+}
+
+#toc h3,
+.toc-group-title-text{
+  font-family: var(--quest-title-font) !important;
+  letter-spacing: 0.4px;
+}
+
+/* Вопросы */
+#question-block, #question-block *{
+  font-family: var(--quest-text-font) !important;
+}
+
+#question-title,
+#intro-text h2{
+  font-family: var(--quest-title-font) !important;
+  letter-spacing: 0.35px;
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -2680,7 +2799,7 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
   <div id="welcome-screen">
 <div class="welcome-card">
   <div class="welcome-wizard">
-    <img src="wizard.png" alt="Маленький волшебник" />
+    <img src="wizard-zero.png" alt="Маленький волшебник" />
     <div class="welcome-bubble">
       <div class="welcome-bubble-title">Добро пожаловать, мой друг!</div>
       <div class="welcome-bubble-text">
@@ -3063,7 +3182,7 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
           <div id="toc-wizard-inner">
             <img
               id="toc-wizard-img"
-              src="wizard.png"
+              src="wizard-zero.png"
               alt="Маленький волшебник" />
             <div id="wizard-bubble" aria-live="polite" aria-atomic="true">
               <div id="wizard-bubble-text">Я буду комментировать выбранные ходы!</div>
@@ -6108,7 +6227,7 @@ if (nextIndex < gamesData.length) {
           introTextEl.style.display = 'none';
         }
         questionTitleEl.style.display = 'block';
-        questionTextEl.style.display = 'block';
+        questionTextEl.style.display = 'none';
 
         prevMoveBtn.disabled = true;
         nextMoveBtn.disabled = true;
@@ -6117,7 +6236,7 @@ if (nextIndex < gamesData.length) {
         const questionNumber = questionIndex !== -1 ? questionIndex + 1 : '';
         questionTitleEl.textContent = questionNumber ? `Вопрос № ${questionNumber}` : 'Вопрос';
 
-        questionTextEl.textContent = moment.question;
+        questionTextEl.textContent = '';
 
         wizardSay(moment.question);
 
@@ -6181,7 +6300,7 @@ if (nextIndex < gamesData.length) {
           introTextEl.style.display = 'none';
         }
         questionTitleEl.style.display = 'block';
-        questionTextEl.style.display = 'block';
+        questionTextEl.style.display = 'none';
 
         prevMoveBtn.disabled = true;
         nextMoveBtn.disabled = true;
@@ -6190,7 +6309,7 @@ if (nextIndex < gamesData.length) {
         const questionNumber = questionIndex !== -1 ? questionIndex + 1 : '';
         questionTitleEl.textContent = questionNumber ? `Вопрос № ${questionNumber}` : 'Вопрос';
 
-        questionTextEl.textContent = moment.question;
+        questionTextEl.textContent = '';
 
         statusEl.style.color = '#333';
         statusEl.textContent = 'Подумай и сделай ход на доске.';
