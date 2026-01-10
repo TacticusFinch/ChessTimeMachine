@@ -160,11 +160,12 @@ body{
 
   .toc-group:hover{
   box-shadow:
-    0 0 0 1px rgba(124,58,237,0.18),
-    0 20px 48px rgba(124,58,237,0.16),
+    0 0 0 1px rgba(47, 52, 49,0.18),
+    0 20px 48px rgba(47, 52, 49,0.16),
     0 14px 34px rgba(0,0,0,0.12);
   background: rgba(255,255,255,0.52);
 }
+
 
 
     .toc-group-title {
@@ -2461,7 +2462,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
    ========================= */
 
 :root{
-  --qa-bg: rgba(248, 248, 250, 0.92);
+  --qa-bg: rgba(255, 255, 255, 0.92);
   --qa-border: rgba(0, 0, 0, 0.10);
   --qa-divider: rgba(0, 0, 0, 0.08);
   --qa-text: rgba(17, 24, 39, 0.92);
@@ -2656,14 +2657,14 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 /* Белое "волшебное" свечение по рамке */
 #answers .answer-option:hover:not(:disabled),
 #answers .answer-option:focus-visible:not(:disabled){
-  background: rgba(255,255,255,0.72) !important;
-  border-color: rgba(255,255,255,0.95) !important;
+  background: rgba(251, 247, 240,0.8) !important;
+  border-color: rgba(251, 247, 240,0.95) !important;
 
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.70),
-    0 0 18px rgba(255,255,255,0.55),
+    0 0 18px rgba(196, 106, 74,0.15),
     0 10px 26px rgba(0,0,0,0.08),
-    0 0 0 3px rgba(10, 132, 255, 0.12); /* тонкий Apple-акцент */
+    0 0 0 3px rgba(90, 70, 56, 0.12); /* тонкий Apple-акцент */
 }
 
 /* Акцент на "буквенный бейдж" */
@@ -2720,6 +2721,54 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 }
 
 
+#toc .toc-group.has-active{
+  background: rgba(255,255,255,0.06) !important;
+  border-radius: 12px;
+}
+#toc .toc-group.has-active .toc-group-title{
+  color: rgba(47, 52, 49,0.78) !important;
+}
+#toc .toc-group.has-active{
+  outline: 2px solid rgba(47, 52, 49,0.18);
+}
+
+
+
+.wizard-media{
+  position: relative;
+  width: 72px; /* подгони под свой размер в #toc-wizard img */
+  flex: 0 0 auto;
+}
+
+.wizard-media > img,
+.wizard-media > video{
+  width: 72px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.25));
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* видео поверх картинки */
+#toc-wizard-yes{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* класс "играем анимацию" */
+.wizard-media.is-animating #toc-wizard-yes{
+  opacity: 1;
+}
+
+.wizard-media.is-animating #toc-wizard-img{
+  opacity: 0;
+}
 
 
 
@@ -3187,10 +3236,22 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 
         <div id="toc-wizard">
           <div id="toc-wizard-inner">
-            <img
-              id="toc-wizard-img"
-              src="wizard-zero.png"
-              alt="Маленький волшебник" />
+            <div class="wizard-media">
+  <img
+    id="toc-wizard-img"
+    src="wizard-zero.png"
+    alt="Маленький волшебник" />
+
+  <video
+    id="toc-wizard-yes"
+    src="yeswizard.mp4"
+    poster="wizard-zero.png"
+    preload="auto"
+    playsinline
+    muted
+  ></video>
+</div>
+
             <div id="wizard-bubble" aria-live="polite" aria-atomic="true">
               <div id="wizard-bubble-text">Я буду комментировать выбранные ходы!</div>
             </div>
@@ -4950,6 +5011,43 @@ function playSound(el, volume = 0.8) {
         }
       }
 
+function animateWizardYes(){
+  const media = document.querySelector('.wizard-media');
+  const img = document.getElementById('toc-wizard-img');
+  const vid = document.getElementById('toc-wizard-yes');
+  if (!media || !vid || !img) return;
+
+  // перезапуск анимации
+  media.classList.add('is-animating');
+
+  try {
+    vid.pause();
+    vid.currentTime = 0;
+  } catch (e) {}
+
+  const stop = () => {
+    media.classList.remove('is-animating');
+    vid.removeEventListener('ended', stop);
+    vid.removeEventListener('pause', stop);
+  };
+
+  vid.addEventListener('ended', stop, { once: true });
+
+  // На всякий случай: если видео не стартанёт, вернёмся к картинке
+  setTimeout(() => {
+    if (!vid.paused && !vid.ended) return;
+    stop();
+  }, 1200);
+
+  const p = vid.play();
+  if (p && typeof p.catch === 'function') {
+    p.catch(() => stop());
+  }
+}
+
+
+
+
       function triggerHitImpact() {
         if (!boardWrapperEl) return;
         boardWrapperEl.classList.remove('hit-impact');
@@ -5063,6 +5161,8 @@ function tryTapMove(toSquare){
         diamondMoves.add(activeManualMoment.index);
       } else {
         playRightSound();
+	animateWizardYes();
+
       }
 
       statusEl.style.color = 'green';
@@ -5222,6 +5322,7 @@ window.addEventListener('resize', () => {
               diamondMoves.add(activeManualMoment.index);
             } else {
               playRightSound();
+	      
             }
 
             statusEl.style.color = 'green';
@@ -6365,6 +6466,7 @@ if (nextIndex < gamesData.length) {
             diamondMoves.add(moment.index);
           } else {
             playRightSound();
+	    
           }
 
           statusEl.style.color = 'green';
