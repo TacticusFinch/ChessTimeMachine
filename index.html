@@ -2060,11 +2060,11 @@ body::before{
   inset: 0;
   z-index: -1;
 
-  / светлая вуаль + лёгкая дымка /
+
   background:
     radial-gradient(circle at 30% 20%, rgba(255,255,255,0.70), rgba(255,255,255,0.35) 55%, rgba(255,255,255,0.22) 100%),
     linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.18));
-backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
+backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 -webkit-backdrop-filter: blur(28px) saturate(140%) brightness(1.08);
 
 }
@@ -2795,6 +2795,13 @@ backdrop-filter: blur(100px) saturate(140%) brightness(1.08);
     src="diamond.mp3"
     preload="auto">
   </audio>
+
+<audio id="sound-clicktoc" src="sound/clicktoc.wav" preload="auto"></audio>
+<audio id="sound-questchoice" src="sound/questchoice.wav" preload="auto"></audio>
+<audio id="sound-answerhover" src="sound/answerhover.wav" preload="auto"></audio>
+
+
+
 
   <div id="welcome-screen">
 <div class="welcome-card">
@@ -4900,6 +4907,19 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
       });
 
       const boardWrapperEl = document.getElementById('board-wrapper');
+const clickTocSoundEl = document.getElementById('sound-clicktoc');
+const questChoiceSoundEl = document.getElementById('sound-questchoice');
+const answerHoverSoundEl = document.getElementById('sound-answerhover');
+
+function playSound(el, volume = 0.8) {
+  if (!el) return;
+  try {
+    el.currentTime = 0;
+    el.volume = volume;
+    el.play().catch(() => {});
+  } catch (e) {}
+}
+
 
       const wizardBubbleEl = document.getElementById('wizard-bubble');
       const wizardBubbleTextEl = document.getElementById('wizard-bubble-text');
@@ -5904,6 +5924,7 @@ function goToNextQuest() {
 if (Number.isNaN(idx)) return;
 
   /* 1) сворачиваем группу, где был выбран пункт */
+  playSound(questChoiceSoundEl, 0.75);
   const parentGroup = btn.closest('.toc-group');
   if (parentGroup) {
     parentGroup.classList.add('collapsed');
@@ -5926,6 +5947,7 @@ if (Number.isNaN(idx)) return;
         if (!title || !list) return;
 
         title.addEventListener('click', () => {
+	  playSound(clickTocSoundEl, 0.6);
           group.classList.toggle('collapsed');
         });
       });
@@ -6262,6 +6284,7 @@ if (nextIndex < gamesData.length) {
 
           btn.addEventListener('mouseenter', () => {
             if (!questionActive) return;
+	    playSound(answerHoverSoundEl, 0.35);
             if (squares) {
               highlightMoveOnBoard(squares.from, squares.to);
             }
