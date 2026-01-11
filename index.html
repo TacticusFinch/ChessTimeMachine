@@ -1410,7 +1410,7 @@ body{
         0 0 18px rgba(59, 130, 246, 0.9),
         0 0 40px rgba(59, 130, 246, 0.4),
         inset 0 0 10px rgba(15, 23, 42, 0.9);
-      transform: translateY(-1px).scale(1.03);
+      transform: translateY(-1px) scale(1.03);
       border-color: #60a5fa;
     }
 
@@ -2458,7 +2458,6 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 
 /* =========================
    APPLE-LIKE QUESTIONS UI
-   (add at the VERY END of <style>)
    ========================= */
 
 :root{
@@ -2736,7 +2735,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 
 .wizard-media{
   position: relative;
-  width: 72px; /* подгони под свой размер в #toc-wizard img */
+  width: 72px;
   flex: 0 0 auto;
 }
 
@@ -2751,18 +2750,18 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 }
 
 /* видео поверх картинки */
-#toc-wizard-yes{
+#toc-wizard-video{
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  opacity: 0;
+  opacity: 0;             /* по умолчанию скрыто */
   pointer-events: none;
 }
 
 /* класс "играем анимацию" */
-.wizard-media.is-animating #toc-wizard-yes{
+.wizard-media.is-animating #toc-wizard-video{
   opacity: 1;
 }
 
@@ -2782,10 +2781,15 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 
 
 
+
+
+
+
+
   </style>
 </head>
 <body>
-  <h1>Шахматные квесты</h1>
+ <h1>Шахматные квесты</h1>
 <button id="toc-toggle-btn" class="toc-toggle-btn" aria-controls="toc" aria-expanded="false">
   Выбрать квест
 </button>
@@ -3234,22 +3238,18 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
         <p id="question-text" style="display:none;"></p>
         <div id="answers"></div>
 
-        <div id="toc-wizard">
+     <div id="toc-wizard">
           <div id="toc-wizard-inner">
             <div class="wizard-media">
-  <img
-    id="toc-wizard-img"
-    src="wizard-zero.png"
-    alt="Маленький волшебник" />
-
-  <video
-    id="toc-wizard-yes"
-    src="yeswizard.mp4"
-    poster="wizard-zero.png"
-    preload="auto"
-    playsinline
-    muted
-  ></video>
+  	    <img id="toc-wizard-img"
+     	    src="wizard-zero.png"
+            alt="Маленький волшебник" />
+  <video id="toc-wizard-video"
+  poster="wizard-zero.png"
+  preload="auto"
+  playsinline
+  muted
+></video>
 </div>
 
             <div id="wizard-bubble" aria-live="polite" aria-atomic="true">
@@ -3279,7 +3279,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
     </div>
   </div>
 
-  <div id="era-progress">
+ <!-- <div id="era-progress">
     <div id="era-progress-header">
       <span>XVII век · Романтизм</span>
       <span>XXI век · Современные шахматы</span>
@@ -3290,6 +3290,8 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
     </div>
     <div id="era-progress-current"></div>
   </div>
+-->
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
@@ -4984,6 +4986,59 @@ function playSound(el, volume = 0.8) {
 
       const wizardBubbleEl = document.getElementById('wizard-bubble');
       const wizardBubbleTextEl = document.getElementById('wizard-bubble-text');
+      const wizardMediaEl = document.querySelector('.wizard-media');
+const wizardVideoEl = document.getElementById('toc-wizard-video');
+const wizardImgEl = document.getElementById('toc-wizard-img');
+
+const WIZARD_YES_FILES = [
+  'animations/wizard_yes_1.mp4',
+  'animations/wizard_yes_2.mp4',
+  'animations/wizard_yes_3.mp4',
+  'animations/wizard_yes_5.mp4'
+];
+
+const WIZARD_NO_FILES = [
+  'animations/wizard_no_1.mp4',
+  'animations/wizard_no_2.mp4',
+  'animations/wizard_no_3.mp4',
+  'animations/wizard_no_4.mp4',
+  'animations/wizard_no_5.mp4'
+];
+
+function playWizardAnimation(kind){ // kind: 'yes' | 'no'
+  if (!wizardMediaEl || !wizardVideoEl || !wizardImgEl) return;
+
+  const pool = kind === 'yes' ? WIZARD_YES_FILES : WIZARD_NO_FILES;
+  if (!pool.length) return;
+
+  const file = pool[Math.floor(Math.random() * pool.length)];
+  wizardVideoEl.src = file;
+
+  wizardMediaEl.classList.add('is-animating');
+
+  try {
+    wizardVideoEl.pause();
+    wizardVideoEl.currentTime = 0;
+  } catch (e) {}
+
+  const stop = () => {
+    wizardMediaEl.classList.remove('is-animating');
+    wizardVideoEl.removeEventListener('ended', stop);
+  };
+
+  wizardVideoEl.addEventListener('ended', stop, { once: true });
+
+  const p = wizardVideoEl.play();
+  if (p && typeof p.catch === 'function') {
+    p.catch(() => stop());
+  }
+}
+
+
+
+
+
+
 
       function wizardSay(text) {
         if (!wizardBubbleEl || !wizardBubbleTextEl) return;
@@ -5011,39 +5066,6 @@ function playSound(el, volume = 0.8) {
         }
       }
 
-function animateWizardYes(){
-  const media = document.querySelector('.wizard-media');
-  const img = document.getElementById('toc-wizard-img');
-  const vid = document.getElementById('toc-wizard-yes');
-  if (!media || !vid || !img) return;
-
-  // перезапуск анимации
-  media.classList.add('is-animating');
-
-  try {
-    vid.pause();
-    vid.currentTime = 0;
-  } catch (e) {}
-
-  const stop = () => {
-    media.classList.remove('is-animating');
-    vid.removeEventListener('ended', stop);
-    vid.removeEventListener('pause', stop);
-  };
-
-  vid.addEventListener('ended', stop, { once: true });
-
-  // На всякий случай: если видео не стартанёт, вернёмся к картинке
-  setTimeout(() => {
-    if (!vid.paused && !vid.ended) return;
-    stop();
-  }, 1200);
-
-  const p = vid.play();
-  if (p && typeof p.catch === 'function') {
-    p.catch(() => stop());
-  }
-}
 
 
 
@@ -5161,7 +5183,6 @@ function tryTapMove(toSquare){
         diamondMoves.add(activeManualMoment.index);
       } else {
         playRightSound();
-	animateWizardYes();
 
       }
 
@@ -5324,7 +5345,7 @@ window.addEventListener('resize', () => {
               playRightSound();
 	      
             }
-
+	    playWizardAnimation('yes');
             statusEl.style.color = 'green';
             statusEl.textContent = 'Верно!';
 
@@ -5370,6 +5391,7 @@ window.addEventListener('resize', () => {
             updateScoreDisplay(delta);
 
             playWrongSound();
+	    playWizardAnimation('no');
 
             const explWrong =
               activeManualMoment.explanations &&
@@ -5652,14 +5674,6 @@ window.addEventListener('resize', () => {
         statusEl.style.color = '#b91c1c';
         statusEl.textContent = 'Жизни закончились.';
         if (explanationEl) explanationEl.textContent = '';
-
-        const restartBtn = document.createElement('button');
-        restartBtn.className = 'restart-btn';
-        restartBtn.textContent = 'Начать заново';
-        restartBtn.addEventListener('click', () => {
-          loadGame(currentGameIndex);
-        });
-        answersEl.appendChild(restartBtn);
 
         wizardSay('Режим выживания: 3 ошибки — поражение. Нажми «Начать заново», чтобы попробовать ещё раз.');
       }
@@ -6310,6 +6324,7 @@ if (nextIndex < gamesData.length) {
   nextQuestBtn.classList.add('is-shimmering');
   nextQuestBtn.addEventListener('click', () => {
     goToNextQuest();
+    playSound(questChoiceSoundEl, 0.75);
   });
 
   answersEl.appendChild(nextQuestBtn);
@@ -6468,7 +6483,7 @@ if (nextIndex < gamesData.length) {
             playRightSound();
 	    
           }
-
+	  playWizardAnimation('yes');
           statusEl.style.color = 'green';
           statusEl.textContent = 'Верно!';
 
@@ -6509,6 +6524,7 @@ if (nextIndex < gamesData.length) {
           updateScoreDisplay(delta);
 
           playWrongSound();
+	  playWizardAnimation('no');	  
 
           statusEl.style.color = 'red';
           statusEl.textContent = 'Попробуй ещё раз.';
