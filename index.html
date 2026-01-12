@@ -2849,6 +2849,15 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
     preload="auto">
   </audio>
 
+<audio
+  id="magic-two-sound"
+  src="magicsound+2.mp3"
+  preload="auto">
+</audio>
+
+
+
+
 <audio id="sound-clicktoc" src="sound/clicktoc.wav" preload="auto"></audio>
 <audio id="sound-questchoice" src="sound/questchoice.wav" preload="auto"></audio>
 <audio id="sound-answerhover" src="sound/answerhover.wav" preload="auto"></audio>
@@ -3304,8 +3313,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
           id: 'greco1',
           title: 'Партия 1. Джоакино Греко – NN, Лондон 1623',
           introParagraphs: [
-            'Наше путешествие мы начнём с 17 века - ',
-            'Белые быстро открывают линии против короля и используют неудачное расположение чёрных фигур, чтобы поставить мат уже на 8‑м ходу.',
+            'Наше путешествие мы начнём с 17 века - начала эпохи шахматных романтиков. Джоакино Греко был поистине мифической фигурой в шахматной истории. Разберем его 4 миниатюры.  ',          'В этой партии белые быстро открывают линии против короля и используют неудачное расположение чёрных фигур, чтобы поставить мат уже на 8‑м ходу.',
             'Попробуй сам(а) найти ключевые удары Греко за белых.'
           ],
           pgn: `
@@ -5183,7 +5191,9 @@ function tryTapMove(toSquare){
         diamondMoves.add(activeManualMoment.index);
       } else {
         playRightSound();
-
+	 if (delta === 2) {
+    playMagicTwoSound();
+  }
       }
 
       statusEl.style.color = 'green';
@@ -5343,7 +5353,9 @@ window.addEventListener('resize', () => {
               diamondMoves.add(activeManualMoment.index);
             } else {
               playRightSound();
-	      
+	       if (delta === 2) {
+    playMagicTwoSound();
+  }
             }
 	    playWizardAnimation('yes');
             statusEl.style.color = 'green';
@@ -5437,6 +5449,7 @@ window.addEventListener('resize', () => {
       const victorySoundEl = document.getElementById('victory-sound');
       const fullVictorySoundEl = document.getElementById('full-victory-sound');
       const soundRightEl = document.getElementById('sound-right');
+      const magicTwoSoundEl = document.getElementById('magic-two-sound');
       const soundWrongEl = document.getElementById('sound-wrong');
       const diamondSoundEl = document.getElementById('diamond-sound');
       const gameoverSoundEl = document.getElementById('gameover-sound');
@@ -6228,6 +6241,21 @@ if (Number.isNaN(idx)) return;
         }
       }
 
+	function playMagicTwoSound() {
+  if (!magicTwoSoundEl) return;
+  try {
+    magicTwoSoundEl.currentTime = 0;
+    magicTwoSoundEl.volume = 0.9;
+    magicTwoSoundEl.play().catch(() => {});
+  } catch (e) {
+    console.warn('Не удалось проиграть magicsound+2.mp3:', e);
+  }
+}
+
+
+
+
+
       function playWrongSound() {
         if (!soundWrongEl) return;
         try {
@@ -6481,7 +6509,9 @@ if (nextIndex < gamesData.length) {
             diamondMoves.add(moment.index);
           } else {
             playRightSound();
-	    
+	    if (delta === 2) {
+    playMagicTwoSound();
+  }
           }
 	  playWizardAnimation('yes');
           statusEl.style.color = 'green';
