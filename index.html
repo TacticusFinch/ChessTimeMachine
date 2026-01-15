@@ -24,9 +24,78 @@
 
 
 
-/* Sand + plants (eye-friendly) theme for chessboard.js v1
+:root{
+  --sq-light: #f2e0c7;  /* тёплый светлый орех */
+  --sq-dark:  #b07845;  /* насыщенный орех/терракота */
+  --grid-line: rgba(60, 35, 20, 0.20);
+  --glow-sun:  rgba(255, 204, 128, 0.45);
+  --glow-leaf: rgba(34, 197, 94, 0.25);
+}
+
+.board-b72b1{
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+
+
+  border: 1px solid rgba(15, 23, 42, 0.35);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255,255,255,0.35), transparent 55%),
+    radial-gradient(circle at 90% 0%, rgba(252, 211, 77, 0.21), transparent 60%),
+    radial-gradient(circle at 50% 110%, #3b1f0a, #12070b 70%);
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.55),
+    0 0 26px rgba(124, 58, 237, 0.30),
+    0 0 32px rgba(251, 191, 36, 0.35),
+    inset 0 0 0 1px rgba(255,255,255,0.22);
+}
+
+/* светлые клетки — тёплое лаковое дерево */
+.white-1e1d7{
+  background: var(--sq-light) !important;
+  background-image:
+    linear-gradient(90deg, rgba(190,130,80,0.25) 0, transparent 35%, rgba(190,130,80,0.18) 70%, transparent 100%),
+    radial-gradient(18px 14px at 25% 25%, rgba(255,255,255,0.55), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.24), rgba(0,0,0,0.10));
+  background-blend-mode: multiply, screen, overlay;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* тёмные клетки — насыщенный орех */
+.black-3c85d{
+  background: var(--sq-dark) !important;
+  background-image:
+    linear-gradient(90deg, rgba(60,25,10,0.50) 0, rgba(140,70,30,0.4) 40%, rgba(60,25,10,0.65) 100%),
+    radial-gradient(18px 14px at 30% 30%, rgba(255,255,255,0.25), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.25));
+  background-blend-mode: overlay, screen, multiply;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* лёгкая реакция на наведение */
+.white-1e1d7:hover,
+.black-3c85d:hover{
+  filter: brightness(1.05) saturate(1.05);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<-- Sand + plants (eye-friendly) theme for chessboard.js v1
    Мягкий контраст, хорошая читаемость фигур, приятное тёплое свечение.
-   Вставь ПОСЛЕ chessboard.css */
+   Вставь ПОСЛЕ chessboard.css 
 
 :root{
   /* Клетки: “песок” + “шалфей/листья” (мягко, но различимо) */
@@ -99,6 +168,135 @@
 .board-b72b1 img{
   filter: drop-shadow(0 2px 2px rgba(20, 14, 8, 0.18));
 }
+
+
+-->
+
+
+<!-- Контейнер доски: как стол из орехового дерева с мягким сиянием листвы 
+/*Walnut & Lettuce Garden theme for chessboard.js
+   Тёплое ореховое дерево + свежий салатовый, чёткий контраст, мягкое природное свечение.
+   Вставь ПОСЛЕ chessboard.css */
+
+:root{
+  /* Клетки:
+     светлая — светлое ореховое дерево;
+     тёмная — свежий, но не кислотный салатовый. */
+  --sq-light: #f3e4cf;  /* светлый тёплый орех */
+  --sq-dark:  #7abf4b;  /* мягкий салатовый (лист/зелень) */
+
+  --grid-line: rgba(70, 45, 25, 0.14);
+
+  /* Свечение: тёплое солнце + лесная зелень + мягкая тень древесины */
+  --glow-sun:    rgba(255, 210, 150, 0.30);
+  --glow-leaf:   rgba(125, 205, 140, 0.26);
+  --glow-wood:   rgba(120, 85, 55, 0.24);
+}
+
+<!-- Подложка вокруг доски (контейнер #board, если используется) */
+#board{
+  padding: 16px;
+  border-radius: 20px;
+  background:
+    /* верх — свет неба, пробивающийся через кроны */
+    radial-gradient(140% 130% at 15% 0%, rgba(255,255,255,0.98), rgba(225,240,230,0.85) 55%, transparent 100%),
+    /* низ — ореховые доски/почва леса */
+    radial-gradient(170% 160% at 100% 100%, rgba(150, 115, 80, 0.82), rgba(70, 45, 30, 0.97) 70%),
+    /* плавный переход дерева и зелени */
+    linear-gradient(135deg, #f6ebd8 0%, #e2d0b2 30%, #c4ae88 55%, #60854b 100%);
+}
+
+-->
+
+
+.board-b72b1{
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+
+  border: 1px solid rgba(50, 35, 22, 0.95);
+  background:
+    /* лёгкие «блики» сверху */
+    radial-gradient(circle at 18% 20%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(circle at 82% 35%, rgba(255,255,255,0.08), transparent 60%),
+    /* тёмная древесная подложка */
+    radial-gradient(circle at 50% 25%, #3a2616, #160d08 72%);
+
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.45),  /* глубина */
+    0 0 30px var(--glow-sun),         /* тёплое солнечное свечение */
+    0 0 40px var(--glow-leaf),        /* зелёный ореол листвы */
+    0 0 44px var(--glow-wood),        /* мягкое свечение древесины */
+    inset 0 0 0 1px rgba(252, 242, 225, 0.26);
+}
+
+/* Внутренняя окантовка — тонкий, слегка глянцевый кант */
+.board-b72b1::before{
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 12px;
+  pointer-events: none;
+  border: 1px solid rgba(245, 235, 220, 0.70);
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.30),
+    inset 0 0 2px rgba(255, 255, 255, 0.86);
+}
+
+/* Природная дымка: свет сквозь листья, лёгкое солнце над доской */
+.board-b72b1::after{
+  content: "";
+  position: absolute;
+  inset: -12% -10% auto -10%;
+  height: 48%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(195, 235, 205, 0.52), transparent 68%), /* светлая листва */
+    radial-gradient(circle at 82% 0%, rgba(135, 205, 150, 0.45), transparent 65%),  /* кроны деревьев */
+    radial-gradient(circle at 55% 38%, rgba(255, 225, 170, 0.42), transparent 72%); /* мягкое солнце */
+  mix-blend-mode: soft-light;
+}
+
+/* Светлые клетки: ореховое дерево с лёгкой фактурой */
+.white-1e1d7{
+  background: var(--sq-light) !important;
+  background-image:
+    /* мягкие блики */
+    radial-gradient(18px 14px at 28% 26%, rgba(255,255,255,0.44), rgba(255,255,255,0) 65%),
+    /* лёгкие древесные полосы */
+    linear-gradient(90deg, rgba(180, 145, 105, 0.16), rgba(180,145,105,0) 40%, rgba(180,145,105,0.14) 60%, rgba(180,145,105,0) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.04));
+  background-blend-mode: screen, multiply, overlay;
+}
+
+/* Тёмные клетки: свежий салатовый лист, чёткий, но мягкий для глаз */
+.black-3c85d{
+  background: var(--sq-dark) !important;
+  background-image:
+    /* прожилки листа */
+    radial-gradient(28px 24px at 30% 30%, rgba(255,255,255,0.22), rgba(255,255,255,0) 70%),
+    radial-gradient(24px 20px at 80% 70%, rgba(30, 90, 40, 0.26), rgba(30,90,40,0) 72%),
+    linear-gradient(160deg, rgba(230,255,230,0.18), rgba(0,0,0,0.16));
+  background-blend-mode: screen, multiply, overlay;
+}
+
+/* Лёгкая сетка — структура доски чётко читается, но не режет глаз */
+.white-1e1d7, .black-3c85d{
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* Нежное природное подсвечивание клетки под курсором */
+.white-1e1d7:hover, .black-3c85d:hover{
+  filter: brightness(1.05) saturate(1.04);
+}
+
+/* Мягкая тень фигур — фигуры отчётливо видны и на дереве, и на зелени */
+.board-b72b1 img{
+  filter: drop-shadow(0 2px 2px rgba(25, 18, 10, 0.28));
+}
+
+-->
+
 
 
 
@@ -2619,6 +2817,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 /* === SYMMETRY FIX: equal gaps toc↔️board and board↔️questions === */
 :root{
   --layout-gap: 18px; /* один источник правды */
+  --board-size: 520px;
 }
 
 /* внешний грид */
@@ -2881,6 +3080,41 @@ h1{
 
 
 
+#board .square-55d63.hover-highlight-from{
+  box-shadow:
+    inset 0 0 0 3px rgba(251, 191, 36, 0.95),
+    inset 0 0 12px rgba(251, 191, 36, 0.85);
+  background:
+    radial-gradient(circle, rgba(251, 191, 36, 0.55), transparent 70%);
+}
+
+#board .square-55d63.hover-highlight-to{
+  box-shadow:
+    inset 0 0 0 3px rgba(37, 99, 235, 0.95),
+    inset 0 0 14px rgba(37, 99, 235, 0.85);
+  background:
+    radial-gradient(circle, rgba(59, 130, 246, 0.55), transparent 70%);
+}
+
+/ пользовательские выделения — яркий, но «яблочный» синий /
+#board .square-55d63.user-highlight-square{
+  box-shadow:
+    inset 0 0 0 3px rgba(10, 132, 255, 0.96),
+    inset 0 0 0 6px rgba(15, 23, 42, 0.55);
+  background:
+    radial-gradient(circle, rgba(10,132,255,0.40), transparent 70%);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2966,7 +3200,7 @@ h1{
 <audio id="sound-clicktoc" src="sound/clicktoc.wav" preload="auto"></audio>
 <audio id="sound-questchoice" src="sound/questchoice.wav" preload="auto"></audio>
 <audio id="sound-answerhover" src="sound/answerhover.wav" preload="auto"></audio>
-
+<audio id="heart-sound" src="sound/heartbeating.mp3"  preload="auto"></audio>
 
 
 
@@ -3174,11 +3408,39 @@ h1{
             <button class="toc-item" data-game-index="14">
               <span class="toc-item-number">15</span>
               <span class="toc-item-text">
-                <span class="toc-item-main">В. Стейниц - А. Зельман</span>
+                <span class="toc-item-main">В. Стейниц - А.Зельман</span>
                 <span class="toc-item-sub">Балтимор, 1885 · Позиционная игра</span>
               </span>
             </button>
           </li>
+	  <li>
+	    <button class="toc-item" data-game-index="15">
+              <span class="toc-item-number">16</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">С.Дюбуа - В.Стейниц</span>
+                <span class="toc-item-sub">Лондон, 1862 · Агрессивная итальянка</span>
+              </span>
+            </button>
+	  </li>
+	  <li>
+	    <button class="toc-item" data-game-index="16">
+              <span class="toc-item-number">17</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">В. Кнорре - М.Чигорин</span>
+                <span class="toc-item-sub">Лондон, 1862 · Агрессивная итальянка</span>
+              </span>
+            </button>
+	  </li>
+
+
+
+
+
+
+
+
+
+
         </ol>
       </div>
 
@@ -3193,8 +3455,8 @@ h1{
   </div>
   <ol id="toc-lasker-list">
     <li>
-      <button class="toc-item" data-game-index="15">
-        <span class="toc-item-number">16</span>
+      <button class="toc-item" data-game-index="18">
+        <span class="toc-item-number">19</span>
         <span class="toc-item-text">
           <span class="toc-item-main">Эм. Ласкер – И. Бауэр</span>
           <span class="toc-item-sub">пример · Тема атаки на короля</span>
@@ -3216,14 +3478,24 @@ h1{
   </div>
   <ol id="toc-capablanca-list">
     <li>
-      <button class="toc-item" data-game-index="16">
-        <span class="toc-item-number">17</span>
+      <button class="toc-item" data-game-index="20">
+        <span class="toc-item-number">21</span>
         <span class="toc-item-text">
           <span class="toc-item-main">Х.Р. Капабланка – Ф.Д. Маршалл</span>
           <span class="toc-item-sub">Испанская партия, интересный план</span>
         </span>
       </button>
     </li>
+   <li>
+      <button class="toc-item" data-game-index="19">
+        <span class="toc-item-number">20</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Х.Р. Капабланка – М. Фонарофф</span>
+          <span class="toc-item-sub">Испанская партия, легкое исполнение</span>
+        </span>
+      </button>
+    </li>
+
   </ol>
 </div>
 
@@ -4084,7 +4356,7 @@ Bxg1 19.e5 Qxa1+ 20.Ke2 Na6 21.Nxg7+ Kd8 22.Qf6+ Nxf6
 [Result "1-0"]
 
 1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3
-5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc8 c6
+5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6
 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O
 Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7
 16. Qb8+ Nxb8 17. Rd8# 1-0
@@ -4246,7 +4518,24 @@ Rae8 17. Qa6 Qxf3 18. gxf3 Rg6+ 19. Kh1 Bh3 20. Rd1 Bg2+ 21. Kg1
 Bxf3+ 22. Kf1 Bg2+ 23. Kg1 Bh3+ 24. Kh1 Bxf2 25. Qf1 Bxf1 26. Rxf1
 Re2 27. Ra1 Rh6 28. d4 Rxh2+ 0-1
           `.trim(),
-          keyMoments: []
+          keyMoments: [
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+]
         },
 
         {
@@ -4959,16 +5248,352 @@ Qxc7 32. Rxc7 Ke8 33. Ng5 Nf8 34. Bc5 Nd7 35. Bd6 1-0
               index: 22,
               question: 'Чем бы вы взяли на d3?',
               correctMoveSan: 'cxd3',
-              options: [
-                'cxd3',
-                'Qxd3'
-              ],
+              type: 'manual',
+              points: 1,
+
               explanations: {
-                'cxd3': 'Начало позиционного шедевра',
+                'cxd3': 'Лучшее взятие.',
+              }
+	    }
+           ]
+         },
+
+{
+          id: 'dubois_steinitz_London_1862',
+          title: 'Партия 17. С.Дюбуа - В. Стейниц, Лондон 1862',
+          introParagraphs: [
+            'Стейниц в атаке.',
+            'Поучимся черным цветом в Итальянской партии играть первым номером от маэстро Вильгельма Стейница. Отличный план, чистое исполнение.',
+            'Найдите ключевые моменты атакующей и позиционной игры. Поехали!'
+          ],
+          pgn: `
+[Event "B.C.A. Grand Tourney"]
+[Site "London ENG"]
+[Date "1862.07.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Serafino Dubois"]
+[Black "Wilhelm Steinitz"]
+[ECO "C50"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "74"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 5. O-O d6 6. Bg5 h6
+7. Bh4 g5 8. Bg3 h5 9. h4 Bg4 10. c3 Qd7 11. d4 exd4 12. e5
+dxe5 13. Bxe5 Nxe5 14. Nxe5 Qf5 15. Nxg4 hxg4 16. Bd3 Qd5
+17. b4 O-O-O 18. c4 Qc6 19. bxc5 Rxh4 20. f3 Rdh8 21. fxg4 Qe8
+22. Qe2 Qe3+ 23. Qxe3 dxe3 24. g3 Rh1+ 25. Kg2 R8h2+ 26. Kf3
+Rxf1+ 27. Bxf1 Rf2+ 28. Kxe3 Rxf1 29. a4 Kd7 30. Kd3 Nxg4
+31. Kc3 Ne3 32. Ra2 Rxb1 33. Rd2+ Kc6 34. Re2 Rc1+ 35. Kd2
+Rc2+ 36. Kxe3 Rxe2+ 37. Kxe2 f5 0-1          `.trim(),
+          keyMoments: [
+            {
+              index: 11,
+              question: 'Преждевременный выпад слоном. Как Стейниц пользуется этим?',
+              correctMoveSan: 'h6',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'h6': 'Если черные еще не рокированы, включение особенно полезно.',
+              }
+            },
+
+	   {
+              index: 13,
+              question: 'Продолжай. "Агрессивная итальянка" - говорит сама за себя.',
+              correctMoveSan: 'g5',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'g5': 'Черные настроены воинственно. Отличное продолжение!',
+              }
+            },
+
+	  {
+              index: 15,
+              question: 'Продолжаем двигать маленький бульдозер.',
+              correctMoveSan: 'h5',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'h5': 'Черные не боятся потерять пешку на g5. После h4 начнется тактическая буря.',
+              }
+            },
+	  {
+              index: 27,
+              question: 'Найди лучшее отступление ферзя.',
+              correctMoveSan: 'Qf5',
+	      options: [
+                'Qe6',
+                'Qd6',
+		'Qf5',
+              ],
+
+              explanations: {
+                'Qf5': 'Вперед, поближе к королю, с атакой на коня.',
+              }
+            },
+
+ 	 {
+              index: 29,
+              question: 'Чем бы вы съели на g4?',
+              correctMoveSan: 'hxg4',
+	      options: [
+                'hxg4',
+                'Nxg4',
+		'Qxg4',
+              ],
+
+              explanations: {
+                'hxg4': 'Ну, конечно, пешкой! Вскрывается линия h..',
+              }
+            },
+	 {
+              index: 39,
+              question: 'Найдите усиление.',
+              correctMoveSan: 'Rdh8',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'hxg4': 'Заряжаем электрические ладьи.',
+              }
+            }, 
+	{
+              index: 43,
+              question: 'Выберите лучшее продолжение.',
+              correctMoveSan: 'Qe3+',
+	      points: 2,
+              options: [
+                'Qe3+',
+                'Rh1+',
+		'Nxg4',
+		'Qd7',
+              ],     
+
+              explanations: {
+                'Qe3+': 'После размена берем под контроль важное поле f2.',
+              }
+            }, 
+	{
+              index: 47,
+              question: 'Выберите лучшее продолжение.',
+              correctMoveSan: 'Rh1+',
+	      type: 'manual',
+	      points: 1,
+
+              explanations: {
+                'Rh1+': 'Начинаем охоту.',
+              }
+            }, 
+	{
+              index: 49,
+              question: 'Выберите лучшее продолжение.',
+              correctMoveSan: 'R8h2+',
+	      type: 'manual',
+	      points: 2,
+
+              explanations: {
+                'R8h2+': 'Продолжаем охоту.',
+              }
+            }, 
+	{
+              index: 53,
+              question: 'Выберите лучшее продолжение.',
+              correctMoveSan: 'Rf2+',
+	      type: 'manual',
+	      points: 1,
+
+              explanations: {
+                'Rf2+': 'Забирем еще слона. Белые фигуры парализованы.',
+              }
+            }, 
+	{
+              index: 69,
+              question: 'Найди самое техничное продолжение.',
+              correctMoveSan: 'Rc2+',
+	      type: 'manual',
+	      points: 3,
+
+              explanations: {
+                'Rс2+': 'Самый быстрый и техничный путь к победе в эндшпиле.',
               }
             }
            ]
          },
+
+
+  {
+          id: 'knorre_chigorin_Peterburg_1874',
+          title: 'Партия 18. В. Кнорре - М. Чигорин, Санкт-Петербург 1874',
+          introParagraphs: [
+            'Интересный метод игры в итальянской партии.',
+            'В этой партии мы увидим классный план в итальянской партии, план с немедленным наступлением на королевском фланге, ранний пешечный бульдозер.',
+            'Найдите ключевые моменты позиционной игры. Поехали!'
+          ],
+          pgn: `
+[Event "St. Petersburg"]
+[Site "St. Petersburg"]
+[Date "1874.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Victor Knorre"]
+[Black "Mikhail Chigorin"]
+[ECO "C50"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "28"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. O-O Nf6 5. d3 d6 6. Bg5 h6
+7. Bh4 g5 8. Bg3 h5 9. Nxg5 h4 10. Nxf7 hxg3 11. Nxd8 Bg4
+12. Qd2 Nd4 13. Nc3 Nf3+ 14. gxf3 Bxf3 15. hxg3 Rh1# 0-1          `.trim(),
+          keyMoments: [
+            {
+              index: 11,
+              question: 'Преждевременный выпад слоном. Как Михаил Чигорин пользуется этим?',
+              correctMoveSan: 'h6',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'h6': 'Если черные еще не рокированы, включение особенно полезно.',
+                }
+             },
+
+	     {
+              index: 13,
+              question: 'Продолжай. "Агрессивная итальянка" - говорит сама за себя.',
+              correctMoveSan: 'g5',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'g5': 'Черные настроены воинственно. Отличное продолжение!',
+              }
+             },
+
+	    {
+              index: 15,
+              question: 'Продолжаем двигать маленький бульдозер.',
+              correctMoveSan: 'h5',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'h5': 'Черные не боятся потерять пешку на g5. Почему же? Узнаем дальше.',
+              }
+            },
+	  {
+              index: 17,
+              question: 'Белые приняли жертву. Твои действия?',
+              correctMoveSan: 'h4',
+              type: 'manual',
+              points: 3,
+
+              explanations: {
+                'h4': 'Ведет к настоящей тактикеской буре!'
+              }
+            },
+ 	{
+              index: 19,
+              question: 'Белые поставили желанную вилку. Твои действия?',
+              correctMoveSan: 'hxg3',
+              options: [
+                'hxg3',
+                'Qe7',
+              ],
+              explanations: {
+                'hxg3': 'Жертва ферзя! Рассмотрим продолжение.'
+              }
+            },
+
+	{
+              index: 21,
+              question: 'Как продолжишь атаку?',
+              correctMoveSan: 'Bg4',
+              options: [
+                'gxf2+',
+                'Bg4',
+		'gxh2+',
+		'Bxf2+'
+              ],
+              explanations: {
+                'Bg4': 'Решительное подключение слона открывает новые возможности.'
+              }
+            },
+
+	{
+              index: 23,
+              question: 'Продолжите атаку. Кого не хватает на этой вечеринке?',
+              correctMoveSan: 'Nd4',
+              options: [
+                'Rxd8',
+                'Nd4',
+		'Nxe4',
+		'Bxf2'
+              ],
+              explanations: {
+                'Nd4': 'Не хватает коня! Конь подключается с умноженной силой.'
+              }
+            },
+
+	 {
+              index: 25,
+              question: 'Найдите бриллиантовое продолжение!',
+              correctMoveSan: 'Nf3+',
+              type: 'manual',
+              points: 3,
+
+              explanations: {
+                'Nf3+': 'Ведет к неибежному мату.',
+              }
+
+            },
+
+ {
+              index: 29,
+              question: 'Завершите партию!',
+              correctMoveSan: 'Rh1#',
+              type: 'manual',
+              points: 1,
+
+              explanations: {
+                'Rh1#': 'Блестящее окончание партии.',
+              }
+
+            }
+
+
+
+
+
+
+           ]
+         },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         {
           id: 'lasker_example_1',
@@ -5060,7 +5685,126 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
               }
             }
           ]
-        }
+        },
+
+{
+          id: 'capablanca_fonaroff_1918',
+          title: 'Партия 17. Х.Р. Капабланка – М. Фонаров, Нью‑Йорк 1918',
+          introParagraphs: [
+            'Классическая партия Капабланки: минимум лишних украшений, максимум простоты и силы ходов.',
+            'Белые методично усиливают фигуры в испанской структуре, аккуратно давят на слабости и переходят в решающую атаку.',
+            'Обрати внимание, как каждый ход подготавливает следующий — без спешки, но с точным расчётом.'
+          ],
+          pgn: `
+[Event "Casual Game"]
+[Site "New York, NY USA"]
+[Date "1918.06.18"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Jose Raul Capablanca"]
+[Black "Marc Fonaroff"]
+[ECO "C66"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "43"]
+
+1. e4 e5 2. Nf3 Nc6 3. d4 d6 4. Nc3 Nf6 5. Bb5 Bd7 6. O-O Be7
+7. Re1 exd4 8. Nxd4 Nxd4 9. Qxd4 Bxb5 10. Nxb5 O-O 11. Qc3 c6
+12. Nd4 Nd7 13. Nf5 Bf6 14. Qg3 Ne5 15. Bf4 Qc7 16. Rad1 Rad8
+17. Rxd6 Rxd6 18. Bxe5 Rd1 19. Rxd1 Bxe5 20. Nh6+ Kh8 21. Qxe5
+Qxe5 22. Nxf7+ 1-0
+          `.trim(),
+          keyMoments: [
+            {
+              index: 24,
+              type: 'manual',
+              question: 'Как бы вы сыграли за белых в этой позиции?',
+              correctMoveSan: 'Nf5',
+              points: 2,
+              explanations: {
+                'Nf5': '13.Nf5! — конь усиливается, давит на d6 и g7, создаёт угрозы против короля и слона e7. Классическое «улучшение фигуры» в стиле Капабланки.'
+              }
+            },
+            {
+              index: 26,
+              type: 'manual',
+              question: 'Чёрные только что сыграли 13...Bf6. Какой отход ферзём здесь лучший за белых?',
+              correctMoveSan: 'Qg3',
+              points: 1,
+              explanations: {
+                'Qg3': '14.Qg3! — ферзь занимает активную диагональ, давит на d6 и g7, поддерживая коня f5 и подготавливая давление по линии d.'
+              }
+            },
+            {
+              index: 30,
+              type: 'manual',
+              question: 'Позиция готова к завершению развития. Какой ход сделаете за белых?',
+              correctMoveSan: 'Rad1',
+              points: 1,
+              explanations: {
+                'Rad1': '16.Rad1 — последняя лёгкая работа: ладья встаёт на полуоткрытую линию d, усиливая давление на d6 и d7.'
+              }
+            },
+            {
+              index: 32,
+              question: 'Какое продолжение за белых самое сильное в этой позиции?',
+              correctMoveSan: 'Rxd6',
+              points: 3,
+              options: ['Nh6+', 'Bxe5', 'Rxd6', 'Nxd6'],
+              explanations: {
+                'Rxd6': '17.Rxd6! — точный удар: белые меняют ладьи на лучшую фигуру соперника и разрушают опору чёрных на d6.',
+                'Nh6+': '17.Nh6+ выглядит эффектно, но преждевременно: сначала лучше разрушить оборону ходом Rxd6!.',
+                'Bxe5': '17.Bxe5? отпускает напряжение и упускает конкретные тактические ресурсы на d6.',
+                'Nxd6': '17.Nxd6?! размен коня преждевременен, ход ладьёй на d6 куда сильнее по динамике.'
+              }
+            },
+            {
+              index: 38,
+              type: 'manual',
+              question: 'После 19...Bxe5 у белых есть выигрыш. Найдите сильнейший ход.',
+              correctMoveSan: 'Nh6+',
+              points: 2,
+              explanations: {
+                'Nh6+': '20.Nh6+! — решающий прыжок коня.'
+              }
+            },
+            {
+              index: 40,
+              type: 'manual',
+              question: 'Чёрные ушли королём на h8. Найдите лучшее продолжение за белых.',
+              correctMoveSan: 'Qxe5',
+              points: 3,
+              explanations: {
+                'Qxe5': '21.Qxe5! — спокойная и точная жертва возвращением материала: после размена ферзей вилка Nf7+ решает партию в пользу белых.'
+              }
+            },
+            {
+              index: 42,
+              type: 'manual',
+              question: 'После 21...Qxe5 за белых остался последний точный ход. Завершите комбинацию.',
+              correctMoveSan: 'Nxf7+',
+              points: 3,
+              explanations: {
+                'Nxf7+': '22.Nxf7+! — вилка королю и ладье, белые выигрывают фигуру и получают технически выигранный эндшпиль.'
+              }
+            }
+          ]
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       ];
 
@@ -5096,6 +5840,7 @@ hxg4 14.hxg4 Bg5 15.Nxg5 Nxg5 16.Kg2 d5 17.Qe2 Re8 18.Rh1 Re6
 const clickTocSoundEl = document.getElementById('sound-clicktoc');
 const questChoiceSoundEl = document.getElementById('sound-questchoice');
 const answerHoverSoundEl = document.getElementById('sound-answerhover');
+const heartSoundEl = document.getElementById('heart-sound');
 
 function playSound(el, volume = 0.8) {
   if (!el) return;
@@ -5117,7 +5862,9 @@ const WIZARD_YES_FILES = [
   'animations/wizard_yes_1.mp4',
   'animations/wizard_yes_2.mp4',
   'animations/wizard_yes_3.mp4',
-  'animations/wizard_yes_5.mp4'
+  'animations/wizard_yes_4.mp4',
+  'animations/wizard_yes_5.mp4',
+  'animations/wizard_yes_6.mp4'
 ];
 
 const WIZARD_NO_FILES = [
@@ -5951,10 +6698,34 @@ window.addEventListener('resize', () => {
 
       function updateBoardAndNotation() {
         applyMovesUpTo(currentMoveIndex);
+	 // если сейчас нет активного вопроса и не показывается финальное резюме —
+      // прячем блок вопросов/ответов
+      if (!questionActive && !summaryShown) {
+        if (questionTitleEl) {
+          questionTitleEl.style.display = 'none';
+          questionTitleEl.textContent = '';
+        }
+        if (questionTextEl) {
+          questionTextEl.style.display = 'none';
+          questionTextEl.textContent = '';
+        }
+        if (answersEl) {
+          answersEl.innerHTML = '';
+        }
+        if (statusEl) {
+          statusEl.textContent = '';
+        }
+        if (explanationEl) {
+          explanationEl.textContent = '';
+          explanationEl.style.color = '#333';
+        }
+      }
 	clearTapHints();
         if (moveCounterEl) {
-          moveCounterEl.textContent = `Ход: ${currentMoveIndex}/${movesList.length}`;
-        }
+  const currentMoveNumber = Math.ceil(currentMoveIndex / 2) || 0;
+  const totalMoveNumber   = Math.ceil(movesList.length / 2);
+  moveCounterEl.textContent = `Ход: ${currentMoveNumber}/${totalMoveNumber}`;
+}
 
         let html = '';
         const visibleMovesCount = currentMoveIndex;
@@ -6254,6 +7025,14 @@ if (Number.isNaN(idx)) return;
           renderLives();
         });
       }
+if (survivalBtnEl && heartSoundEl) {
+  survivalBtnEl.addEventListener('mouseenter', () => {
+    playSound(heartSoundEl, 0.7);
+  });
+}
+
+
+
 
       function launchVictoryEffect() {
         if (!victoryEffectEl) return;
@@ -6791,41 +7570,47 @@ if (nextIndex < gamesData.length) {
         });
       }
 
-      function squareToSvgCoords(square) {
+       function squareToSvgCoords(square) {
         if (!boardEl || !boardArrowLayerEl) return null;
 
-        const boardRect = boardEl.getBoundingClientRect();
-        const svgRect = boardArrowLayerEl.getBoundingClientRect();
-        const size = boardRect.width;
-        const squareSize = size / 8;
+        // Берём любую клетку, чтобы понять смещения и размер
+        const sample = document.querySelector('#board .square-55d63');
+        if (!sample) return null;
 
-        const fileChar = square[0];
-        const rankChar = square[1];
+        const boardRect  = boardEl.getBoundingClientRect();
+        const svgRect    = boardArrowLayerEl.getBoundingClientRect();
+        const sampleRect = sample.getBoundingClientRect();
+
+        const squareSize = sampleRect.width;
+        const offsetX = sampleRect.left - boardRect.left;
+        const offsetY = sampleRect.top  - boardRect.top;
 
         const files = ['a','b','c','d','e','f','g','h'];
         const ranks = ['1','2','3','4','5','6','7','8'];
 
-        const orientation = board.orientation ? board.orientation() : 'white';
+        const fileChar = square[0];
+        const rankChar = square[1];
 
-        let fileIndex = files.indexOf(fileChar);
-        let rankIndex = ranks.indexOf(rankChar);
-
+        const fileIndex = files.indexOf(fileChar);
+        const rankIndex = ranks.indexOf(rankChar);
         if (fileIndex === -1 || rankIndex === -1) return null;
+
+        const orientation = board.orientation ? board.orientation() : 'white';
 
         let xIndex, yIndex;
         if (orientation === 'white') {
           xIndex = fileIndex;
-          yIndex = 7 - rankIndex;
+          yIndex = 7 - rankIndex;   // верх-низ инвертируются
         } else {
           xIndex = 7 - fileIndex;
           yIndex = rankIndex;
         }
 
-        const boardX = (xIndex + 0.5) * squareSize;
-        const boardY = (yIndex + 0.5) * squareSize;
+        const centerXInBoard = offsetX + (xIndex + 0.5) * squareSize;
+        const centerYInBoard = offsetY + (yIndex + 0.5) * squareSize;
 
-        const x = (boardRect.left - svgRect.left) + boardX;
-        const y = (boardRect.top - svgRect.top) + boardY;
+        const x = (boardRect.left - svgRect.left) + centerXInBoard;
+        const y = (boardRect.top  - svgRect.top)  + centerYInBoard;
 
         return { x, y };
       }
