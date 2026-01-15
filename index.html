@@ -24,6 +24,66 @@
 
 
 
+
+/* === Тёплая "оранжевая" доска в стиле остального интерфейса === */
+:root{
+  --sq-light: #fdf4e6;   /* тёплый крем */
+  --sq-dark:  #f2b179;   /* мягкий терракотово-оранжевый */
+  --grid-line: rgba(120, 60, 30, 0.12);
+
+  --glow-sun:  rgba(251, 191, 36, 0.25);
+  --glow-leaf: rgba(96, 165, 250, 0.20);
+}
+
+/* Рамка доски — тёплая, но без кислотности */
+.board-b72b1{
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+
+  border: 1px solid rgba(120, 72, 40, 0.85);
+  background:
+    radial-gradient(circle at 15% 5%, rgba(255,255,255,0.45), transparent 60%),
+    radial-gradient(circle at 85% 10%, rgba(254,215,170,0.40), transparent 65%),
+    radial-gradient(circle at 50% 100%, #4b2e16, #1a0f09 72%);
+
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.40),
+    0 0 26px rgba(251, 191, 36, 0.40),
+    0 0 32px rgba(249, 115, 22, 0.28),
+    inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+
+/* Светлые клетки — тёплое дерево */
+.white-1e1d7{
+  background: var(--sq-light) !important;
+  background-image:
+    linear-gradient(90deg, rgba(229, 152, 76, 0.22), transparent 40%, rgba(229,152,76,0.18) 70%, transparent 100%),
+    radial-gradient(18px 14px at 25% 25%, rgba(255,255,255,0.55), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.22), rgba(0,0,0,0.06));
+  background-blend-mode: multiply, screen, overlay;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* Тёмные клетки — мягкий оранжево-карамельный */
+.black-3c85d{
+  background: var(--sq-dark) !important;
+  background-image:
+    linear-gradient(90deg, rgba(120, 58, 23, 0.55), rgba(226, 137, 76, 0.6) 45%, rgba(120,58,23,0.70) 100%),
+    radial-gradient(18px 14px at 30% 30%, rgba(255,255,255,0.25), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(0,0,0,0.22));
+  background-blend-mode: overlay, screen, multiply;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+.white-1e1d7:hover,
+.black-3c85d:hover{
+  filter: brightness(1.07) saturate(1.08);
+}
+
+
+
+<!-- Cтиль доски - теплое дерево
 :root{
   --sq-light: #f2e0c7;  /* тёплый светлый орех */
   --sq-dark:  #b07845;  /* насыщенный орех/терракота */
@@ -81,13 +141,7 @@
 
 
 
-
-
-
-
-
-
-
+-->
 
 
 
@@ -315,7 +369,9 @@ body{
   gap: 18px;
   align-items: start;
 }
-    /* Оглавление – минимализм и пастельные тона */
+
+
+/* Оглавление – минимализм и пастельные тона */
     #toc {
       width: 350px;
       text-align: left;
@@ -546,6 +602,9 @@ body{
       color: #ffffff;
     }
 
+
+
+
     /* === ВОЛШЕБНИК ПОД ВОПРОСАМИ В ПРАВОЙ КОЛОНКЕ === */
     #toc-wizard {
       margin-top: 14px;
@@ -580,8 +639,8 @@ body{
       box-shadow:
         0 2px 8px rgba(15, 23, 42, 0.08);
       color: #0f172a;
-      font-size: 12.5px;
-      line-height: 1.35;
+      font-size: 14px;
+      line-height: 1.4;
 
       opacity: 0;
       transform: translateY(6px) scale(0.98);
@@ -753,24 +812,7 @@ body{
     0 0 26px rgba(14,165,233,0.14);
     }
 
-    #board .square-55d63.hover-highlight-from {
-      box-shadow: inset 0 0 0 3px rgba(34, 197, 94, 0.95);
-      background: radial-gradient(circle, rgba(250, 204, 21, 0.55), transparent 70%);
-    }
-
-    #board .square-55d63.hover-highlight-to {
-      box-shadow: inset 0 0 0 3px rgba(34, 197, 94, 0.95);
-      background: radial-gradient(circle, rgba(34, 197, 94, 0.55), transparent 70%);
-    }
-
-    #board .square-55d63.user-highlight-square {
-      box-shadow:
-        inset 0 0 0 3px rgba(59, 130, 246, 0.9),
-        inset 0 0 12px rgba(59, 130, 246, 0.85);
-      background:
-        radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent 70%);
-    }
-
+   
     .board-arrow {
       stroke: rgba(59, 130, 246, 0.95);
       stroke-width: 3;
@@ -2713,6 +2755,7 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 }
 
 /* Answer button — Apple-like row */
+/* Базовый вид ответа */
 #answers .answer-option{
   position: relative;
   width: 100%;
@@ -2720,8 +2763,8 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
   padding: 10px 12px 10px 42px;
   border-radius: 12px;
 
-  background: transparent;
-  border: 1px solid var(--qa-divider);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 
   color: var(--qa-text);
   font-size: 13px;
@@ -2730,10 +2773,13 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
   box-shadow: none;
   transform: none;
 
-  transition: background-color 0.12s ease, border-color 0.12s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-/* Letter badge: neutral, not bright blue */
+/* Буквенный бейдж */
 #answers .answer-option::before{
   content: attr(data-letter);
   position: absolute;
@@ -2745,8 +2791,8 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
   height: 22px;
   border-radius: 7px;
 
-  background: rgba(0,0,0,0.06);
-  color: rgba(0,0,0,0.60);
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.60);
 
   display: flex;
   align-items: center;
@@ -2754,25 +2800,36 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 
   font-size: 12px;
   font-weight: 650;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
-/* Hover: same calm light gray as in Apple sidebar */
+/* Hover / фокус в стиле Apple */
 #answers .answer-option:hover:not(:disabled),
 #answers .answer-option:focus-visible:not(:disabled){
-  background: rgba(0,0,0,0.04);
-  border-color: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.035);
+  border-color: rgba(0,0,0,0.15);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   outline: none;
 }
 
-/* Correct/incorrect — subtle, not кислотный */
+#answers .answer-option:hover:not(:disabled)::before,
+#answers .answer-option:focus-visible:not(:disabled)::before{
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.75);
+}
+
+/* Правильный / неправильный — мягкие акценты */
 #answers .answer-option.correct{
-  background: rgba(34, 197, 94, 0.10);
-  border-color: rgba(34, 197, 94, 0.28);
+  background: rgba(22, 163, 74, 0.10);
+  border-color: rgba(22, 163, 74, 0.40);
 }
 
 #answers .answer-option.incorrect{
-  background: rgba(239, 68, 68, 0.10);
-  border-color: rgba(239, 68, 68, 0.28);
+  background: rgba(220, 38, 38, 0.10);
+  border-color: rgba(220, 38, 38, 0.40);
 }
 
 #status{
@@ -2844,55 +2901,6 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 }
 
 
-/* === ANSWERS: white magic glow + subtle Apple accents === */
-:root{
-  --magic-white: rgba(255,255,255,0.92);
-  --magic-glow: rgba(255,255,255,0.65);
-  --apple-blue: rgba(10, 132, 255, 0.55);
-}
-
-#answers .answer-option{
-  border: 1px solid rgba(0,0,0,0.10) !important;
-  background: rgba(255,255,255,0.55) !important;
-  backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-}
-
-/* Белое "волшебное" свечение по рамке */
-#answers .answer-option:hover:not(:disabled),
-#answers .answer-option:focus-visible:not(:disabled){
-  background: rgba(251, 247, 240,0.8) !important;
-  border-color: rgba(251, 247, 240,0.95) !important;
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.70),
-    0 0 18px rgba(196, 106, 74,0.15),
-    0 10px 26px rgba(0,0,0,0.08),
-    0 0 0 3px rgba(90, 70, 56, 0.12); /* тонкий Apple-акцент */
-}
-
-/* Акцент на "буквенный бейдж" */
-#answers .answer-option:hover:not(:disabled)::before,
-#answers .answer-option:focus-visible:not(:disabled)::before{
-  background:rgba(10,132,255,0.18) !important;
-  color: rgba(10,132,255,0.95) !important;
-  box-shadow:
-    0 0 0 1px rgba(10,132,255,0.18),
-    0 0 14px rgba(255,255,255,0.40);
-}
-
-/* Чуть “магии” для правильного/неправильного, но по-Apple мягко */
-#answers .answer-option.correct{
-  box-shadow:
-    0 0 0 1px rgba(34, 197, 94, 0.22),
-    0 0 18px rgba(255,255,255,0.35);
-}
-
-#answers .answer-option.incorrect{
-  box-shadow:
-    0 0 0 1px rgba(239, 68, 68, 0.22),
-    0 0 18px rgba(255,255,255,0.25);
-}
 
 
 
@@ -3080,38 +3088,158 @@ h1{
 
 
 
-#board .square-55d63.hover-highlight-from{
-  box-shadow:
-    inset 0 0 0 3px rgba(251, 191, 36, 0.95),
-    inset 0 0 12px rgba(251, 191, 36, 0.85);
-  background:
-    radial-gradient(circle, rgba(251, 191, 36, 0.55), transparent 70%);
+
+/* Тёплое свечение, исходящее от варианта ответа */
+
+#answers .answer-option {
+  position: relative;
+  overflow: visible;
+  transition:
+    background-color 160ms ease-out,
+    box-shadow 160ms ease-out,
+    transform 140ms ease-out;
 }
 
-#board .square-55d63.hover-highlight-to{
+/* Основной эффект: тёплое «сияние» вокруг ответа */
+#answers .answer-option:hover:not(:disabled),
+#answers .answer-option:focus-visible:not(:disabled) {
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 249, 235, 0.95),   /* тёплое высветление сверху */
+      rgba(254, 243, 199, 0.96)    /* мягкий кремово‑золотистый низ */
+    );
   box-shadow:
-    inset 0 0 0 3px rgba(37, 99, 235, 0.95),
-    inset 0 0 14px rgba(37, 99, 235, 0.85);
-  background:
-    radial-gradient(circle, rgba(59, 130, 246, 0.55), transparent 70%);
+    0 0 0 0 rgba(0, 0, 0, 0),
+    0 0 22px rgba(245, 158, 11, 0.32);  /* рассеянное тёплое свечение вовне */
+  transform: translateY(-1px);          /* очень лёгкий подъём */
+  outline: none;
 }
 
-/ пользовательские выделения — яркий, но «яблочный» синий /
-#board .square-55d63.user-highlight-square{
-  box-shadow:
-    inset 0 0 0 3px rgba(10, 132, 255, 0.96),
-    inset 0 0 0 6px rgba(15, 23, 42, 0.55);
-  background:
-    radial-gradient(circle, rgba(10,132,255,0.40), transparent 70%);
+/* Бейдж с буквой: чуть теплее и мягче, без резких контуров */
+#answers .answer-option:hover:not(:disabled)::before,
+#answers .answer-option:focus-visible:not(:disabled)::before {
+  background: rgba(252, 211, 77, 0.18);           /* тёплый полупрозрачный ореол */
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.45);   /* лёгкое локальное свечение */
+  color: rgba(88, 28, 13, 0.96);
+}
+
+/* Очень деликатный внутренний «отблеск», без явной анимации */
+#answers .answer-option::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255, 255, 255, 0.45),
+    transparent 60%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease-out;
+}
+
+#answers .answer-option:hover:not(:disabled)::after,
+#answers .answer-option:focus-visible:not(:disabled)::after {
+  opacity: 1;
+}
+
+/* Учитываем prefers-reduced-motion — оставляем только плавные изменения без "движения" */
+@media (prefers-reduced-motion: reduce) {
+  #answers .answer-option {
+    transition:
+      background-color 160ms ease-out,
+      box-shadow 160ms ease-out;
+  }
 }
 
 
 
 
+/* ВАРИАНТ 2: тёплый сине-бирюзовый акцент */
+
+#board .square-55d63.hover-highlight-from,
+#board .square-55d63.hover-highlight-to {
+  box-shadow:
+    inset 0 0 0 2px rgba(37, 99, 235, 0.88),   /* глубокий синий контур */
+    inset 0 0 12px rgba(56, 189, 248, 0.60);   /* мягкое бирюзовое свечение */
+  background:
+    radial-gradient(
+      circle,
+      rgba(125, 211, 252, 0.55),               /* светлый тёплый голубой центр */
+      transparent 78%
+    );
+}
 
 
+#wizard-next-move-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 10px;
+
+  width: 110px;
+  height: 36px;
+
+  padding: 0 10px;
+  border-radius: 10px;          /* прямоугольник с мягкими углами */
+
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+
+  font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: rgba(17, 24, 39, 0.9);
+  cursor: pointer;
+
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.04),
+    0 8px 20px rgba(0, 0, 0, 0.08);
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease,
+    color 0.18s ease;
+}
+
+#wizard-next-move-btn:hover {
+  background: rgba(248, 249, 252, 0.98);
+  border-color: rgba(0, 0, 0, 0.20);
+  color: rgba(15, 23, 42, 0.95);
+  transform: translateY(-1px);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.06),
+    0 14px 26px rgba(0, 0, 0, 0.14);
+}
+
+#wizard-next-move-btn:active {
+  transform: translateY(0);
+  background: rgba(243, 244, 246, 0.98);
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.08),
+    0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+#wizard-next-move-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
 
 
+/* Обёртка для кнопки "Дальше" — прижим к правому краю блока вопросов */
+.wizard-next-move-wrapper{
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;  /* тянем кнопку вправо */
+}
 
 
 
@@ -3152,11 +3280,7 @@ h1{
     </div>
   </div>
 
-  <audio
-    id="victory-sound"
-    src="quest_success.mp3"
-    preload="auto">
-  </audio>
+  <audio id="victory-sound" src="quest_success.mp3" preload="auto"></audio>
 
   <audio
     id="gameover-sound"
@@ -3201,7 +3325,7 @@ h1{
 <audio id="sound-questchoice" src="sound/questchoice.wav" preload="auto"></audio>
 <audio id="sound-answerhover" src="sound/answerhover.wav" preload="auto"></audio>
 <audio id="heart-sound" src="sound/heartbeating.mp3"  preload="auto"></audio>
-
+<audio id="sound-listing" src="sound/listing.mp3" preload="auto"></audio>
 
 
   <div id="welcome-screen">
@@ -3653,7 +3777,9 @@ h1{
             </div>
           </div>
         </div>
-
+	<div class="wizard-next-move-wrapper">
+  <button id="wizard-next-move-btn" style="display: none;">Дальше</button>
+</div>
         <div id="score">
           <span id="score-value">Очки: 0</span>
         </div>
@@ -5841,6 +5967,8 @@ const clickTocSoundEl = document.getElementById('sound-clicktoc');
 const questChoiceSoundEl = document.getElementById('sound-questchoice');
 const answerHoverSoundEl = document.getElementById('sound-answerhover');
 const heartSoundEl = document.getElementById('heart-sound');
+const listingSoundEl = document.getElementById('sound-listing');
+
 
 function playSound(el, volume = 0.8) {
   if (!el) return;
@@ -6302,6 +6430,20 @@ window.addEventListener('resize', () => {
       const moveCounterEl = document.getElementById('move-counter');
       const prevMoveBtn = document.getElementById('prev-move-btn');
       const nextMoveBtn = document.getElementById('next-move-btn');
+      const wizardNextMoveBtn = document.getElementById('wizard-next-move-btn');
+
+if (wizardNextMoveBtn) {
+  wizardNextMoveBtn.addEventListener('click', () => {
+    // Поведение как у кнопки "Вперёд" под доской
+    if (questionActive) return;
+    if (currentMoveIndex < movesList.length) {
+      currentMoveIndex++;
+      const mv = movesList[currentMoveIndex - 1];
+      if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
+      updateBoardAndNotation();
+    }
+  });
+}
       const introTextEl = document.getElementById('intro-text');
       const scoreContainerEl = document.getElementById('score');
       const scoreValueEl = document.getElementById('score-value');
@@ -6319,6 +6461,7 @@ window.addEventListener('resize', () => {
       const gameoverVideoEl = document.getElementById('gameover-video');
       const resizeHandleEl = document.getElementById('resize-board-handle');
       const boardEl = document.getElementById('board');
+      const questionBlockEl = document.getElementById('question-block');
       const notationBlockEl = document.getElementById('notation-block');
 // === FIX: не увеличиваем доску на десктопе ===
 // На широких экранах оставляем "дизайнерский" размер из макета,
@@ -6769,6 +6912,18 @@ window.addEventListener('resize', () => {
         ) {
           showFinalSummary();
         }
+
+ // Показ/скрытие кнопки "Дальше" под волшебником
+        if (wizardNextMoveBtn) {
+          // Кнопка видна, когда НЕТ активного вопроса и партия ещё не долистана до конца
+          const canGoNext = !questionActive && currentMoveIndex < movesList.length && !summaryShown;
+          wizardNextMoveBtn.style.display = canGoNext ? 'inline-flex' : 'none';
+        }
+
+
+
+
+
       }
 
 function goToNextQuest() {
@@ -6835,6 +6990,7 @@ function goToNextQuest() {
     const totalPages = Math.ceil(paragraphs.length / pageSize);
     currentPage = (currentPage + 1) % totalPages; // листаем по кругу
     renderPage(currentPage);
+    playSound(listingSoundEl, 0.8);
   });
 
   // начальная страница
@@ -7333,6 +7489,12 @@ if (nextIndex < gamesData.length) {
         prevMoveBtn.disabled = true;
         nextMoveBtn.disabled = true;
 
+
+        if (wizardNextMoveBtn) {
+          wizardNextMoveBtn.style.display = 'none';
+        }
+
+
         const questionIndex = keyMoments.findIndex(m => m.index === moment.index);
         const questionNumber = questionIndex !== -1 ? questionIndex + 1 : '';
         questionTitleEl.textContent = questionNumber ? `Вопрос № ${questionNumber}` : 'Вопрос';
@@ -7406,6 +7568,11 @@ if (nextIndex < gamesData.length) {
 
         prevMoveBtn.disabled = true;
         nextMoveBtn.disabled = true;
+
+
+	if (wizardNextMoveBtn) {
+          wizardNextMoveBtn.style.display = 'none';
+        }
 
         const questionIndex = keyMoments.findIndex(m => m.index === moment.index);
         const questionNumber = questionIndex !== -1 ? questionIndex + 1 : '';
@@ -7746,6 +7913,50 @@ window.addEventListener('resize', () => {
   autoFitBoard();
 });
 
+
+// Прокрутка колёсиком: назад/вперёд по ходам
+function onWheelScrollMoves(e){
+  // если сейчас активен вопрос – не листаем
+  if (questionActive) return;
+
+  // чувствительность: игнорировать очень маленькие движения трекпада
+  if (Math.abs(e.deltaY) < 10) return;
+
+  e.preventDefault();
+
+  if (e.deltaY > 0) {
+    // вниз — следующий ход
+    if (currentMoveIndex < movesList.length) {
+      currentMoveIndex++;
+      const mv = movesList[currentMoveIndex - 1];
+      if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
+      updateBoardAndNotation();
+    }
+  } else {
+    // вверх — предыдущий ход
+    if (currentMoveIndex > 0) {
+      currentMoveIndex--;
+      const mv = movesList[currentMoveIndex - 1];
+      if (mv && mv.san) wizardSay(`Смотрим позицию после: ${mv.san}`);
+      updateBoardAndNotation();
+    }
+  }
+}
+
+// вешаем обработчик на доску и нотацию
+if (boardEl) {
+  boardEl.addEventListener('wheel', onWheelScrollMoves, { passive: false });
+}
+if (notationContentEl) {
+  notationContentEl.addEventListener('wheel', onWheelScrollMoves, { passive: false });
+}
+if (questionBlockEl) {
+  questionBlockEl.addEventListener('wheel', onWheelScrollMoves, { passive: false });
+}
+
+
+
+
     });
 
 // === WELCOME WIZARD: проиграть один раз и заморозить на последнем кадре ===
@@ -7763,7 +7974,6 @@ if (welcomeVideoEl) {
     } catch (e) {}
   });
 }
-
 
 
 
