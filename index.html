@@ -147,7 +147,7 @@
 
 
 
-<-- Sand + plants (eye-friendly) theme for chessboard.js v1
+<!-- Sand + plants (eye-friendly) theme for chessboard.js v1
    Мягкий контраст, хорошая читаемость фигур, приятное тёплое свечение.
    Вставь ПОСЛЕ chessboard.css 
 
@@ -3243,6 +3243,84 @@ h1{
 
 
 
+/* Подсветка клетки по правому клику — более контрастная и всё ещё «тёплая» */
+#board .square-55d63.user-highlight-square{
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.95),
+    inset 0 0 18px rgba(56, 189, 248, 0.85);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.45), transparent 72%);
+}
+
+
+
+
+
+
+
+/* Координаты вокруг подложки доски */
+/* Контейнер доски */
+#board-wrapper{
+  position: relative;
+  display: inline-block; /* чтобы размер подстраивался под доску */
+}
+
+/* Слой координат поверх/рядом с доской */
+#board-coords{
+  position: absolute;
+  inset: 0;           /* совпадает с границами доски */
+  pointer-events: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: #111827;
+}
+
+/* Буквы снизу */
+.board-files.bottom{
+  position: absolute;
+  left: 35px;
+  right: 35px;
+  bottom: 52px;     /* <– вынесено "ниже" доски: меняешь это число */
+  display: flex;
+  justify-content: space-between;
+ // gap: 32px;
+ // padding: 0 6px;    /* отступ от краёв */
+}
+
+/* Цифры справа */
+.board-ranks.right{
+  position: absolute;
+  top: 35px;
+  bottom: 87px;
+  right: 0;      /* <– вынесено "правее" доски */
+  display: flex;
+  flex-direction: column-reverse;  /* 1 внизу, 8 вверху */
+  justify-content: space-between;
+ // padding: 4px 0;
+}
+
+/* Оформление самих символов */
+#board-coords span{
+  display: inline-block;
+  padding: 1px 3px;
+  letter-spacing: 0.08em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3302,7 +3380,7 @@ h1{
 
   <audio
     id="sound-wrong"
-    src="nope.mp3"
+    src="sound_wrong.mp3"
     preload="auto">
   </audio>
 
@@ -3619,6 +3697,32 @@ h1{
         </span>
       </button>
     </li>
+   <li>
+  <button class="toc-item" data-game-index="20">
+    <span class="toc-item-number">21</span>
+    <span class="toc-item-text">
+      <span class="toc-item-main">Х.Р. Капабланка – Ч. Джаффе</span>
+      <span class="toc-item-sub">Нью‑Йорк, 1910 · Спокойная сила в ферзевом гамбите</span>
+    </span>
+  </button>
+</li>
+<li>
+  <button class="toc-item" data-game-index="21">
+    <span class="toc-item-number">22</span>
+    <span class="toc-item-text">
+      <span class="toc-item-main">Х.Р. Капабланка – Д. Яновский</span>
+      <span class="toc-item-sub">С.-Петербург, 1914 · Давление на центр и динамика пешечных подрывов</span>
+    </span>
+  </button>
+</li>
+
+
+
+
+
+
+
+
 
   </ol>
 </div>
@@ -3716,6 +3820,11 @@ h1{
       <div id="board-column">
         <div id="board-wrapper">
           <div id="board"></div>
+	 <!-- НОВОЕ: координаты вокруг доски -->
+  <div id="board-coords">
+    <div class="board-files bottom"></div>
+    <div class="board-ranks right"></div>
+  </div>
 	<div id="move-controls">
           <button id="prev-move-btn" class="move-btn">
             <span class="icon">←</span>
@@ -5880,7 +5989,7 @@ Qxe5 22. Nxf7+ 1-0
               options: ['Nh6+', 'Bxe5', 'Rxd6', 'Nxd6'],
               explanations: {
                 'Rxd6': '17.Rxd6! — точный удар: белые меняют ладьи на лучшую фигуру соперника и разрушают опору чёрных на d6.',
-                'Nh6+': '17.Nh6+ выглядит эффектно, но преждевременно: сначала лучше разрушить оборону ходом Rxd6!.',
+                'Nh6+': '17.Nh6+ выглядит эффектно, но преждевременно.',
                 'Bxe5': '17.Bxe5? отпускает напряжение и упускает конкретные тактические ресурсы на d6.',
                 'Nxd6': '17.Nxd6?! размен коня преждевременен, ход ладьёй на d6 куда сильнее по динамике.'
               }
@@ -5918,11 +6027,252 @@ Qxe5 22. Nxf7+ 1-0
           ]
         },
 
+{
+  id: 'capablanca_jaffe_1910',
+  title: 'Партия ?. Х.Р. Капабланка – Ч. Джаффе, Нью-Йорк 1910',
+  introParagraphs: [
+    'Ещё один пример спокойной, но ядовитой игры Капабланки. Белые развиваются без спешки, проводят e4–e5, затем используют ослабление королевского фланга чёрных.',
+    'Обрати внимание, как Капабланка сначала ставит фигуры на лучшие поля, а затем проводит серию точных тактических ударов.',
+    'Попробуем воспроизвести его ключевые решения по ходу партии.'
+  ],
+  pgn: `
+[Event "NYSCA ch playoff"]
+[Site "New York, NY USA"]
+[Date "1910.03.05"]
+[EventDate "?"]
+[Round "2"]
+[Result "1-0"]
+[White "Jose Raul Capablanca"]
+[Black "Charles Jaffe"]
+[ECO "D46"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "39"]
+
+1. d4 d5 2. Nf3 Nf6 3. e3 c6 4. c4 e6 5. Nc3 Nbd7 6. Bd3 Bd6
+7. O-O O-O 8. e4 dxe4 9. Nxe4 Nxe4 10. Bxe4 Nf6 11. Bc2 h6
+12. b3 b6 13. Bb2 Bb7 14. Qd3 g6 15. Rae1 Nh5 16. Bc1 Kg7
+17. Rxe6 Nf6 18. Ne5 c5 19. Bxh6+ Kxh6 20. Nxf7+ 1-0
+  `.trim(),
+  keyMoments: [
+    // index 14: после 7...O-O, ход белых 8.e4
+    {
+      index: 14,
+      type: 'manual',
+      points: 1,
+      question: 'Найдите лучшее продолжение за белых в этой позиции.',
+      correctMoveSan: 'e4',
+      explanations: {
+        'e4': '8.e4! — логичный центральный прорыв: белые захватывают пространство, подготавливая давление на пункт e5 и размен в центре.'
+      }
+    },
+
+    // index 20: после 10...Nf6, ход белых 11.Bc2
+    {
+      index: 20,
+      question: 'Какое продолжение наилучшее за белых?',
+      correctMoveSan: 'Bc2',
+      points: 2,
+      options: ['Bd3', 'Bc2', 'Bg5', 'Re1'],
+      explanations: {
+        'Bc2': '11.Bc2! — слон отходит на длинную диагональ, оставаясь в игре и поддерживая возможный ход Qd3/Qd3–h7 в будущем.',
+        'Bd3': '11.Bd3 — слон смотрит в свою пешку на e4 и стоит менее активно, чем на c2.',
+        'Bg5': '11.Bg5? отдаёт темп под h6 и g5 и не соответствует капабланковскому стилю усиления фигур.',
+        'Re1': '11.Re1 пока рано: сначала лучше расставить фигуры (слона) на оптимальные поля.'
+      }
+    },
+
+    // index 22: после 11...h6, ход белых 12.b3
+    {
+      index: 22,
+      question: 'Продолжите развитие за белых.',
+      correctMoveSan: 'b3',
+      points: 1,
+      options: ['Be3', 'b3'],
+      explanations: {
+        'b3': '12.b3! — укрепление ферзевого фланга и подготовка Bb2: слон выйдет на мощную диагональ, поддерживая центр и королевский фланг.',
+        'Be3': '12.Be3 выглядит естественно, но слон на b2 будет куда сильнее, чем на e3.'
+      }
+    },
+
+    // index 26: после 13...Bb7, ход белых 14.Qd3
+    {
+      index: 26,
+      type: 'manual',
+      points: 1,
+      question: 'Найдите лучший развивающий ход за белых.',
+      correctMoveSan: 'Qd3',
+      explanations: {
+        'Qd3': '14.Qd3! — ферзь усиливает давление на диагонали d3–h7 и поддерживает e4–e5 или тактические мотивы на g6/h7.'
+      }
+    },
+
+    // index 32: после 16...Kg7, ход белых 17.Rxe6
+    {
+      index: 32,
+      type: 'manual',
+      points: 3,
+      question: 'Пора взорвать позицию чёрных. Найдите лучшее продолжение за белых.',
+      correctMoveSan: 'Rxe6',
+      explanations: {
+        'Rxe6': '17.Rxe6! — мощная жертва качества: белые вскрывают e‑линию и диагонали против короля, используя недостаток фигур вокруг чёрного монарха.'
+      }
+    },
+
+    // index 36: после 18...c5, ход белых 19.Bxh6+
+    {
+      index: 36,
+      type: 'manual',
+      points: 3,
+      question: 'Какой ход здесь самый сильный за белых?',
+      correctMoveSan: 'Bxh6+',
+      explanations: {
+        'Bxh6+': '19.Bxh6+! — добивающий удар: белые уничтожают последнего защитника короля, после чего вилка Nxf7+ решает партию.'
+      }
+    },
+
+    // index 38: после 19...Kxh6, ход белых 20.Nxf7+
+    {
+      index: 38,
+      type: 'manual',
+      points: 3,
+      question: 'Продолжите атаку за белых.',
+      correctMoveSan: 'Nxf7+',explanations: {
+        'Nxf7+': '20.Nxf7+! — типичная вилка: шах королю и атака на ладью h8; чёрные не могут спастись от материальных потерь и продолжающейся атаки.'
+      }
+    }
+  ]
+},
 
 
 
+{
+  id: 'capablanca_janowski_1914',
+  title: 'Партия ?. Х.Р. Капабланка – Д. Яновский, Петербург 1914',
+  introParagraphs: [
+    'Классическая партия Капабланки против острого практического игрока Давида Яновского.',
+    'Белые терпеливо усиливают позицию: выжидают, улучшая фигуры (таинственный ход ладьёй), затем готовят пешечные прорывы на ферзевом фланге и в центре.',
+    'Проследи, как Капабланка шаг за шагом улучшает позицию и подготавливает подрывные работы. Попробуй сам(а) найти его ключевые ходы.'
+  ],
+  pgn: `
+[Event "St. Petersburg"]
+[Site "St. Petersburg  RUE"]
+[Date "1914.05.03"]
+[EventDate "1914.04.21"]
+[Round "9"]
+[Result "1-0"]
+[White "Jose Raul Capablanca"]
+[Black "David Janowski"]
+[ECO "C68"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "61"]
 
-
+1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Bxc6 dxc6 5.Nc3 Bc5 6.d3 Bg4
+7.Be3 Bxe3 8.fxe3 Qe7 9.O-O O-O-O 10.Qe1 Nh6 11.Rb1 f6 12.b4
+Nf7 13.a4 Bxf3 14.Rxf3 b6 15.b5 cxb5 16.axb5 a5 17.Nd5 Qc5
+18.c4 Ng5 19.Rf2 Ne6 20.Qc3 Rd7 21.Rd1 Kb7 22.d4 Qd6 23.Rc2
+exd4 24.exd4 Nf4 25.c5 Nxd5 26.exd5 Qxd5 27.c6+ Kb8 28.cxd7
+Qxd7 29.d5 Re8 30.d6 cxd6 31.Qc6 1-0
+  `.trim(),
+  keyMoments: [
+    {
+      index: 12,
+      question: 'Позиция после 6...Bg4. Какой ход за белых наилучший?',
+      correctMoveSan: 'Be3',
+      options: ['Be3', 'Bg5', 'O-O', 'Na4'],
+      explanations: {
+        'Be3': '7.Be3! — спокойное развитие с борьбой за ключевое поле c5 и подготовкой укрепления центра. Очень капабланковский ход.',
+        'Bg5': '7.Bg5 выглядит активно, но создаёт лишние обмены и не так чётко поддерживает структуру пешек.',
+        'O-O': '7.O-O — нормально, но ход слоном Be3 более точен по смыслу позиции.',
+        'Na4': '7.Na4 — прыжок ради нападения на слона, но конь при этом оказывается на краю и теряет влияние в центре.'
+      }
+    },
+    {
+      index: 18,
+      question: 'После 9...O-O-O у белых крепкий центр и слон на e3. Найдите типичный ход за белых в подобных структурах.',
+      correctMoveSan: 'Qe1',
+      options: ['d4', 'Qe1', 'Qd2'],
+      explanations: {
+        'Qe1': '10.Qe1! — очень типичный приём: ферзь готовится выйти на g3 или h4, поддерживая e4–e5 и возможное давление на короля.',
+        'd4': '10.d4?! слишком рано вскрывает центр — пока фигуры ещё не все оптимально расставлены.',
+        'Qd2': '10.Qd2 имеет похожую идею, но Qe1 более гибок: можно идти и на g3, и на h4, и на f2.'
+      }
+    },
+    {
+      index: 20,
+      type: 'manual',
+      points: 3,
+      question: 'После 10...Nh6 белые Делают нестандартный, но сильный ход. Найдите его.',
+      correctMoveSan: 'Rb1',
+      explanations: {
+        'Rb1': '11.Rb1!! — тихий, но очень сильный ход: ладья заранее встаёт на открытую линию b, поддерживая пешечные подрывы b4–b5 и давление на ферзевый фланг.'
+      }
+    },
+    {
+      index: 32,
+      type: 'manual',
+      points: 1,
+      question: 'После 16...a5 у белых «просится» один ход — и он действительно лучший. Найдите его.',
+      correctMoveSan: 'Nd5',
+      explanations: {
+        'Nd5': '17.Nd5! — конь врывается на сильнейший форпост, усиливая давление на c7 и f6 и связывая фигуры чёрных.'
+      }
+    },
+    {
+      index: 40,
+      type: 'manual',
+      points: 2,
+      question: 'Ходом 20...Rd7 чёрные пока удерживают позицию. У белых появилась потенциальная возможность взорвать позицию. Как подготовить подрывные работы?',
+      correctMoveSan: 'Rd1',
+      explanations: {
+        'Rd1': '21.Rd1! — белые удваивают тяжёлые фигуры по вертикали d и готовят мощный прорыв пешкой d4–d5, вскрывая игру против короля чёрных.'
+      }
+    },
+    {
+      index: 44,
+      type: 'manual',
+      points: 1,
+      question: 'После 22...Qd6 белые могут усилить давление и снова подготовить «взрыв». Какой ход они делают?',
+      correctMoveSan: 'Rc2',
+      explanations: {
+        'Rc2': '23.Rc2! — ладья переводится на c‑линию, поддерживая пешку c5 и готовя вторжение по c7 и d7 после прорыва d4–d5.'
+      }
+    },
+    {
+      index: 50,
+      question: 'После 25...Nxd5 у белых несколько возможностей продолжить. Какой ход сильнейший?',
+      correctMoveSan: 'exd5',
+      points: 2,
+      options: ['c6+', 'exd5', 'cxd6'],
+      explanations: {
+        'exd5': '26.exd5! — сильнейшее продолжение: пешка d становится проходной, а линия e открывается для тяжёлых фигур.',
+        'c6+': '26.c6+?! выглядит заманчиво, но преждевременно фиксирует структуру и не использует всей силы проходной пешки d.',
+        'cxd6': '26.cxd6? упрощает игру и отдаёт инициативу: проходная пешка могла быть куда опаснее.'
+      }
+    },
+    {
+      index: 58,
+      type: 'manual',
+      points: 1,
+      question: 'После 29...Re8 у белых есть простой и при этом очень сильный способ продолжить давление. Найдите его.',
+      correctMoveSan: 'd6',
+      explanations: {
+        'd6': '30.d6! — пешка становится на шестую горизонталь и связывает фигуры чёрных: любые размены ведут к опасной проходной и угрозам по диагоналям.'
+      }
+    },
+    {
+      index: 60,
+      type: 'manual',
+      points: 3,
+      question: 'Чёрные только что сыграли 30...cxd6. Как белые завершают партию самым техничным образом?',
+      correctMoveSan: 'Qc6',
+      explanations: {
+        'Qc6': '31.Qc6! — ферзь вторгается на c6 с двойным ударом: давление на d6 и b6, угрозы по 7‑й горизонтали и фактически безнадёжная позиция чёрных. Технический нокаут.'
+      }
+    }
+  ]
+},
 
 
 
@@ -5959,10 +6309,47 @@ Qxe5 22. Nxf7+ 1-0
         pieceTheme: 'img/chesspieces/alpha/{piece}.png',
         onDragStart: onDragStart,
         onDrop: onDrop,
-        onSnapEnd: onSnapEnd
+        onSnapEnd: onSnapEnd,
+	showNotation: false  
       });
 
-      const boardWrapperEl = document.getElementById('board-wrapper');
+const boardWrapperEl = document.getElementById('board-wrapper');
+
+// ==== КООРДИНАТЫ: снизу (файлы) и справа (ранги) ====
+const boardCoordsEl = document.getElementById('board-coords');
+const filesBottomEl = boardCoordsEl.querySelector('.board-files.bottom');
+const ranksRightEl  = boardCoordsEl.querySelector('.board-ranks.right');
+
+function renderBoardCoords() {
+  const orientation = board.orientation();
+  const files = ['A','B','C','D','E','F','G','H'];
+  const ranks = ['1','2','3','4','5','6','7','8'];
+
+  const filesToShow = (orientation === 'white') ? files : files.slice().reverse();
+  const ranksToShow = ranks; // всегда 1 внизу, 8 вверху
+
+  filesBottomEl.innerHTML = '';
+  filesToShow.forEach(f => {
+    const span = document.createElement('span');
+    span.textContent = f;
+    filesBottomEl.appendChild(span);
+  });
+
+  ranksRightEl.innerHTML = '';
+  ranksToShow.forEach(r => {
+    const span = document.createElement('span');
+    span.textContent = r;
+    ranksRightEl.appendChild(span);
+  });
+}
+// первый рендер
+renderBoardCoords();
+
+
+
+
+
+
 const clickTocSoundEl = document.getElementById('sound-clicktoc');
 const questChoiceSoundEl = document.getElementById('sound-questchoice');
 const answerHoverSoundEl = document.getElementById('sound-answerhover');
@@ -6483,6 +6870,7 @@ function autoFitBoard() {
 
     try { board.resize(); } catch (e) {}
     try { updateAllArrowsPositions(); } catch (e) {}
+    renderBoardCoords(); 
     return;
   }
 
@@ -6751,6 +7139,7 @@ window.addEventListener('resize', () => {
         flipBoardBtn.addEventListener('click', () => {
           board.flip();
           updateAllArrowsPositions();
+	  renderBoardCoords();
         });
       }
 
