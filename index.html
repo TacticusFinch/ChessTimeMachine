@@ -375,7 +375,7 @@ body{
     #toc {
       width: 350px;
       text-align: left;
-      border-right: 1px solid #e5e7eb;
+      border: 2px solid #e5e7eb;
       padding-right: 14px;
       box-sizing: border-box;
       padding-top: 10px;
@@ -3311,6 +3311,38 @@ h1{
 
 
 
+.answer-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.answer-eye-btn{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.92);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+.answer-eye-btn:hover{
+  background: rgba(0,0,0,0.03);
+}
+
+.answer-eye-btn:disabled{
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+
 
 
 
@@ -3968,6 +4000,29 @@ h1{
                 'Nc3': 'Стандартное развитие.'
               }
             },
+	
+	{
+  	index: 4,
+  	question: 'Как белым лучше всего защитить пешку на e4?',
+  	correctMoveSan: 'Bd3',
+  	options: ['Bd3', 'Qg4', 'f3'],
+  	explanations: {
+    	'Bd3': '3.Bd3 — самый естественный ход: и развиваем слона, и перекрываем диагональ b7–e4, защищая пешку e4.',
+    	'Qg4': '3.Qg4?! выглядит активно, но не решает проблему пешки e4: чёрные могут быстро выиграть e4.',
+    	'f3':  '3.f3 — защищает пешку e4, но это ослабляет короля и тормозит развитие. Хуже, чем Bd3.'
+  	},
+
+  	// ВАЖНО: описываем «вариант для просмотра» при неправильном ответе Qg4
+  	viewLineForWrong: {
+    	'Qg4': {
+      	title: 'Вариант после 3.Qg4?!',
+      	movesSan: ['Qg4', 'Nf6', 'Qh4', 'Nxe4']
+    			}
+  		}
+	},
+
+
+
             {
               index: 6,
               question: 'Позиция после 3...f5. Как Греко наказывает преждевременное продвижение пешки f у чёрных?',
@@ -6300,6 +6355,14 @@ Qxd7 29.d5 Re8 30.d6 cxd6 31.Qc6 1-0
       let activeManualMoment = null;
       let summaryShown = false;
 
+      let variationMode = false;
+      let variationMovesSan = [];
+      let variationIndex = 0;
+      let variationTitle = '';
+
+      let savedMainFen = '';
+      let savedMainMoveIndex = 0;
+      let savedMomentForVariation = null;
       let survivalMode = false;
       let lives = 3;
 
@@ -6651,6 +6714,7 @@ function tryTapMove(toSquare){
 /* Делегирование кликов по клеткам */
 if (boardElLocal) {
   boardElLocal.addEventListener('click', (e) => {
+    if (variationMode) return;
     if (!isMobileTapMode()) return;
     if (questionActive && !manualQuestionActive) return;
 
@@ -6700,6 +6764,7 @@ window.addEventListener('resize', () => {
      function onDragStart(source, piece, position, orientation) {
   if (window.matchMedia('(max-width: 900px)').matches) return false; // mobile: only tap-to-move
   if (game.game_over()) return false;
+  if (variationMode) return false;
   if (questionActive && !manualQuestionActive) return false;
   if (game.turn() === 'w' && piece[0] === 'b') return false;
   if (game.turn() === 'b' && piece[0] === 'w') return false;
@@ -7228,6 +7293,140 @@ window.addEventListener('resize', () => {
         showQuestionForMoment(moment);
       }
 
+
+function enterVariationMode(moment, lineObj) {
+  // moment — вопрос, из которого мы ушли смотреть
+  // lineObj — { title, movesSan: [...] }
+
+  variationMode = true;
+  savedMomentForVariation = moment;
+
+  // сохраняем текущую основную позицию (она сейчас в game на моменте index)
+  savedMainFen = game.fen();
+  savedMainMoveIndex = currentMoveIndex;
+
+  variationTitle = lineObj.title || 'Вариант';
+  variationMovesSan = Array.isArray(lineObj.movesSan) ? lineObj.movesSan.slice() : [];
+  variationIndex = 0;
+
+  // блокируем обычное управление вопросами/ответами
+  questionActive = true;          // чтобы ваша логика не перескакивала дальше
+  manualQuestionActive = false;prevMoveBtn.disabled = false;
+  nextMoveBtn.disabled = false;
+
+  // показываем интерфейс просмотра варианта
+  renderVariationUI();
+  renderVariationPosition();
+}
+
+function renderVariationUI() {
+  // Показываем заголовок и текст в правом блоке
+  if (introTextEl) introTextEl.style.display = 'none';
+
+  questionTitleEl.style.display = 'block';
+  questionTextEl.style.display = 'block';
+  questionTitleEl.textContent = variationTitle;
+  questionTextEl.textContent = 'Листай вариант кнопками Назад/Вперёд.';
+
+  // очищаем ответы и показываем кнопку "Вернуться"
+  answersEl.innerHTML = '';
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'next-quest-btn'; // можно ваш стиль кнопки
+  backBtn.textContent = 'Вернуться к партии';
+  backBtn.addEventListener('click', () => {
+    exitVariationMode();
+  });
+
+  answersEl.appendChild(backBtn);
+
+  statusEl.textContent = '';
+  if (explanationEl) explanationEl.textContent = '';
+
+  wizardSay('Смотри: это пример, почему Qg4? может быть неточным.');
+}
+
+function renderVariationPosition() {
+  // строим позицию: старт — сохранённый FEN, затем проигрываем variationIndex SAN-ходов
+  const tmp = new Chess(savedMainFen);
+
+  for (let i = 0; i < variationIndex; i++) {
+    const san = variationMovesSan[i];
+    const mv = tmp.move(san);
+    if (!mv) {
+      // если SAN не применился (ошибка в SAN/позиции) — остановимся
+      break;
+    }
+  }
+
+  game.load(tmp.fen());
+  board.position(game.fen());
+
+  // обновим «нотацию» так, чтобы было видно вариант
+  if (notationContentEl) {
+    let html = '';
+    for (let i = 0; i < variationIndex; i++) {
+      html += variationMovesSan[i] + ' ';
+    }
+    notationContentEl.innerHTML = html || '(начало варианта)';
+  }
+
+  // счётчик ходов под кнопками можете также обновить
+  if (moveCounterEl) {
+    moveCounterEl.textContent = `Вариант: ${variationIndex}/${variationMovesSan.length}`;
+  }
+}
+
+function exitVariationMode() {
+  variationMode = false;
+  variationMovesSan = [];
+  variationIndex = 0;
+  variationTitle = '';
+
+  // возвращаем основную позицию
+  game.load(savedMainFen);
+  board.position(game.fen());
+  currentMoveIndex = savedMainMoveIndex;
+
+  // возвращаем вопрос (игрок снова выбирает ответ)
+  questionActive = false;  // чтобы showQuestionForMoment нормально отрисовал снова
+  manualQuestionActive = false;
+
+  prevMoveBtn.disabled = true;  // как у вас в вопросах
+  nextMoveBtn.disabled = true;
+
+  // снова показать тот же вопрос
+  if (savedMomentForVariation) {
+    showQuestionForMoment(savedMomentForVariation);
+  } else {
+    updateBoardAndNotation();
+  }
+
+  savedMomentForVariation = null;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       function updateBoardAndNotation() {
         applyMovesUpTo(currentMoveIndex);
 	 // если сейчас нет активного вопроса и не показывается финальное резюме —
@@ -7467,24 +7666,40 @@ function goToNextQuest() {
 
 
       prevMoveBtn.addEventListener('click', () => {
-        if (questionActive) return;
-        if (currentMoveIndex > 0) {
-          currentMoveIndex--;
-          const mv = movesList[currentMoveIndex - 1];
-          if (mv && mv.san) wizardSay(`Смотрим позицию после: ${mv.san}`);
-          updateBoardAndNotation();
-        }
-      });
+  if (variationMode) {
+    if (variationIndex > 0) {
+      variationIndex--;
+      renderVariationPosition();
+    }
+    return;
+  }
+
+  if (questionActive) return;
+  if (currentMoveIndex > 0) {
+    currentMoveIndex--;
+    const mv = movesList[currentMoveIndex - 1];
+    if (mv && mv.san) wizardSay(`Смотрим позицию после: ${mv.san}`);
+    updateBoardAndNotation();
+  }
+});
 
       nextMoveBtn.addEventListener('click', () => {
-        if (questionActive) return;
-        if (currentMoveIndex < movesList.length) {
-          currentMoveIndex++;
-          const mv = movesList[currentMoveIndex - 1];
-          if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
-          updateBoardAndNotation();
-        }
-      });
+  if (variationMode) {
+    if (variationIndex < variationMovesSan.length) {
+      variationIndex++;
+      renderVariationPosition();
+    }
+    return;
+  }
+
+  if (questionActive) return;
+  if (currentMoveIndex < movesList.length) {
+    currentMoveIndex++;
+    const mv = movesList[currentMoveIndex - 1];
+    if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
+    updateBoardAndNotation();
+  }
+});
 
       document.addEventListener('keydown', (event) => {
         if (questionActive) return;
@@ -7905,31 +8120,45 @@ if (nextIndex < gamesData.length) {
         const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
         shuffledOptions.forEach((optionSan, idx) => {
-          const btn = document.createElement('button');
-          btn.textContent = optionSan;
-          btn.classList.add('answer-option');
-          btn.dataset.letter = letters[idx] || '';
+  const row = document.createElement('div');
+  row.className = 'answer-row';
 
-          const squares = sanToSquares[optionSan] || null;
+  const btn = document.createElement('button');
+  btn.textContent = optionSan;
+  btn.classList.add('answer-option');
+  btn.dataset.letter = letters[idx] || '';
 
-          btn.addEventListener('mouseenter', () => {
-            if (!questionActive) return;
-	    playSound(answerHoverSoundEl, 0.35);
-            if (squares) {
-              highlightMoveOnBoard(squares.from, squares.to);
-            }
-          });
+  const squares = sanToSquares[optionSan] || null;
 
-          btn.addEventListener('mouseleave', () => {
-            if (!questionActive) return;
-            clearHoverHighlights();
-          });
+  btn.addEventListener('mouseenter', () => {
+    if (!questionActive) return;
+    playSound(answerHoverSoundEl, 0.35);
+    if (squares) highlightMoveOnBoard(squares.from, squares.to);
+  });
 
-          btn.addEventListener('click', () => {
-            checkAnswerForMoment(optionSan, moment);
-          });
-          answersEl.appendChild(btn);
-        });
+  btn.addEventListener('mouseleave', () => {
+    if (!questionActive) return;
+    clearHoverHighlights();
+  });
+
+  btn.addEventListener('click', () => {
+    checkAnswerForMoment(optionSan, moment, row);
+  });
+
+  row.appendChild(btn);
+
+  // "Глаз" создаём сразу, но скрываем
+  const eyeBtn = document.createElement('button');
+  eyeBtn.className = 'answer-eye-btn';
+  eyeBtn.type = 'button';
+  eyeBtn.textContent = '👁';
+  eyeBtn.style.display = 'none';
+  eyeBtn.title = 'Посмотреть вариант';
+  row.appendChild(eyeBtn);
+
+  answersEl.appendChild(row);
+});
+
       }
 
       function showManualQuestion(moment) {
@@ -7975,7 +8204,7 @@ if (nextIndex < gamesData.length) {
         wizardSay(moment.question + '\nСделай ход на доске.');
       }
 
-      function checkAnswerForMoment(selectedSan, moment) {
+      function checkAnswerForMoment(selectedSan, moment, rowEl) {
         if (survivalMode && lives <= 0) return;
 
         const buttons = Array.from(answersEl.querySelectorAll('button'));
@@ -8047,6 +8276,25 @@ if (nextIndex < gamesData.length) {
 	  playWizardAnimation('no');	  
 
           statusEl.style.color = 'red';
+	 // Если для этого неправильного ответа предусмотрен "просмотр варианта"
+const lineObj = moment.viewLineForWrong && moment.viewLineForWrong[selectedSan]
+  ? moment.viewLineForWrong[selectedSan]
+  : null;
+
+if (lineObj && rowEl) {
+  const eyeBtn = rowEl.querySelector('.answer-eye-btn');
+  if (eyeBtn) {
+    eyeBtn.style.display = 'inline-flex';
+    eyeBtn.disabled = false;
+
+    eyeBtn.onclick = () => {
+      // важно: не давать уйти, если уже поражение в survival
+      if (survivalMode && lives <= 0) return;
+      enterVariationMode(moment, lineObj);
+    };
+  }
+}
+
           statusEl.textContent = 'Попробуй ещё раз.';
 
           if (explanationEl) {
