@@ -1327,6 +1327,132 @@ body{
 }
 
 
+/* Кнопка "Вернуться" — отдельный стиль, визуально близкий к next-quest-btn */
+.back-quest-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;                 /* расстояние между стрелкой и текстом */
+  padding: 10px 24px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: #ffffff;
+  color: #222;
+
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color 0.22s ease-out,
+    border-color 0.22s ease-out,
+    color 0.22s ease-out,
+    box-shadow 0.22s ease-out,
+    transform 0.22s ease-out;
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.back-quest-btn span {
+  position: relative;
+  transition: transform 0.22s ease-out;
+}
+
+/* Левая стрелка "<" */
+.back-quest-btn::before {
+  content: "";
+  position: relative;
+  width: 10px;
+  height: 10px;
+
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+
+  transform: rotate(45deg);      /* визуально это "<" */
+  opacity: 0.9;
+
+  transition: transform 0.22s ease-out, opacity 0.22s ease-out;
+}
+
+/* Shine-эффект */
+.back-quest-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-20deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.back-quest-btn:hover {
+  background: #e6f0ff;
+  border-color: #2f80ff;
+  color: #1454c4;
+  box-shadow:
+    0 0 0 1px rgba(47, 128, 255, 0.28),
+    0 10px 22px rgba(47, 128, 255, 0.35);
+
+  /* Для "назад" логично чуть уезжать влево */
+  transform: translateX(-3px) translateY(-1px);
+}
+
+.back-quest-btn:hover span {
+  transform: translateX(-1px);
+}
+
+.back-quest-btn:hover::before {
+  transform: rotate(45deg) translateX(-2px);
+  opacity: 1;
+}
+
+.back-quest-btn:hover::after {
+  animation: backQuestShine 0.65s ease-out forwards;
+}
+
+@keyframes backQuestShine {
+  0% { left: -40%; opacity: 0; }
+  10% { opacity: 0.95; }
+  100% { left: 120%; opacity: 0; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     .restart-btn {
       padding: 12px 22px;
@@ -3143,4 +3269,17 @@ h1{
   .variation-controls .next-quest-btn{ flex: 1 1 100%; }
 }
 
+
+/* "Условно правильный" ответ: жёлтая подсветка */
+#answers .answer-option.alt-correct{
+  background: rgba(250, 204, 21, 0.18);
+  border-color: rgba(250, 204, 21, 0.65);
+}
+
+
+.alt-correct {
+  background: #fff7cc;
+  border: 1px solid #f2c94c;
+  color: #333;
+}
 

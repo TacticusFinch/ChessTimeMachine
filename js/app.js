@@ -26,7 +26,16 @@
       let variationAutoDelayMs = 650; // скорость (можно 450–900)
       let variationAutoRunning = false;
 
+let proofMode = false;
+let proofMoment = null;        // какой исходный момент мы доказываем
+let proofAlt = null;           // какой альтернативный ответ выбран (объект из altCorrect)
+let proofStepIndex = 0;        // индекс шага мини-квеста
+let proofAutoTimer = null;
+let proofAutoDelayMs = 650;
+let proofAutoRunning = false;
 
+let savedProofMainFen = '';
+let savedProofMainMoveIndex = 0;
 
 
       let savedMainFen = '';
@@ -207,6 +216,73 @@ function toggleVariationAuto(playBtnEl) {
 
 
 
+function stopProofAuto() {
+  if (proofAutoTimer) {
+    clearInterval(proofAutoTimer);
+    proofAutoTimer = null;
+  }
+  proofAutoRunning = false;
+}
+
+function autoplayMovesFromCurrentPosition(movesSan, onDone) {
+  stopProofAuto();
+
+  if (!Array.isArray(movesSan) || movesSan.length === 0) {
+    if (typeof onDone === 'function') onDone();
+    return;
+  }
+
+  let i = 0;
+  proofAutoRunning = true;
+
+  proofAutoTimer = setInterval(() => {
+    if (!proofMode) {
+      stopProofAuto();
+      return;
+    }
+
+    const san = movesSan[i];
+    const mv = game.move(san);
+    if (!mv) {
+      // если SAN не применился — остановимся
+      stopProofAuto();
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+
+    board.position(game.fen());
+    updateBoardAndNotation();
+
+    i++;
+
+    if (i >= movesSan.length) {
+      stopProofAuto();
+      if (typeof onDone === 'function') onDone();
+    }
+  }, proofAutoDelayMs);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       function wizardSay(text) {
         if (!wizardBubbleEl || !wizardBubbleTextEl) return;
@@ -377,6 +453,28 @@ function tryTapMove(toSquare){
       activeManualMoment = null;
       questionActive = false;
 
+// === PROOF MODE: если это manual-вопрос мини-квеста — продолжаем сценарий ===
+if (proofMode) {
+  // закрываем текущий manual-вопрос
+  manualQuestionActive = false;
+  activeManualMoment = null;
+  questionActive = true;
+
+  const quest = proofAlt && proofAlt.proofQuest;
+  const step = quest && quest.steps ? quest.steps[proofStepIndex] : null;
+
+  const afterMoves = step ? (step.afterCorrectAutoplayMoves || []) : [];
+
+  // проигрываем ответные ходы, потом следующий шаг
+  autoplayMovesFromCurrentPosition(afterMoves, () => {
+    startProofStep(proofStepIndex + 1);
+  });
+
+  return;
+}
+
+
+
       prevMoveBtn.disabled = false;
       nextMoveBtn.disabled = false;
 
@@ -540,6 +638,30 @@ window.addEventListener('resize', () => {
             manualQuestionActive = false;
             activeManualMoment = null;
             questionActive = false;
+
+// === PROOF MODE: если это manual-вопрос мини-квеста — продолжаем сценарий ===
+if (proofMode) {
+  // закрываем текущий manual-вопрос
+  manualQuestionActive = false;
+  activeManualMoment = null;
+  questionActive = true;
+
+  const quest = proofAlt && proofAlt.proofQuest;
+  const step = quest && quest.steps ? quest.steps[proofStepIndex] : null;
+
+  const afterMoves = step ? (step.afterCorrectAutoplayMoves || []) : [];
+
+  // проигрываем ответные ходы, потом следующий шаг
+  autoplayMovesFromCurrentPosition(afterMoves, () => {
+    startProofStep(proofStepIndex + 1);
+  });
+
+  return;
+}
+
+
+
+
 
             prevMoveBtn.disabled = false;
             nextMoveBtn.disabled = false;
@@ -1012,6 +1134,20 @@ window.addEventListener('resize', () => {
         showQuestionForMoment(moment);
       }
 
+     function findAltCorrect(moment, san) {
+  	const arr = moment && Array.isArray(moment.altCorrect) ? moment.altCorrect : [];
+  	return arr.find(a => a && a.san === san) || null;
+	}
+
+
+
+
+
+
+
+
+
+
 
 function enterVariationMode(moment, lineObj) {
   // moment — вопрос, из которого мы ушли смотреть
@@ -1070,16 +1206,16 @@ function renderVariationUI() {
   });
 
   const backBtn = document.createElement('button');
-  backBtn.className = 'next-quest-btn';
+  backBtn.className = 'back-quest-btn';
   backBtn.type = 'button';
-  backBtn.textContent = 'Вернуться';
+  backBtn.innerHTML = 'Вернуться';
   backBtn.addEventListener('click', () => {
     exitVariationMode();
   });
 
+  controls.appendChild(backBtn);
   controls.appendChild(playBtn);
   controls.appendChild(restartBtn);
-  controls.appendChild(backBtn);
 
   answersEl.appendChild(controls);
 
@@ -1151,6 +1287,178 @@ function exitVariationMode() {
 
 
 
+function enterProofMode(moment, altObj) {
+  proofMode = true;
+  proofMoment = moment;
+  proofAlt = altObj;
+  proofStepIndex = 0;
+
+  // сохраняем основную позицию (как вы делаете для варианта)
+  savedProofMainFen = game.fen();
+  savedProofMainMoveIndex = currentMoveIndex;
+
+  // блокируем обычную навигацию по партии, пока идёт мини-квест
+  questionActive = true;
+  manualQuestionActive = false;
+  activeManualMoment = null;
+
+  prevMoveBtn.disabled = true;
+  nextMoveBtn.disabled = true;
+
+  renderProofUI();
+  startProofStep(0);
+}
+
+function exitProofMode(returnToMoment = true) {
+  stopProofAuto();
+
+  proofMode = false;
+  proofStepIndex = 0;
+
+  // вернуться в исходную позицию основного квеста
+  game.load(savedProofMainFen);
+  board.position(game.fen());
+  currentMoveIndex = savedProofMainMoveIndex;
+
+  questionActive = false;
+  manualQuestionActive = false;
+  activeManualMoment = null;
+
+  prevMoveBtn.disabled = false;
+  nextMoveBtn.disabled = false;
+
+  if (returnToMoment && proofMoment) {
+    // снова показываем исходный вопрос
+    showQuestionForMoment(proofMoment);
+  } else {
+    updateBoardAndNotation();
+  }
+
+  proofMoment = null;
+  proofAlt = null;
+}
+
+function renderProofUI() {
+  if (introTextEl) introTextEl.style.display = 'none';
+
+  questionTitleEl.style.display = 'block';
+  questionTextEl.style.display = 'block';
+  questionTitleEl.textContent = (proofAlt && proofAlt.proofQuest && proofAlt.proofQuest.title)
+    ? proofAlt.proofQuest.title
+    : 'Доказательство';
+
+  questionTextEl.textContent = 'Мини‑квест: докажи, что альтернатива работает.';
+
+  answersEl.innerHTML = '';
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'back-quest-btn';
+  backBtn.type = 'button';
+  backBtn.textContent = 'Вернуться';
+  backBtn.addEventListener('click', () => exitProofMode(true));
+
+  answersEl.appendChild(backBtn);
+
+  statusEl.textContent = '';
+  if (explanationEl) explanationEl.textContent = '';
+
+  wizardSay('Докажи идею: сначала посмотрим линию, потом тебе нужно будет сделать ходы на доске.');
+}
+
+function startProofStep(stepIdx) {
+  const quest = proofAlt && proofAlt.proofQuest;
+  if (!quest || !Array.isArray(quest.steps)) {
+    // тут можно сразу выходить, потому что квест некорректен
+    exitProofMode(true);
+    return;
+  }
+
+  const step = quest.steps[stepIdx];
+
+  if (!step) {
+    // === ВАЖНО: НЕ ВЫХОДИМ из proofMode автоматически ===
+    // оставляем текущую позицию на доске (после финального хода)
+
+    const reward = typeof quest.rewardPoints === 'number' ? quest.rewardPoints : 0;
+    if (reward > 0) {
+      score += reward;
+      updateScoreDisplay(reward);
+    }
+
+    questionActive = true;
+    manualQuestionActive = false;
+    activeManualMoment = null;
+
+    // можно разблокировать навигацию, но чаще лучше оставить заблокированной,
+    // чтобы пользователь не "сломал" доказанную позицию случайно
+    prevMoveBtn.disabled = true;
+    nextMoveBtn.disabled = true;
+
+    // UI финала мини-квеста
+    questionTitleEl.style.display = 'block';
+    questionTextEl.style.display = 'block';
+    questionTitleEl.textContent = 'Доказательство завершено';
+    questionTextEl.textContent = 'Вариант доказан. Нажми «Вернуться», чтобы вернуться к основному вопросу.';
+
+    answersEl.innerHTML = '';
+
+    const backBtn = document.createElement('button');
+    backBtn.className = 'back-quest-btn';
+    backBtn.type = 'button';
+
+    // текст завернём в span, чтобы ваш CSS для span работал
+    backBtn.innerHTML = 'Вернуться';
+    backBtn.addEventListener('click', () => exitProofMode(true));
+
+    answersEl.appendChild(backBtn);
+
+    statusEl.textContent = '';
+    if (explanationEl) explanationEl.textContent = '';
+
+    wizardSay('Отлично! Вариант доказан. Если хочешь вернуться — нажми «Вернуться».');
+    return;
+  }
+
+  proofStepIndex = stepIdx;
+
+  autoplayMovesFromCurrentPosition(step.autoplayMoves || [], () => {
+    showProofManualQuestion(step);
+  });
+}
+function showProofManualQuestion(step) {
+  // мы используем вашу существующую логику manual-вопроса,
+  // но "момент" создаём на лету.
+  const pseudoMoment = {
+    index: -1000 - proofStepIndex, // фиктивный индекс
+    question: step.question,
+    type: 'manual',
+    correctMoveSan: step.correctMoveSan,
+    explanations: step.explanations || {}
+  };
+
+  questionActive = true;
+  manualQuestionActive = true;
+  activeManualMoment = pseudoMoment;
+
+  // UI как у manual-вопроса
+  statusEl.style.color = '#333';
+  statusEl.textContent = 'Сделай ход на доске.';
+
+  questionTitleEl.style.display = 'block';
+  questionTextEl.style.display = 'none';
+
+  answersEl.innerHTML = '';
+
+  const backBtn =document.createElement('button');
+  backBtn.className = 'back-quest-btn';
+  backBtn.type = 'button';
+  backBtn.textContent = 'Вернуться';
+  backBtn.addEventListener('click', () => exitProofMode(true));
+  answersEl.appendChild(backBtn);
+
+
+  wizardSay(step.question + 'nСделай ход на доске.');
+}
 
 
 
@@ -1158,7 +1466,11 @@ function exitVariationMode() {
 
 
       function updateBoardAndNotation() {
-        applyMovesUpTo(currentMoveIndex);
+	 // В режимах, где позицию двигают НЕ по mainline-индексу,
+  	// нельзя принудительно "перезагружать" mainline.
+       	if (!proofMode && !variationMode) {
+    		applyMovesUpTo(currentMoveIndex);
+  		}
 	 // если сейчас нет активного вопроса и не показывается финальное резюме —
       // прячем блок вопросов/ответов
       if (!questionActive && !summaryShown) {
@@ -1935,6 +2247,8 @@ if (nextIndex < gamesData.length) {
       }
 
       function checkAnswerForMoment(selectedSan, moment, rowEl) {
+	const alt = findAltCorrect(moment, selectedSan);
+
         if (survivalMode && lives <= 0) return;
 
         const buttons = Array.from(answersEl.querySelectorAll('button'));
@@ -1958,11 +2272,11 @@ if (nextIndex < gamesData.length) {
             triggerDiamondImpact();
             diamondMoves.add(moment.index);
           } else if (delta === 2) {
-    playMagicTwoSound();      // только магический звук
-  } else {
-    playRightSound();         // обычный звук для 1 очка
-  }
-  playWizardAnimation('yes');
+    		playMagicTwoSound();      // только магический звук
+  		} else {
+    			playRightSound();         // обычный звук для 1 очка
+  		}
+  		playWizardAnimation('yes');
           statusEl.style.color = 'green';
           statusEl.textContent = 'Верно!';
 
@@ -1992,7 +2306,53 @@ if (nextIndex < gamesData.length) {
           nextMoveBtn.disabled = false;
           updateBoardAndNotation();
           nextBtn.style.display = 'none';
-        } else {
+	  return;
+        } 
+if (alt) {
+  // 1) Подсветка строки ответа (желтым)
+  if (rowEl) rowEl.classList.add(alt.highlightClass || 'alt-correct');
+
+  // 2) Сообщение игроку
+  statusEl.style.color = '#b45309';
+  statusEl.textContent = 'Ход выглядит возможным, но его нужно доказать. Нажми ⊢.';
+
+  // 3) Кнопка ⊢ (запуск мини-квеста доказательства)
+  const thinkBtn = document.createElement('button');
+  thinkBtn.className = 'answer-eye-btn';
+  thinkBtn.type = 'button';
+  thinkBtn.textContent = '⊢';
+  thinkBtn.title = 'Доказать вариант';
+  thinkBtn.style.display = 'inline-flex';
+
+  thinkBtn.addEventListener('click', () => {
+    // Важно: вернуться в позицию момента перед proof-режимом
+    applyMovesUpTo(moment.index);
+    currentMoveIndex = moment.index;
+
+    enterProofMode(moment, alt);
+  });
+
+  // добавляем кнопку в строку выбранного ответа
+  rowEl.appendChild(thinkBtn);
+
+  // 4) НЕ засчитываем ответ, НЕ тратим жизнь, НЕ даём очки, НЕ двигаем партию
+  // Разблокируем ответы, чтобы игрок мог и передумать
+  const buttons = answersEl.querySelectorAll('button.answer-option');
+  buttons.forEach(b => (b.disabled = false));
+
+  if (explanationEl) {
+    const expl = moment.explanations && moment.explanations[selectedSan];
+    explanationEl.textContent = expl || 'Альтернатива интересная. Докажи её в мини-квесте.';
+  }
+
+  wizardSay('Это может работать. Давай докажем!');
+  return;
+}
+
+
+
+
+else {
           loseLife();
           if (survivalMode && lives <= 0) {
             return;
