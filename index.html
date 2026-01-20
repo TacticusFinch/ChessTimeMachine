@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Шахматный квест</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
+  <link rel="stylesheet" href="css/app.css">
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
+
+
+
+</head>
+<body>
+ <h1>Шахматные квесты</h1>
+<button id="toc-toggle-btn" class="toc-toggle-btn" aria-controls="toc" aria-expanded="false">
+  Выбрать квест
+</button>
+<div id="toc-overlay" class="toc-overlay" hidden></div>
+
+  <div id="victory-effect"></div>
+
+  <div id="gameover-overlay">
+    <div id="gameover-content">
+      <video
+        id="gameover-video"
+        src="animations/RobertWeirde.mp4"
+        autoplay
+        playsinline
+        controls
+      ></video>
+
+      <button id="gameover-restart-btn" class="restart-btn">
+        Начать заново
+      </button>
+    </div>
+  </div>
+
+  <audio id="victory-sound" src="sound/quest_success.mp3" preload="auto"></audio>
+
+  <audio
+    id="gameover-sound"
+    src="sound/gameover.mp3"
+    preload="auto">
+  </audio>
+
+  <audio
+    id="full-victory-sound"
+    src="sound/full_victory.mp3"
+    preload="auto">
+  </audio>
+
+  <audio
+    id="sound-right"
+    src="sound/sound_right.mp3"
+    preload="auto">
+  </audio>
+
+  <audio
+    id="sound-wrong"
+    src="sound/sound_wrong.mp3"
+    preload="auto">
+  </audio>
+
+  <audio
+    id="diamond-sound"
+    src="sound/diamond.mp3"
+    preload="auto">
+  </audio>
+
+<audio
+  id="magic-two-sound"
+  src="sound/magicsound+2.mp3"
+  preload="auto">
+</audio>
+
+
+
+
+<audio id="sound-clicktoc" src="sound/clicktoc.wav" preload="auto"></audio>
+<audio id="sound-questchoice" src="sound/questchoice.wav" preload="auto"></audio>
+<audio id="sound-answerhover" src="sound/answerhover.wav" preload="auto"></audio>
+<audio id="heart-sound" src="sound/heartbeating.mp3"  preload="auto"></audio>
+<audio id="sound-listing" src="sound/listing.mp3" preload="auto"></audio>
+
+
+  <div id="welcome-screen">
+<div class="welcome-card">
+  <div class="welcome-wizard">
+  <div class="welcome-media">
+    <video
+      id="welcome-video"
+      class="welcome-wizard-video"
+      src="animations/wizardwelcome.mp4"
+      autoplay
+      muted
+      playsinline
+    ></video>
+  </div>
+
+  <div class="welcome-bubble">
+    <div class="welcome-bubble-title">Добро пожаловать, мой друг!</div>
+    <div class="welcome-bubble-text">
+      В этом интерактиве представлены разборы легендарных шахматных партий в формате квеста.
+      В ключевые моменты партии тебе будут заданы вопросы на позиционное понимание и на тактику.
+      В конце каждой партии мы посчитаем итоговое количество очков. В путь!
+      </div>
+
+    <button id="start-quest-btn" class="start-quest-btn">Начать квест</button>
+   </div>
+  </div>
+    </div>
+  </div>
+
+  <div id="layout" style="display:grid;">
+
+    <div id="toc">
+      <h3>Оглавление партий</h3>
+
+      <!-- Итальянский романтизм -->
+      <div class="toc-group collapsed">
+        <div class="toc-group-title">
+          <div class="toc-group-title-left">
+            <span class="toc-group-title-badge"></span>
+            <span class="toc-group-title-text">Итальянский романтизм (1620-1850)</span>
+          </div>
+          <span class="toc-group-toggle-icon">›</span>
+        </div>
+        <ol id="toc-greco-list">
+          <li>
+            <button class="toc-item" data-game-index="0">
+              <span class="toc-item-number">1</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Джоакино Греко – NN</span>
+                <span class="toc-item-sub">Лондон, 1623 · Быстрый мат в дебюте</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="1">
+              <span class="toc-item-number">2</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Джоакино Греко – NN</span>
+                <span class="toc-item-sub">ок. 1620 · Атака на короля в центре</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="2">
+              <span class="toc-item-number">3</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Джоакино Греко – NN</span>
+                <span class="toc-item-sub">ок. 1620 · Жертва слона на h7</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="3">
+              <span class="toc-item-number">4</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">NN – Джоакино Греко</span>
+                <span class="toc-item-sub">ок. 1620 · Атака ферзём и конём</span>
+              </span>
+            </button>
+          </li>
+
+          <!-- НОВАЯ ПАРТИЯ: ЛА БУРДОННЕ – МАКДОННЕЛЛ -->
+          <li>
+            <button class="toc-item" data-game-index="4">
+              <span class="toc-item-number">5</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Александер Макдоннелл – Л. де Ла Бурдонне</span>
+                <span class="toc-item-sub">Лондон, 1834 · Классический сицилианский штурм</span>
+              </span>
+            </button>
+          </li>
+
+          <!-- БЕССМЕРТНАЯ (Андерссен – Кизерицкий) -->
+          <li>
+            <button class="toc-item" data-game-index="5">
+              <span class="toc-item-number">6</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Адольф Андерссен – Лионель Кизерицкий</span>
+                <span class="toc-item-sub">Лондон, 1851 · Бессмертная партия</span>
+              </span>
+            </button>
+          </li>
+
+          <li>
+            <button class="toc-item" data-game-index="6">
+              <span class="toc-item-number">7</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Адольф Андерссен – Жан Дюфресн</span>
+                <span class="toc-item-sub">Берлин, 1852 · Жертва качества и атака в Эвансе</span>
+              </span>
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Орлеанский волшебник -->
+      <div class="toc-group collapsed">
+        <div class="toc-group-title">
+          <div class="toc-group-title-left">
+            <span class="toc-group-title-badge"></span>
+            <span class="toc-group-title-text">Пол Чарльз Морфи (1850-1860-е)</span>
+          </div>
+          <span class="toc-group-toggle-icon">›</span>
+        </div>
+        <ol id="toc-morphy-list">
+          <li>
+            <button class="toc-item" data-game-index="7">
+              <span class="toc-item-number">8</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Пол Морфи – Консультанты</span>
+                <span class="toc-item-sub">Оперная партия, 1858 · Классическая атака</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="8">
+              <span class="toc-item-number">9</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Луи Паульсен – Пол Морфи</span>
+                <span class="toc-item-sub">Нью-Йорк, 1857 · Жертва ферзя в атаке</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="9">
+              <span class="toc-item-number">10</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Сент-Аман / де Бастеро – Пол Морфи</span>
+                <span class="toc-item-sub">Париж, 1858 · Консультативная партия</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="10">
+              <span class="toc-item-number">11</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Джон В. Шультен – Пол Морфи</span>
+                <span class="toc-item-sub">Нью-Йорк, 1857 · Гамбит короля с атакой Морфи</span>
+              </span>
+            </button>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Стейниц и претенденты -->
+      <div class="toc-group collapsed">
+        <div class="toc-group-title">
+          <div class="toc-group-title-left">
+            <span class="toc-group-title-badge"></span>
+            <span class="toc-group-title-text">Стейниц и претенденты (1860-1890-е)</span>
+          </div>
+          <span class="toc-group-toggle-icon">›</span>
+        </div>
+        <ol id="toc-steinitz-list">
+          <li>
+            <button class="toc-item" data-game-index="11">
+              <span class="toc-item-number">12</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Исидор Гунсберг – Михаил Чигорин</span>
+                <span class="toc-item-sub">Гавана, 1890 · Динамическая защита в испанской партии</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="12">
+              <span class="toc-item-number">13</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">Чигорин – Поллок</span>
+                <span class="toc-item-sub">Нью-Йорк, 1889 · Прорыв, жертва и атака</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="13">
+              <span class="toc-item-number">14</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">М. Чигорин – В. Стейниц</span>
+                <span class="toc-item-sub">Гавана, 1892 · Матч на первенство мира</span>
+              </span>
+            </button>
+          </li>
+          <li>
+            <button class="toc-item" data-game-index="14">
+              <span class="toc-item-number">15</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">В. Стейниц - А.Зельман</span>
+                <span class="toc-item-sub">Балтимор, 1885 · Позиционная игра</span>
+              </span>
+            </button>
+          </li>
+	  <li>
+	    <button class="toc-item" data-game-index="15">
+              <span class="toc-item-number">16</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">С.Дюбуа - В.Стейниц</span>
+                <span class="toc-item-sub">Лондон, 1862 · Агрессивная итальянка</span>
+              </span>
+            </button>
+	  </li>
+	  <li>
+	    <button class="toc-item" data-game-index="16">
+              <span class="toc-item-number">17</span>
+              <span class="toc-item-text">
+                <span class="toc-item-main">В. Кнорре - М.Чигорин</span>
+                <span class="toc-item-sub">Лондон, 1862 · Агрессивная итальянка</span>
+              </span>
+            </button>
+	  </li>
+       </ol>
+      </div>
+
+<!-- Ласкер и современники -->
+<div class="toc-group collapsed">
+  <div class="toc-group-title">
+    <div class="toc-group-title-left">
+      <span class="toc-group-title-badge"></span>
+      <span class="toc-group-title-text">Ласкер и современники (1890-1920-е)</span>
+    </div>
+    <span class="toc-group-toggle-icon">›</span>
+  </div>
+  <ol id="toc-lasker-list">
+    <li>
+      <button class="toc-item" data-game-index="17">
+        <span class="toc-item-number">18</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Эм. Ласкер – И. Бауэр</span>
+          <span class="toc-item-sub">пример · Тема атаки на короля</span>
+        </span>
+      </button>
+    </li>
+  </ol>
+</div>
+
+
+<!-- Капабланка. Простота и Гармония -->
+<div class="toc-group collapsed">
+  <div class="toc-group-title">
+    <div class="toc-group-title-left">
+      <span class="toc-group-title-badge"></span>
+      <span class="toc-group-title-text">Капабланка. Простота и Гармония</span>
+    </div>
+    <span class="toc-group-toggle-icon">›</span>
+  </div>
+  <ol id="toc-capablanca-list">
+    <li>
+      <button class="toc-item" data-game-index="18">
+        <span class="toc-item-number">20</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Х.Р. Капабланка – Ф.Д. Маршалл</span>
+          <span class="toc-item-sub">Испанская партия, интересный план</span>
+        </span>
+      </button>
+    </li>
+   <li>
+      <button class="toc-item" data-game-index="20">
+        <span class="toc-item-number">21</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Х.Р. Капабланка – М. Фонарофф</span>
+          <span class="toc-item-sub">Испанская партия, легкое исполнение</span>
+        </span>
+      </button>
+    </li>
+   <li>
+  <button class="toc-item" data-game-index="21">
+    <span class="toc-item-number">22</span>
+    <span class="toc-item-text">
+      <span class="toc-item-main">Х.Р. Капабланка – Ч. Джаффе</span>
+      <span class="toc-item-sub">Нью‑Йорк, 1910 · Спокойная сила в ферзевом гамбите</span>
+    </span>
+  </button>
+</li>
+<li>
+  <button class="toc-item" data-game-index="22">
+    <span class="toc-item-number">23</span>
+    <span class="toc-item-text">
+      <span class="toc-item-main">Х.Р. Капабланка – Д. Яновский</span>
+      <span class="toc-item-sub">С.-Петербург, 1914 · Давление на центр и динамика пешечных подрывов</span>
+    </span>
+  </button>
+</li>
+
+
+
+
+
+
+
+
+
+  </ol>
+</div>
+
+<!-- Алехин. Глубина и динамика -->
+<div class="toc-group collapsed">
+  <div class="toc-group-title">
+    <div class="toc-group-title-left">
+      <span class="toc-group-title-badge"></span>
+      <span class="toc-group-title-text">Алехин. Глубина и динамика</span>
+    </div>
+    <span class="toc-group-toggle-icon">›</span>
+  </div>
+  <ol id="toc-alekhine-list">
+    <li>
+      <button class="toc-item" data-game-index="23">
+        <span class="toc-item-number">24</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Алехин-Капабланка</span>
+          <span class="toc-item-sub">Комбинация, динамические шахматы</span>
+        </span>
+      </button>
+    </li>
+  </ol>
+</div>
+
+
+<!-- Эйве. Метод и логика -->
+<div class="toc-group collapsed">
+  <div class="toc-group-title">
+    <div class="toc-group-title-left">
+      <span class="toc-group-title-badge"></span>
+      <span class="toc-group-title-text">Эйве. Метод и логика</span>
+    </div>
+    <span class="toc-group-toggle-icon">›</span>
+  </div>
+  <ol id="toc-eywe-list">
+    <li>
+      <button class="toc-item" data-game-index="24">
+        <span class="toc-item-number">25</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Эйве-Алехин</span>
+          <span class="toc-item-sub">Методичность, рациональные шахматы</span>
+        </span>
+      </button>
+    </li>
+  </ol>
+</div>
+
+
+<!-- Ботвинник. Асфальтоукладочный каток -->
+<div class="toc-group collapsed">
+  <div class="toc-group-title">
+    <div class="toc-group-title-left">
+      <span class="toc-group-title-badge"></span>
+      <span class="toc-group-title-text">Ботвинник. Асфальтоукладочный каток</span>
+    </div>
+    <span class="toc-group-toggle-icon">›</span>
+  </div>
+  <ol id="toc-botvinnik-list">
+    <li>
+      <button class="toc-item" data-game-index="25">
+        <span class="toc-item-number">26</span>
+        <span class="toc-item-text">
+          <span class="toc-item-main">Ботвинник - Капабланка</span>
+          <span class="toc-item-sub">Сеанс одновременной игры</span>
+        </span>
+      </button>
+    </li>
+  </ol>
+</div>
+<div id="survival-controls">
+          <button id="survival-btn">
+            <span class="survival-text">Режим выживания</span>
+            <span class="survival-ecg"></span>
+          </button>
+
+          <div id="lives-container" aria-label="Жизни">
+            <span class="life-heart" data-life="1">♥</span>
+            <span class="life-heart" data-life="2">♥</span>
+            <span class="life-heart" data-life="3">♥</span>
+          </div>
+        </div>
+
+
+
+
+
+      <!-- Остальные партии (пока пусто, резерв для будущих добавлений) -->
+      <ol id="toc-list"></ol>
+    </div>
+
+
+    <div id="quest-container">
+      <div id="board-column">
+        <div id="board-wrapper">
+          <div id="board"></div>
+	 <!-- НОВОЕ: координаты вокруг доски -->
+  <div id="board-coords">
+    <div class="board-files bottom"></div>
+    <div class="board-ranks right"></div>
+  </div>
+	<div id="move-controls">
+          <button id="prev-move-btn" class="move-btn">
+            <span class="icon">←</span>
+            <span>Назад</span>
+          </button>
+          <span id="move-counter"></span>
+          <button id="next-move-btn" class="move-btn">
+            <span>Вперёд</span>
+            <span class="icon">→</span>
+          </button>
+        </div>
+          <svg id="board-arrow-layer">
+            <defs>
+              <marker id="board-arrow-head-marker"
+                      class="board-arrow-head"
+                      markerWidth="10"
+                      markerHeight="10"
+                      refX="5"
+                      refY="3"
+                      orient="auto"
+                      markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 z"></path>
+              </marker>
+            </defs>
+          </svg>
+
+          <button id="flip-board-btn" title="Перевернуть доску">⇄</button>
+          <div id="resize-board-handle" title="Потяните, чтобы изменить размер доски"></div>
+        </div>
+	
+        <div id="notation-block">
+          <div id="notation-content"></div>
+        </div>
+      </div>
+
+      <div id="question-block">
+        <div id="intro-text"></div>        
+
+        <h2 id="question-title" style="display:none;"></h2>
+        <p id="question-text" style="display:none;"></p>
+        <div id="answers"></div>
+
+     <div id="toc-wizard">
+          <div id="toc-wizard-inner">
+            <div class="wizard-media">
+  	    <img id="toc-wizard-img"
+     	    src="img/wizard-top.png"
+            alt="Маленький волшебник" />
+  <video id="toc-wizard-video"
+  poster="img/wizard-zero.png"
+  preload="auto"
+  playsinline
+  muted
+></video>
+</div>
+
+            <div id="wizard-bubble" aria-live="polite" aria-atomic="true">
+              <div id="wizard-bubble-text">Я буду комментировать выбранные ходы!</div>
+            </div>
+          </div>
+        </div>
+	<div class="wizard-next-move-wrapper">
+  <button id="wizard-next-move-btn" style="display: none;">Дальше</button>
+</div>
+        <div id="score">
+          <span id="score-value">Очки: 0</span>
+        </div>
+
+        <div id="progress-container" style="display:none;">
+          <div id="progress-label"></div>
+          <div id="progress-track">
+            <div id="progress-bar"></div>
+          </div>
+        </div>
+
+        <div id="status"></div>
+        <div id="explanation"></div>
+
+        <button id="next-btn" style="display:none;">Дальше</button>
+
+        
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
+  <script src="js/games-data.js"></script>
+  <script src="js/app.js"></script>
+
+
+
+
+
+  
+</body>
+</html>
