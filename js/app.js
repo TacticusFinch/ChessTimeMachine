@@ -731,6 +731,7 @@ if (wizardNextMoveBtn) {
     if (questionActive) return;
     if (currentMoveIndex < movesList.length) {
       currentMoveIndex++;
+      playChessMoveNavSound(0.45);
       const mv = movesList[currentMoveIndex - 1];
       if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
       updateBoardAndNotation();
@@ -749,6 +750,25 @@ if (wizardNextMoveBtn) {
       const soundWrongEl = document.getElementById('sound-wrong');
       const diamondSoundEl = document.getElementById('diamond-sound');
       const gameoverSoundEl = document.getElementById('gameover-sound');
+
+const chessMoveSoundEl = new Audio('sound/chesspieces.mp3');
+chessMoveSoundEl.preload = 'auto';
+
+function playChessMoveNavSound(volume = 0.45) {
+  if (!chessMoveSoundEl) return;
+  try {
+    chessMoveSoundEl.pause();
+    chessMoveSoundEl.currentTime = 0;
+    chessMoveSoundEl.volume = volume;
+    chessMoveSoundEl.play().catch(() => {});
+  } catch (e) {}
+}
+
+
+
+
+
+
       const gameoverOverlayEl = document.getElementById('gameover-overlay');
       const gameoverRestartBtnEl = document.getElementById('gameover-restart-btn');
       const gameoverVideoEl = document.getElementById('gameover-video');
@@ -2309,44 +2329,56 @@ if (nextIndex < gamesData.length) {
 	  return;
         } 
 if (alt) {
-  // 1) Подсветка строки ответа (желтым)
-  if (rowEl) rowEl.classList.add(alt.highlightClass || 'alt-correct');
+ // 1) Подсветка ЖЁЛТЫМ именно кнопки ответа (а не строки)
+  const answerBtn = rowEl ? rowEl.querySelector('button.answer-option') : null;
+  if (answerBtn) answerBtn.classList.add(alt.highlightClass || 'alt-correct');
 
   // 2) Сообщение игроку
   statusEl.style.color = '#b45309';
   statusEl.textContent = 'Ход выглядит возможным, но его нужно доказать. Нажми ⊢.';
 
-  // 3) Кнопка ⊢ (запуск мини-квеста доказательства)
+  // 3) Кнопка ⊢ (создаём один раз)
+const existingThinkBtn = rowEl.querySelector('button.answer-think-btn');
+if (!existingThinkBtn) {
   const thinkBtn = document.createElement('button');
-  thinkBtn.className = 'answer-eye-btn';
+  thinkBtn.className = 'answer-eye-btn answer-think-btn';
   thinkBtn.type = 'button';
   thinkBtn.textContent = '⊢';
   thinkBtn.title = 'Доказать вариант';
   thinkBtn.style.display = 'inline-flex';
 
   thinkBtn.addEventListener('click', () => {
-    // Важно: вернуться в позицию момента перед proof-режимом
+    // (опционально) защита от повторного клика по ⊢
+    thinkBtn.disabled = true;
+
     applyMovesUpTo(moment.index);
     currentMoveIndex = moment.index;
 
     enterProofMode(moment, alt);
   });
 
-  // добавляем кнопку в строку выбранного ответа
   rowEl.appendChild(thinkBtn);
+}
 
-  // 4) НЕ засчитываем ответ, НЕ тратим жизнь, НЕ даём очки, НЕ двигаем партию
-  // Разблокируем ответы, чтобы игрок мог и передумать
-  const buttons = answersEl.querySelectorAll('button.answer-option');
-  buttons.forEach(b => (b.disabled = false));
+// 4) Блокируем повторный клик по ЭТОМУ альтернативному ответу,
+// чтобы пользователь не плодил эффекты/состояния
+const thisAnswerBtn = rowEl.querySelector('button.answer-option');
+if (thisAnswerBtn) thisAnswerBtn.disabled = true;
 
-  if (explanationEl) {
-    const expl = moment.explanations && moment.explanations[selectedSan];
-    explanationEl.textContent = expl || 'Альтернатива интересная. Докажи её в мини-квесте.';
-  }
+// 5) Остальные ответы оставляем доступными (чтобы можно было передумать)
+const optionButtons = answersEl.querySelectorAll('button.answer-option');
+optionButtons.forEach(b => {
+  if (b !== thisAnswerBtn) b.disabled = false;
+});
 
-  wizardSay('Это может работать. Давай докажем!');
-  return;
+if (explanationEl) {
+  const expl = moment.explanations && moment.explanations[selectedSan];
+  explanationEl.textContent = expl || 'Альтернатива интересная. Докажи её в мини-квесте.';
+}
+
+wizardSay('Это может работать. Давай докажем!');
+return;
+
 }
 
 
@@ -2603,7 +2635,10 @@ if (lineObj && rowEl) {
       const welcomeScreen = document.getElementById('welcome-screen');
       const layout = document.getElementById('layout');
       const startBtn = document.getElementById('start-quest-btn');
-      
+
+
+
+
 startBtn.addEventListener('click', () => {
   playFullVictorySound();
 
@@ -2664,6 +2699,7 @@ function onWheelScrollMoves(e){
     // вниз — следующий ход
     if (currentMoveIndex < movesList.length) {
       currentMoveIndex++;
+      playChessMoveNavSound(0.45);
       const mv = movesList[currentMoveIndex - 1];
       if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
       updateBoardAndNotation();
@@ -2672,6 +2708,8 @@ function onWheelScrollMoves(e){
     // вверх — предыдущий ход
     if (currentMoveIndex > 0) {
       currentMoveIndex--;
+      playChessMoveNavSound(0.45);
+
       const mv = movesList[currentMoveIndex - 1];
       if (mv && mv.san) wizardSay(`Смотрим позицию после: ${mv.san}`);
       updateBoardAndNotation();
@@ -2689,6 +2727,14 @@ if (notationContentEl) {
 if (questionBlockEl) {
   questionBlockEl.addEventListener('wheel', onWheelScrollMoves, { passive: false });
 }
+
+
+
+
+
+
+
+
 
 
 
