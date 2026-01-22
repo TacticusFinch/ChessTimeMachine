@@ -123,7 +123,9 @@ const WIZARD_YES_FILES = [
   'animations/wizard_yes_3.mp4',
   'animations/wizard_yes_4.mp4',
   'animations/wizard_yes_5.mp4',
-  'animations/wizard_yes_6.mp4'
+  'animations/wizard_yes_6.mp4',
+  'animations/wizard_yes_7.mp4',
+  'animations/wizard_yes_8.mp4'
 ];
 
 const WIZARD_NO_FILES = [
@@ -131,7 +133,10 @@ const WIZARD_NO_FILES = [
   'animations/wizard_no_2.mp4',
   'animations/wizard_no_3.mp4',
   'animations/wizard_no_4.mp4',
-  'animations/wizard_no_5.mp4'
+  'animations/wizard_no_5.mp4',
+  'animations/wizard_no_6.mp4',
+  'animations/wizard_no_7.mp4',
+  'animations/wizard_no_8.mp4'
 ];
 
 function playWizardAnimation(kind){ // kind: 'yes' | 'no'
