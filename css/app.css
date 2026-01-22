@@ -3249,7 +3249,32 @@ h1{
 
 
 
+.wizard-hint-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.15);
+  background: rgba(255,255,255,.9);
+  cursor: pointer;
+}
 
+.wizard-hint-btn:disabled{
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* подсветка клетки-источника (фигура) */
+#board .square-55d63.hint-from{
+  box-shadow: inset 0 0 0 4px rgba(59,130,246,.75);
+}
+
+/* подсветка клетки-цели */
+#board .square-55d63.hint-to{
+  box-shadow: inset 0 0 0 4px rgba(59,130,246,.85);
+}
 
 
 

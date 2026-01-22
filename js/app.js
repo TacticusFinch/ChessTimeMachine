@@ -26,6 +26,9 @@
       let variationAutoDelayMs = 650; // скорость (можно 450–900)
       let variationAutoRunning = false;
 
+      let manualHintStage = 0;      // 0 - нет, 1 - показали фигуру (from), 2 - показали клетку (to)
+      let manualHintMomentKey = null; // чтобы сбрасывать подсказку при смене момента
+
 let proofMode = false;
 let proofMoment = null;        // какой исходный момент мы доказываем
 let proofAlt = null;           // какой альтернативный ответ выбран (объект из altCorrect)
@@ -329,6 +332,39 @@ function triggerDiamondImpact() {
 }
 
 
+function clearHintHighlights() {
+  const squares = document.querySelectorAll('#board .square-55d63');
+  squares.forEach(sq => sq.classList.remove('hint-from', 'hint-to'));
+}
+
+function addHintHighlight(square, cls) {
+  const el = document.querySelector('#board .square-55d63[data-square="' + square + '"]');
+  if (el) el.classList.add(cls);
+}
+
+
+/**
+ * Находит (from,to) для SAN из ТЕКУЩЕЙ позиции game.
+ * Важно: в manual-вопросе позиция уже стоит на нужном моменте.
+ */
+function getMoveSquaresForSanFromCurrentPosition(san) {
+  const legal = game.moves({ verbose: true });
+  const mv = legal.find(m => m.san === san);
+  if (!mv) return null;
+  return { from: mv.from, to: mv.to, piece: mv.piece }; // piece: 'p','n','b','r','q','k'
+}
+
+function pieceNameRu(pieceChar) {
+  const map = { p: 'пешка', n: 'конь', b: 'слон', r: 'ладья', q: 'ферзь', k: 'король' };
+  return map[pieceChar] || 'фигура';
+}
+
+function resetManualHintState() {
+  manualHintStage = 0;
+  manualHintMomentKey = null;
+  clearHintHighlights();
+  if (wizardHintBtn) wizardHintBtn.disabled = false;
+}
 
       function clearHoverHighlights() {
         const squares = document.querySelectorAll('#board .square-55d63');
@@ -434,7 +470,7 @@ function tryTapMove(toSquare){
 
       statusEl.style.color = 'green';
       statusEl.textContent = 'Верно!';
-
+      resetManualHintState();
       const expl =
         activeManualMoment.explanations &&
         activeManualMoment.explanations[correctSan]
@@ -452,6 +488,9 @@ function tryTapMove(toSquare){
       manualQuestionActive = false;
       activeManualMoment = null;
       questionActive = false;
+
+updateWizardHintBtnVisibility();
+
 
 // === PROOF MODE: если это manual-вопрос мини-квеста — продолжаем сценарий ===
 if (proofMode) {
@@ -618,7 +657,7 @@ window.addEventListener('resize', () => {
   playWizardAnimation('yes');
             statusEl.style.color = 'green';
             statusEl.textContent = 'Верно!';
-
+	    resetManualHintState();
             const expl =
               activeManualMoment.explanations &&
               activeManualMoment.explanations[correctSan]
@@ -638,6 +677,9 @@ window.addEventListener('resize', () => {
             manualQuestionActive = false;
             activeManualMoment = null;
             questionActive = false;
+
+	    updateWizardHintBtnVisibility();
+
 
 // === PROOF MODE: если это manual-вопрос мини-квеста — продолжаем сценарий ===
 if (proofMode) {
@@ -725,19 +767,79 @@ if (proofMode) {
       const nextMoveBtn = document.getElementById('next-move-btn');
       const wizardNextMoveBtn = document.getElementById('wizard-next-move-btn');
 
-if (wizardNextMoveBtn) {
-  wizardNextMoveBtn.addEventListener('click', () => {
-    // Поведение как у кнопки "Вперёд" под доской
-    if (questionActive) return;
-    if (currentMoveIndex < movesList.length) {
-      currentMoveIndex++;
-      playChessMoveNavSound(0.45);
-      const mv = movesList[currentMoveIndex - 1];
-      if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
-      updateBoardAndNotation();
+		if (wizardNextMoveBtn) {
+  		wizardNextMoveBtn.addEventListener('click', () => {
+    		// Поведение как у кнопки "Вперёд" под доской
+    		if (questionActive) return;
+    		if (currentMoveIndex < movesList.length) {
+      		currentMoveIndex++;
+      		playChessMoveNavSound(0.45);
+      		const mv = movesList[currentMoveIndex - 1];
+      		if (mv && mv.san) wizardSay(`Ход партии: ${mv.san}`);
+      		updateBoardAndNotation();
+    		}
+  		});
+	}
+
+     const wizardHintBtn = document.getElementById('wizard-hint-btn');
+
+     		if (wizardHintBtn) {
+  		wizardHintBtn.addEventListener('click', () => {
+		
+    		// Подсказки только когда игрок ДОЛЖЕН сделать ход (manual)
+    		if (!manualQuestionActive || !activeManualMoment) {
+     		wizardSay('Подсказки доступны, когда нужно сделать ход на доске.');
+      		return;
+    	}
+    updateWizardHintBtnVisibility();
+    // если момент сменился — сбросим стадию
+    const key = activeManualMoment.index + '|' + (activeManualMoment.correctMoveSan || '');
+    if (manualHintMomentKey !== key) {
+      manualHintMomentKey = key;
+      manualHintStage = 0;
+      clearHintHighlights();
+    }
+
+    const correctSan = activeManualMoment.correctMoveSan;
+    const squares = getMoveSquaresForSanFromCurrentPosition(correctSan);
+
+    if (!squares) {
+      // значит SAN не матчится с текущей позицией (или ошибка в SAN)
+      wizardSay('Не могу построить подсказку для этой позиции.');
+      return;
+    }
+
+    // 2-ступенчатая подсказка: 1) from, 2) to, затем по кругу
+    if (manualHintStage === 0 || manualHintStage === 2) {
+      // этап 1: подсветить откуда ходит
+      manualHintStage = 1;
+
+      // снимаем 1 очко
+      score -= 1;
+      updateScoreDisplay(-1);
+
+      clearHintHighlights(); 
+      addHintHighlight(squares.from, 'hint-from');
+      wizardSay('Обрати внимание, ходит ' + pieceNameRu(squares.piece) + '.');
+      return;
+    }
+
+    if (manualHintStage === 1) {
+      // этап 2: подсветить куда ходить
+      manualHintStage = 2;
+
+      score -= 1;
+      updateScoreDisplay(-1);
+
+      addHintHighlight(squares.to, 'hint-to');
+      wizardSay('Только кнопки умеешь жать, а самому догадаться?!');
+      return;
     }
   });
 }
+
+
+
       const introTextEl = document.getElementById('intro-text');
       const scoreContainerEl = document.getElementById('score');
       const scoreValueEl = document.getElementById('score-value');
@@ -1282,6 +1384,8 @@ function exitVariationMode() {
   stopVariationAuto();
 
   variationMode = false;
+  updateWizardHintBtnVisibility();
+
   variationMovesSan = [];
   variationIndex = 0;
   variationTitle = '';
@@ -1343,6 +1447,8 @@ function exitProofMode(returnToMoment = true) {
   questionActive = false;
   manualQuestionActive = false;
   activeManualMoment = null;
+
+  updateWizardHintBtnVisibility();
 
   prevMoveBtn.disabled = false;
   nextMoveBtn.disabled = false;
@@ -1446,6 +1552,7 @@ function startProofStep(stepIdx) {
   });
 }
 function showProofManualQuestion(step) {
+   resetManualHintState();
   // мы используем вашу существующую логику manual-вопроса,
   // но "момент" создаём на лету.
   const pseudoMoment = {
@@ -1459,6 +1566,8 @@ function showProofManualQuestion(step) {
   questionActive = true;
   manualQuestionActive = true;
   activeManualMoment = pseudoMoment;
+  updateWizardHintBtnVisibility();
+
 
   // UI как у manual-вопроса
   statusEl.style.color = '#333';
@@ -1478,6 +1587,20 @@ function showProofManualQuestion(step) {
 
 
   wizardSay(step.question + 'nСделай ход на доске.');
+}
+
+
+function updateWizardHintBtnVisibility() {
+  if (!wizardHintBtn) return;
+
+  // Кнопка должна быть видна только в режиме manual-вопроса
+  const shouldShow =
+    manualQuestionActive === true &&
+    !!activeManualMoment &&
+    variationMode === false &&
+    proofMode === false;
+
+  wizardHintBtn.style.display = shouldShow ? "inline-flex" : "none";
 }
 
 
@@ -1570,9 +1693,7 @@ function showProofManualQuestion(step) {
           wizardNextMoveBtn.style.display = canGoNext ? 'inline-flex' : 'none';
         }
 
-
-
-
+	updateWizardHintBtnVisibility();
 
       }
 
@@ -2229,6 +2350,8 @@ if (nextIndex < gamesData.length) {
         questionActive = true;
         manualQuestionActive = true;
         activeManualMoment = moment;
+	updateWizardHintBtnVisibility();
+        resetManualHintState();
 
         statusEl.textContent = '';
         statusEl.style.color = '';
