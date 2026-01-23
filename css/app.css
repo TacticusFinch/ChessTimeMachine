@@ -2251,30 +2251,12 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 #welcome-screen button:hover {
   transform: translateY(-4px) translateX(-2px);
   box-shadow: 2px 5px 0 0 black;
-};
+}
 
 #welcome-screen button:active {
   transform: translateY(2px) translateX(1px);
   box-shadow: 0 0 0 0 black;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -2756,11 +2738,11 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 h1{
   margin: 16px auto 4px;
   max-width: 1120px;
-  text-align: center;
+  text-align: left;
 
   font-family: "Cinzel", "Spectral", serif;
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 
@@ -3234,6 +3216,87 @@ h1{
 
 
 
+
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 10002;
+  background: rgba(245, 245, 247, 0.68);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.topbar-inner{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-left{ justify-self: start; }
+.topbar-center{ justify-self: center; }
+.topbar-right{
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Тот же стиль, что у твоего h1 */
+.topbar-title{
+  margin: 0;
+  font-family: "Cinzel", "Spectral", serif;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.92);
+}
+
+/* Весь текст в том же стиле, что и h1 */
+.topbar-link{
+  font-family: "Cinzel", "Spectral", serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.78);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.topbar-link:hover{
+  background: rgba(0,0,0,0.045);
+  color: rgba(17, 24, 39, 0.92);
+}
+
+/* Чтобы не было дублирования старого h1 (если он уже есть на странице) */
+h1:not(.topbar-title){
+  display: none;
+}
+
+/* Мобилка: центр убираем, справа оставляем компактно */
+@media (max-width: 520px){
+  .topbar-inner{
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "left right"
+      "center center";
+    row-gap: 8px;
+  }
+  .topbar-left{ grid-area: left; }
+  .topbar-right{ grid-area: right; }
+  .topbar-center{ grid-area: center; justify-self: start; }
+
+  .topbar-title{ font-size: 14px; }
+  .topbar-link{ font-size: 12px; padding: 6px 8px; }
+}
 
 
 
