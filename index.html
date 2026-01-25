@@ -562,18 +562,6 @@
 
 
 
-<div id="survival-controls">
-          <button id="survival-btn">
-            <span class="survival-text">Режим выживания</span>
-            <span class="survival-ecg"></span>
-          </button>
-
-          <div id="lives-container" aria-label="Жизни">
-            <span class="life-heart" data-life="1">♥</span>
-            <span class="life-heart" data-life="2">♥</span>
-            <span class="life-heart" data-life="3">♥</span>
-          </div>
-        </div>
 
 
 
@@ -631,10 +619,15 @@
 
         <div class="question-title-row">
   <h2 id="question-title" style="display:none;"></h2>
-
+            <div id="lives-container" aria-label="Жизни">
+            <span class="life-heart" data-life="1">♥</span>
+            <span class="life-heart" data-life="2">♥</span>
+            <span class="life-heart" data-life="3">♥</span>
+          </div>
   <div id="question-timer" class="question-timer" style="display:none;" aria-live="polite">
     02:00
   </div>
+  
 </div>
         <p id="question-text" style="display:none;"></p>
         <div id="answers"></div>
@@ -677,7 +670,18 @@
         <div id="explanation"></div>
 
         <button id="next-btn" style="display:none;">Дальше</button>
-	<button id="pro-btn" class="survival-btn">Режим hardcore</button>
+	<div id="survival-controls">
+          <button id="survival-btn">
+            <span class="survival-text">Режим medium</span>
+            <span class="survival-ecg"></span>
+          </button>
+		<span class="pro-wrap">
+  <button id="pro-btn" class="pro-btn">Режим профессионала</button>
+</span>
+		
+        </div>
+
+
         
       </div>
     </div>
