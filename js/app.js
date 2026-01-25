@@ -1726,7 +1726,7 @@ function goToNextQuest() {
   introTextEl.appendChild(h2);
 
   const paragraphs = data.introParagraphs || [];
-  const pageSize = 2; // сколько абзацев показывать на одной "странице"
+  const pageSize = 1; // сколько абзацев показывать на одной "странице"
   let currentPage = 0;
 
   const contentWrapper = document.createElement('div');
@@ -2444,15 +2444,17 @@ if (nextIndex < gamesData.length) {
           answeredMoments.add(moment.index);
           updateProgress();
 
-          game.move(moment.correctMoveSan);
-          board.position(game.fen());
+          const mv = game.move(moment.correctMoveSan);
+board.position(game.fen());
 
-          syncCurrentIndexWithGame();
+// мы сделали ровно один полуход после позиции момента
+currentMoveIndex = moment.index + 1;
 
-          questionActive = false;
-          prevMoveBtn.disabled = false;
-          nextMoveBtn.disabled = false;
-          updateBoardAndNotation();
+questionActive = false;
+prevMoveBtn.disabled = false;
+nextMoveBtn.disabled = false;
+updateBoardAndNotation();
+
           nextBtn.style.display = 'none';
 	  return;
         } 

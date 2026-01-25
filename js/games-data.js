@@ -2404,6 +2404,235 @@ Qxd7 29.d5 Re8 30.d6 cxd6 31.Qc6 1-0
 
 
 
+{
+  id: 'Tal_NN_196N',
+  title: 'Михаил Таль – NN, Москва 196N',
+  introParagraphs: [
+    'Быстрая дуэль в сицилианке. Таль проводит блестящую атаку с фейерверком жертв',
+    'Проследи, как Михаил Таль чувствует динамику и использует все атакующие возможности.'
+  ],
+  pgn: `
+[Event "Moscow"]
+[Site "Moscow  RUE"]
+[Date "196N.00.0"]
+[EventDate "196N.00.0"]
+[Round "N"]
+[Result "1-0"]
+[White "Mikhail Tal"]
+[Black "NN"]
+[ECO "C00"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "?"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Bg5 b5 
+7. f4 e6 8. e5 dxe5 9. fxe5 Qc7 10. Qe2 Nfd7 11. O-O-O Bb7 
+12. Nxe6 fxe6 13. Qg4 Qb6 14. Rd6 Bxd6 15. Qxe6+ Kf8 
+16. Bc4 bxc4 17. Rf1+ Nf6 18. Rxf6+ gxf6 19. Bh6# 1-0 
+	`.trim(),
+  keyMoments: [
+    {
+      index: 14,
+      type: 'manual',
+      points: 1,
+      question: 'Какой ход самый опасный?',
+      correctMoveSan: 'e5',
+
+      explanations: {
+        'e5': 'Прекрасная возможность для e5.'
+      }
+    },
+    {
+      index: 18,
+      question: 'Ваши действия?',
+      correctMoveSan: 'Qe2',
+      options: ['exf6', 'Qe2', 'Bxf6', 'Bf4'],
+      explanations: {
+        'exf6': 'Ошибка, почему?',
+        'Qe2': 'Лучшее продолжение.',
+        'Bxf6': '7.O-O — нормально, но ход слоном Be3 более точен по смыслу позиции.',
+        'Bf4': '7.Na4 — прыжок ради нападения на слона, но конь при этом оказывается на краю и теряет влияние в центре.'
+      },
+      viewLineForWrong: {
+    	'exf6': {
+      	title: 'Вариант после 10.exf6?',
+      	movesSan: ['exf6', 'Qe5+', 'Be2', 'Qxg5']
+    			},
+
+	'Bxf6': {
+      	title: 'Вариант после 10.Bxf6?',
+      	movesSan: ['Bxf6', 'gxf6', 'exf6', 'Nd7']
+    			},
+
+	'Bf4': {
+      	title: 'Вариант после 10.Bf4?',
+      	movesSan: ['Bf4','Bb4', 'exf6','Qxf4', 'fxg7', 'Rg8']
+    			},
+
+		}
+	},
+    {
+      index: 22,
+      type: 'manual',
+      points: 3,
+      question: 'Найдите лучшее продолжение.',
+      correctMoveSan: 'Nxe6',
+
+      explanations: {
+        'Nxe6': 'На самом деле достаточно частая жертва в Сицилианке.'
+      }
+    },
+
+   {
+      index: 24,
+      type: 'manual',
+      points: 2,
+      question: 'Продолжите атаку.',
+      correctMoveSan: 'Qg4',
+
+      explanations: {
+        'Qg4': 'Берем пешку e6 на прицел.'
+      }
+    },
+
+   {
+      index: 25,
+      question: 'Как черным лучше всего защитить пешку?',
+      correctMoveSan: 'Qxe5',
+      options: ['Qxe5', 'Nc5', 'Qb6', 'Kf7'],
+      explanations: {
+        'Qb6': 'Это зевок. Увидим дальше в партии.',
+        'Nc5': 'Не лучшая защита. Посмотри вариант ->',
+        'Qxe5': 'Определенно лучшая защита.',
+        'Kf7': 'Это продолжение проигрывает. Почему?'
+      },
+      viewLineForWrong: {
+    	'Nc5': {
+      	title: 'Вариант после 13. ... Nc5?',
+      	movesSan: ['Nc5','Rd8+', 'Kf7', 'Bxb5', 'Kg8', 'Rf1']
+    			},
+
+       }
+   },
+
+
+    {
+      index: 26,
+      question: 'Найдите лучшее продолжение.',
+      type: 'manual',
+      points: 3,
+      correctMoveSan: 'Rd6',
+      explanations: {
+        'Rd6': 'Перекрытие!'
+      },
+
+   },
+   {
+      index: 30,
+      question: 'Найдите третий бриллиант.',
+      type: 'manual',
+      points: 3,
+      correctMoveSan: 'Bc4',
+      explanations: {
+        'Bc4': 'Молодец!'
+      },
+
+   },
+   {
+      index: 32,
+      question: 'Продолжайте атаку.',
+      type: 'manual',
+      points: 1,
+      correctMoveSan: 'Rf1+',
+      explanations: {
+        'Bc4': 'Молодец!'
+      },
+
+   }, 
+   {
+      index: 34,
+      question: 'Что дальше?',
+      type: 'manual',
+      points: 3,
+      correctMoveSan: 'Rxf6+',
+      explanations: {
+        'Bc4': 'Супер!'
+      },
+
+   },
+   {
+      index: 36,
+      question: 'Завершите партию',
+      type: 'manual',
+      points: 1,
+      correctMoveSan: 'Bh6#',
+      explanations: {
+        'Bc4': 'Мои поздравления!'
+      },
+   }
+  ]
+},
+
+{
+  id: 'Tal_Koblents_1965',
+  title: 'Михаил Таль – Алексадр Кобленц, Москва 1965',
+  introParagraphs: [
+    'Еще одна дуэль в сицилианке. В этот раз шевенингенское построение. Таль проводит нестандартную жертву и находит бриллиант.',
+    'Проследи, как Михаил Таль чувствует динамику и использует все атакующие возможности.'
+  ],
+  pgn: `
+[Event "?"]
+[Site "?"]
+[Date "1965.??.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "1-0"]
+[White "Mikhail Tal"]
+[Black "Alexander Koblents"]
+[ECO "B82"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "43"]
+
+1.e4 {Notes by Stockfish 9 v010218 (minimum 6s/ply)} c5 2.Nf3
+e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 d6 6.Be3 Nc6 7.f4 Be7 8.Qf3 O-O
+9.Be2 {? 9.O-O-O Nxd4 10.Bxd4 Qa5 11.e5 dxe5 12.fxe5 Nd5
+13.Nxd5 +/= +0.54 (28 ply)} Bd7 {? 9...e5 10.Nxc6 bxc6 11.h3
+Rb8 12.fxe5 dxe5 13.Rb1 Bb4 = -0.28 (25 ply)} 10.O-O-O {+/=
++0.63 (23 ply)} Nxd4 11.Bxd4 Bc6 {? 11...Qa5 12.Qg3 Rac8
+13.Bf3 b5 14.e5 dxe5 15.fxe5 Ne8 = 0.00 (34 ply)} 12.g4 {+/=
++0.85 (27 ply)} Qa5 {better is 12...Rb8 13.g5 Nd7 14.h4 b5
+15.Bd3 b4 16.Ne2 Qa5 17.Kb1 = +0.33 (28 ply)} 13.g5 {+/= +0.96
+(30 ply) after 13.Kb1 Nd7 14.g5 b5 15.f5 b4 16.f6 Ne5 17.Qh3
+Rfe8 } Nd7 14.Rhg1 {better is 14.Kb1 Rae8 15.a3 e5 16.Be3 exf4
+17.Bxf4 Ne5 18.Qg3 Ng6 +/= +0.79 (30 ply)} b5 {= +0.21 (30
+ply)} 15.Qh5 {? 15.f5 exf5 16.Qxf5 g6 17.Qh3 Ne5 18.Kb1 b4
+19.Nd5 Bxd5 +/= +0.62 (31 ply)} b4 {=/+ -0.86 (31 ply)} 16.Rd3
+{? 16.Rg3 bxc3 17.Bxc3 Qxa2 18.Rh3 Bxe4 19.Bd3 Bxd3 = 0.00 (33
+ply)} bxc3 {-/+ -2.26 (24 ply)} 17.Bxc3 Qxa2 {? 17...Qa4 18.f5
+Bxe4 19.f6 Bg6 20.Qf3 Qxa2 21.Rdd1 Ne5 -/+ -2.37 (25 ply)}
+18.Rh3 {+- mate-in-14} Bxe4 {+- mate-in-23 after 18...h6}
+19.g6 Bxg6 20.Qxh7+ Bxh7 21.Rxg7+ Kh8 22.Rhxh7# 1-0
+`.trim(),
+  keyMoments: [
+    {
+      index: 14,
+      type: 'manual',
+      points: 1,
+      question: 'Какой ход самый опасный?',
+      correctMoveSan: 'e5',
+
+      explanations: {
+        'e5': 'Прекрасная возможность для e5.'
+      }
+    }
+ ]
+}
+
+
+
+
+
 
 
 
