@@ -8,11 +8,14 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css" />
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/digital-7-mono">
 
-
+  
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
 <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Spectral:wght@500;600;700&display=swap" rel="stylesheet">
 
@@ -547,17 +550,9 @@
       </button>
     </li>
 
+
   </ol>
 </div>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -578,8 +573,6 @@
             <span class="life-heart" data-life="3">♥</span>
           </div>
         </div>
-
-
 
 
 
@@ -635,7 +628,13 @@
       <div id="question-block">
         <div id="intro-text"></div>        
 
-        <h2 id="question-title" style="display:none;"></h2>
+        <div class="question-title-row">
+  <h2 id="question-title" style="display:none;"></h2>
+
+  <div id="question-timer" class="question-timer" style="display:none;" aria-live="polite">
+    02:00
+  </div>
+</div>
         <p id="question-text" style="display:none;"></p>
         <div id="answers"></div>
 
@@ -677,7 +676,7 @@
         <div id="explanation"></div>
 
         <button id="next-btn" style="display:none;">Дальше</button>
-
+	<button id="pro-btn" class="survival-btn">Режим hardcore</button>
         
       </div>
     </div>

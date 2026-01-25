@@ -46,6 +46,13 @@ let savedProofMainMoveIndex = 0;
       let savedMomentForVariation = null;
       let survivalMode = false;
       let lives = 3;
+      let proMode = false;
+
+      // таймер вопроса
+      let questionTimerId = null;
+      let questionTimeLeftMs = 0;
+      const PRO_QUESTION_TIME_MS = 2 * 60 * 1000; // 2 минуты
+
 
       const board = Chessboard('board', {
         draggable: true,
@@ -458,6 +465,10 @@ function tryTapMove(toSquare){
     const correctSan = activeManualMoment.correctMoveSan;
 
     if (san === correctSan) {
+
+      stopQuestionTimer();
+      hideQuestionTimerUI();
+
       const delta = getMomentPoints(activeManualMoment);
       score += delta;
       updateScoreDisplay(delta);
@@ -646,6 +657,10 @@ window.addEventListener('resize', () => {
           const correctSan = activeManualMoment.correctMoveSan;
 
           if (san === correctSan) {
+
+            stopQuestionTimer();
+	    hideQuestionTimerUI();
+
             const delta = getMomentPoints(activeManualMoment);
             score += delta;
             updateScoreDisplay(delta);
@@ -934,6 +949,12 @@ function autoFitBoard() {
 
       const survivalBtnEl = document.getElementById('survival-btn');
       const livesContainerEl = document.getElementById('lives-container');
+      const proBtnEl = document.getElementById('pro-btn');
+      const questionTimerEl = document.getElementById('question-timer');
+
+
+
+
 
       const tocButtons = document.querySelectorAll('#toc .toc-item');
 
@@ -1062,6 +1083,114 @@ window.addEventListener('resize', () => {
         });
       }
 
+
+      function formatMsToMMSS(ms) {
+  const totalSec = Math.max(0, Math.ceil(ms / 1000));
+  const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
+  const ss = String(totalSec % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+}
+
+function renderQuestionTimer() {
+  if (!questionTimerEl) return;
+  questionTimerEl.textContent = formatMsToMMSS(questionTimeLeftMs);
+
+  // по желанию: красим, когда мало времени
+  if (questionTimeLeftMs <= 15000) {
+    questionTimerEl.style.color = '#b91c1c';
+  } else {
+    questionTimerEl.style.color = '';
+  }
+}
+
+function stopQuestionTimer() {
+  if (questionTimerId) {
+    clearInterval(questionTimerId);
+    questionTimerId = null;
+  }
+}
+
+function hideQuestionTimerUI() {
+  if (!questionTimerEl) return;
+  questionTimerEl.style.display = 'none';
+}
+
+function showQuestionTimerUI() {
+  if (!questionTimerEl) return;
+  questionTimerEl.style.display = 'block';
+}
+
+function onQuestionTimeExpired() {
+  // Время вышло — считаем как ошибку (минус жизнь и минус 1 очко, как у тебя за wrong)
+  // Если хочешь без минуса очков — убери блок score ниже.
+  stopQuestionTimer();
+
+  if (!proMode) return;
+  if (!questionActive) return; // если вопрос уже закрыт — ничего не делаем
+
+  statusEl.style.color = '#b91c1c';
+  statusEl.textContent = 'Время вышло!';
+
+  // штраф по очкам (как за неправильный ответ)
+  score -= 1;
+  updateScoreDisplay(-1);
+
+  // минус жизнь (работает только если survivalMode=true, поэтому в proMode мы включим survivalMode)
+  loseLife();
+
+  wizardSay('Время вышло. Попробуй ещё раз быстрее.');
+
+  // ВАЖНО: вопрос остаётся активным, игрок может пробовать дальше,
+  // но таймер надо перезапустить заново на 2:00
+  startQuestionTimer();
+}
+
+function startQuestionTimer() {
+  // Таймер работает только в proMode и только когда вопрос активен
+  if (!proMode) return;
+  if (!questionActive) return;
+
+  stopQuestionTimer();
+  showQuestionTimerUI();
+
+  questionTimeLeftMs = PRO_QUESTION_TIME_MS;
+  renderQuestionTimer();
+
+  questionTimerId = setInterval(() => {
+    questionTimeLeftMs -= 250; // шаг 250мс выглядит плавнее
+    if (questionTimeLeftMs <= 0) {
+      questionTimeLeftMs = 0;
+      renderQuestionTimer();
+      onQuestionTimeExpired();
+      return;
+    }
+    renderQuestionTimer();
+  }, 250);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       function setSurvivalUIVisible(isVisible) {
         if (!livesContainerEl) return;
         if (isVisible) {
@@ -1087,6 +1216,10 @@ window.addEventListener('resize', () => {
       }
 
       function triggerDefeat() {
+
+	stopQuestionTimer();
+        hideQuestionTimerUI();
+
         questionActive = true;
         manualQuestionActive = false;
         activeManualMoment = null;
@@ -1280,6 +1413,11 @@ function enterVariationMode(moment, lineObj) {
   // moment — вопрос, из которого мы ушли смотреть
   // lineObj — { title, movesSan: [...] }
 
+
+
+
+  stopQuestionTimer();
+  hideQuestionTimerUI();
   variationMode = true;
   savedMomentForVariation = moment;
 
@@ -1389,6 +1527,10 @@ function exitVariationMode() {
   stopVariationAuto();
 
   variationMode = false;
+  // если вернулись в вопрос — таймер снова запустится showQuestionForMoment/showManualQuestion
+// но если вопрос активен прямо сейчас — можно подстраховаться
+if (questionActive) startQuestionTimer();
+else hideQuestionTimerUI();
   updateWizardHintBtnVisibility();
 
   variationMovesSan = [];
@@ -1417,10 +1559,15 @@ function exitVariationMode() {
 
 
 function enterProofMode(moment, altObj) {
+  
+  
   proofMode = true;
   proofMoment = moment;
   proofAlt = altObj;
   proofStepIndex = 0;
+
+  stopQuestionTimer();
+  hideQuestionTimerUI();
 
   // сохраняем основную позицию (как вы делаете для варианта)
   savedProofMainFen = game.fen();
@@ -1442,6 +1589,11 @@ function exitProofMode(returnToMoment = true) {
   stopProofAuto();
 
   proofMode = false;
+
+  if (questionActive) startQuestionTimer();
+  else hideQuestionTimerUI();
+
+
   proofStepIndex = 0;
 
   // вернуться в исходную позицию основного квеста
@@ -1718,6 +1870,11 @@ function goToNextQuest() {
         const data = gamesData[index];
         hideGameoverOverlay();
 
+	stopQuestionTimer();
+        hideQuestionTimerUI();
+
+
+
        if (introTextEl) {
   introTextEl.innerHTML = '';
 
@@ -1972,6 +2129,47 @@ if (Number.isNaN(idx)) return;
 
           renderLives();
         });
+
+if (proBtnEl) {
+  proBtnEl.addEventListener('click', () => {
+    proMode = !proMode;
+
+    if (proMode) {
+      // PRO включает жизни: используем твою систему survivalMode + lives
+      survivalMode = true;
+      resetLives();
+      setSurvivalUIVisible(true);
+      renderLives();
+
+      proBtnEl.classList.add('active');
+      if (survivalBtnEl) survivalBtnEl.classList.add('active');
+
+      wizardSay('PRO режим включён: 3 жизни и 2 минуты на каждый вопрос.');
+
+      // если прямо сейчас уже открыт вопрос — стартуем таймер
+      if (questionActive) startQuestionTimer();
+      else hideQuestionTimerUI();
+    } else {
+      // выключаем pro: таймер убрать
+      stopQuestionTimer();
+      hideQuestionTimerUI();
+
+      proBtnEl.classList.remove('active');
+
+      wizardSay('PRO режим выключен.');
+      // survivalMode можно оставить как было (или выключать тоже — как тебе нужно).
+      // Если хочешь, чтобы PRO выключал и survival, раскомментируй:
+      // survivalMode = false;
+      // setSurvivalUIVisible(false);
+      // if (survivalBtnEl) survivalBtnEl.classList.remove('active');
+    }
+  });
+}
+
+
+
+
+
       }
 if (survivalBtnEl && heartSoundEl) {
   survivalBtnEl.addEventListener('mouseenter', () => {
@@ -2183,6 +2381,9 @@ if (survivalBtnEl && heartSoundEl) {
 function showFinalSummary() {
   summaryShown = true;
 
+  stopQuestionTimer();
+  hideQuestionTimerUI();
+
   updateProgress();
 
   if (!keyMoments || keyMoments.length === 0) {
@@ -2294,6 +2495,10 @@ if (nextIndex < gamesData.length) {
         questionTextEl.textContent = '';
 
         wizardSay(moment.question);
+	// PRO: старт таймера на вопрос
+        startQuestionTimer();
+
+
 
         const sanToSquares = {};
         (moment.options || []).forEach(san => {
@@ -2392,6 +2597,8 @@ if (nextIndex < gamesData.length) {
         statusEl.textContent = 'Подумай и сделай ход на доске.';
 
         wizardSay(moment.question + '\nСделай ход на доске.');
+        // PRO: старт таймера на вопрос
+        startQuestionTimer();
       }
 
       function checkAnswerForMoment(selectedSan, moment, rowEl) {
@@ -2411,6 +2618,8 @@ if (nextIndex < gamesData.length) {
         clearHoverHighlights();
 
         if (selectedSan === moment.correctMoveSan) {
+          stopQuestionTimer();
+          hideQuestionTimerUI();
           const delta = getMomentPoints(moment);
           score += delta;
           updateScoreDisplay(delta);

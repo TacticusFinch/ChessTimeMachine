@@ -849,6 +849,37 @@ body{
       }
     }
 
+ #pro-btn{
+      position: relative;
+      overflow: hidden;
+
+      padding: 8px 12px;
+      border-radius: 10px;
+
+      background: #ffffff;
+      border: 1px solid rgba(15, 23, 42, 0.14);
+
+      color: rgba(15, 23, 42, 0.92);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+
+      cursor: pointer;
+      user-select: none;
+
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease;
+      box-shadow:
+        0 1px 0 rgba(15, 23, 42, 0.04),
+        0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+
+
+
     #lives-container {
       display: none;
       align-items: center;
@@ -3301,15 +3332,17 @@ h1:not(.topbar-title){
 
 
 
+.question-title-row{
+  display:flex;
+  align-items:baseline;         /* таймер красиво «садится» по линии текста заголовка */
+  justify-content:space-between;
+  gap: 5px;
+  margin: 6px 0 10px;
+}
 
-
-
-
-
-
-
-
-
+#question-title{
+  margin:0;                     /* чтобы не ломал ряд */
+}
 
 
 
