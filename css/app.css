@@ -3579,6 +3579,86 @@ h1:not(.topbar-title){
 
 
 
+/* === HEADER MODE SWITCH (Игровой режим) === */
+.mode-switch{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mode-switch__label{
+  font-family: "Cinzel", "Spectral", serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(17, 24, 39, 0.72);
+  white-space: nowrap;
+}
+
+.mode-switch__segmented{
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+}
+
+.mode-seg,
+.mode-switch__segmented #survival-btn,
+.mode-switch__segmented #pro-btn{
+  appearance: none;
+  -webkit-appearance: none;
+
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+
+  font: 700 12px/1 ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  color: rgba(17, 24, 39, 0.72);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+}
+
+/* Hover */
+.mode-switch__segmented #survival-btn:hover,
+.mode-switch__segmented #pro-btn:hover{
+  background: rgba(0,0,0,0.05);
+  color: rgba(17, 24, 39, 0.92);
+}
+
+/* Active segment */
+.mode-switch__segmented #survival-btn.is-active,
+.mode-switch__segmented #pro-btn.is-active{
+  background: rgba(255,255,255,0.98);
+  color: rgba(17, 24, 39, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.08),
+    0 10px 22px rgba(0,0,0,0.10);
+}
+
+/* Keyboard focus */
+.mode-switch__segmented #survival-btn:focus-visible,
+.mode-switch__segmented #pro-btn:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.22);
+}
+
+/* Mobile: прячем подпись, оставляем сегменты */
+@media (max-width: 520px){
+  .mode-switch__label{ display:none; }
+}
+
+
 
 
 

@@ -105,6 +105,7 @@ const clickTocSoundEl = document.getElementById('sound-clicktoc');
 const questChoiceSoundEl = document.getElementById('sound-questchoice');
 const answerHoverSoundEl = document.getElementById('sound-answerhover');
 const heartSoundEl = document.getElementById('heart-sound');
+const angelSoundEl = document.getElementById('angel-sound');
 const listingSoundEl = document.getElementById('sound-listing');
 
 
@@ -2166,6 +2167,11 @@ if (proBtnEl) {
   });
 }
 
+if (proBtnEl && angelSoundEl) {
+  proBtnEl.addEventListener('mouseenter', () => {
+    playSound(angelSoundEl, 0.7);
+  });
+}
 
 
 
