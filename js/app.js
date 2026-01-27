@@ -909,7 +909,7 @@ function autoFitBoard() {
 
   if (!isNarrow) {
     // Десктоп: фиксированные размеры как в CSS/макете
-    const desktopBoardSize = 430;
+    const desktopBoardSize = 415;
     const desktopNotationSize = 420;
 
     boardEl.style.width = desktopBoardSize + 'px';
