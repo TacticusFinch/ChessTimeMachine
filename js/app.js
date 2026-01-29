@@ -3074,16 +3074,6 @@ if (questionBlockEl) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
     });
 
 // === WELCOME WIZARD: проиграть один раз и заморозить на последнем кадре ===
@@ -3104,3 +3094,47 @@ if (welcomeVideoEl) {
 
 
 
+(() => {
+  const wrapper = document.getElementById('board-wrapper');
+  const btn = document.getElementById('theme-board-btn');
+  if (!wrapper || !btn) return;
+
+  const themes = [
+    { id: 'amber-wood',    label: 'Amber' },
+    { id: 'moonstone',     label: 'Moon'  },
+    { id: 'evergreen',     label: 'Green' },
+    { id: 'lavender-mist', label: 'Lav'   },
+    { id: 'sage-sand',      label: 'Sage'   }
+  ];
+
+  const STORAGE_KEY = 'boardTheme';
+
+  function setTheme(themeId) {
+    wrapper.setAttribute('data-board-theme', themeId);
+
+    const t = themes.find(x => x.id === themeId);
+    btn.textContent = t ? t.label : 'Theme';
+
+    try { localStorage.setItem(STORAGE_KEY, themeId); } catch (e) {}
+  }
+
+  function getCurrentThemeIndex() {
+    const current = wrapper.getAttribute('data-board-theme');
+    const idx = themes.findIndex(x => x.id === current);
+    return idx >= 0 ? idx : 0;
+  }
+
+  // init
+  const saved = (() => {
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  })();
+
+  setTheme(saved && themes.some(t => t.id === saved) ? saved : themes[0].id);
+
+  // click -> next theme
+  btn.addEventListener('click', () => {
+    const idx = getCurrentThemeIndex();
+    const next = themes[(idx + 1) % themes.length];
+    setTheme(next.id);
+  });
+})();

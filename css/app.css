@@ -3656,4 +3656,133 @@ h1:not(.topbar-title){
 }
 
 
+.bottom-img-fixed{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 55px;
+
+  z-index: 10;        /* при необходимости поднять */
+  pointer-events: none; /* чтобы не мешала кликам */
+}
+
+
+
+
+/* =========================
+   BOARD THEMES (5)
+   Switcher works by setting #board-wrapper[data-board-theme="..."]
+   ========================= */
+
+/* Базовые значения на случай, если тема не задана */
+#board-wrapper{
+  --sq-light: #fdf4e6;
+  --sq-dark:  #f2b179;
+  --grid-line: rgba(120, 60, 30, 0.12);
+  --glow-sun:  rgba(251, 191, 36, 0.25);
+  --glow-leaf: rgba(96, 165, 250, 0.20);
+}
+
+/* 1) Creme orange Wood (тёплое дерево, очень мягко) */
+#board-wrapper[data-board-theme="amber-wood"]{
+  --sq-light: #fdf4e6;
+  --sq-dark:  #f2b179;
+  --grid-line: rgba(120, 60, 30, 0.12);
+  --glow-sun:  rgba(251, 191, 36, 0.25);
+  --glow-leaf: rgba(96, 165, 250, 0.20);
+
+}
+
+/* 2) Moonstone (серо‑голубая “луна”, медитативно) */
+#board-wrapper[data-board-theme="moonstone"]{
+  --sq-light: #eef2f7;
+  --sq-dark:  #9aa9bf;
+  --grid-line: rgba(15, 23, 42, 0.10);
+  --glow-sun: rgba(147, 197, 253, 0.14);
+  --glow-leaf: rgba(99, 102, 241, 0.10);
+}
+
+/* 3) Evergreen (глубокий зелёный “сад”, не кричит) */
+#board-wrapper[data-board-theme="evergreen"]{
+  --sq-light: #f3e4cf;  /* светлый тёплый орех */
+  --sq-dark:  #7abf4b;  /* мягкий салатовый (лист/зелень) */
+  --grid-line: rgba(70, 45, 25, 0.14);
+  --glow-sun:    rgba(255, 210, 150, 0.30);
+  --glow-leaf:   rgba(125, 205, 140, 0.26);
+
+
+}
+
+/* 4) Lavender Mist (лаванда + сливки, очень “мягкое свечение”) */
+#board-wrapper[data-board-theme="lavender-mist"]{
+  --sq-light: #f7f2fb;
+  --sq-dark:  #b79ad6;
+  --grid-line: rgba(59, 7, 100, 0.10);
+  --glow-sun: rgba(167, 139, 250, 0.16);
+  --glow-leaf: rgba(56, 189, 248, 0.10);
+}
+
+/* 5) Sage & sand (шалфей + песок, контрастно, приятно глазу) */
+#board-wrapper[data-board-theme="sage-sand"]{
+  --sq-light: #f3ecdf;  
+  --sq-dark:  #a9c1a8;  
+  --grid-line: rgba(35, 28, 18, 0.07);
+  --glow-sun:  rgba(255, 205, 135, 0.18);
+  --glow-leaf: rgba(140, 210, 160, 0.12);
+}
+
+/* Применяем новые переменные к твоим клеткам (у тебя уже есть !important) */
+.white-1e1d7{
+  background: var(--sq-light) !important;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+.black-3c85d{
+  background: var(--sq-dark) !important;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* (Опционально) лёгкое свечение борда от темы */
+#board{
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.14),
+    0 18px 50px rgba(0,0,0,0.35),
+    0 0 26px var(--glow-sun),
+    0 0 22px var(--glow-leaf);
+}
+
+/* =========================
+   MINI BUTTON: Theme switcher (top-left like flip/resize)
+   ========================= */
+#theme-board-btn{
+  position: absolute;
+  top: 6px;
+  left: 6px;
+
+  padding: 2px 6px;
+  font-size: 10px;
+  line-height: 1;
+
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.5);
+  color: #555;
+
+  cursor: pointer;
+  opacity: 0.35;
+  transition: opacity 0.15s ease, transform 0.12s ease;
+  z-index: 2;
+}
+
+#theme-board-btn:hover{
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+#theme-board-btn:active{
+  transform: translateY(0);
+}
+
+
+
 

@@ -2616,16 +2616,210 @@ Bxe4 19.f6 Bg6 20.Qf3 Qxa2 21.Rdd1 Ne5 -/+ -2.37 (25 ply)}
 `.trim(),
   keyMoments: [
     {
-      index: 14,
+      index: 30,
+      question: 'Как бы вы сыграли в данной позиции?',
+      correctMoveSan: 'Rd3',
+      options: ['Nb1', 'Bxg7', 'Rd3'],
+      explanations: {
+        'Nb1': 'Нет, очень пассивный ход.',
+        'Bxg7': 'Слишком неразумно так жертвовать слона.',
+        'Rd3': 'Самое оптимальное и опасное решение.'
+       }
+     },
+    {
+      index: 34,
+      question: 'Продолжайте вариант.',
+      type: 'manual',
+      points: 2,
+      correctMoveSan: 'Rh3',
+      explanations: {
+        'Rh3': 'Да, идем за матом!'
+      }
+    },
+   {
+      index: 36,
+      question: 'Найдите лучшее продолжение!',
+      type: 'manual',
+      points: 3,
+      correctMoveSan: 'g6',
+      explanations: {
+        'g6': 'Ход особой силы, тактический удар - перекрытие!'
+      }
+    },
+   {
+      index: 38,
+      question: 'Ваши действия?',
+      type: 'manual',
+      points: 3,
+      correctMoveSan: 'Qxh7+',
+      explanations: {
+        'Qxh7+': 'Ход особой силы, тактический удар - перекрытие!'
+      }
+    },
+   {
+      index: 40,
+      question: 'Продолжайте.',
       type: 'manual',
       points: 1,
-      question: 'Какой ход самый опасный?',
-      correctMoveSan: 'e5',
-
+      correctMoveSan: 'Rxg7+',
       explanations: {
-        'e5': 'Прекрасная возможность для e5.'
+        'Rxg7+': 'Закрываем вариант красивой победой.'
       }
+    },
+   {
+      index: 42,
+      question: 'Завершите партию.',
+      type: 'manual',
+      points: 1,
+      correctMoveSan: 'Rhxh7#',
+      explanations: {
+        'Rhxh7#': 'Congratulatti!'
+      }
+    },
+ ]
+},
+{
+  id: 'Szukszta_Tal_1956',
+  title: 'Ян Жукста – Михаил Таль, Уппсала 1956',
+  introParagraphs: [
+    'Староиндийская защита, или маленький магазинчик ужасов - особое оружие в руках мастера атаки... Посмотрим как Михаил Таль в образе пирата берет на абордаж вариант Земиша',
+    'Проследи, как Михаил Таль чувствует динамику и использует все атакующие возможности.'
+  ],
+  pgn: `
+[Event "Uppsala blitz"]
+[Site "Uppsala SWE"]
+[Date "1956.04.??"]
+[EventDate "?"]
+[Round "?"]
+[Result "0-1"]
+[White "Janusz Szukszta"]
+[Black "Mikhail Tal"]
+[ECO "E86"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "40"]
+
+
+1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6 5.f3 O-O 6.Be3 e5 7.Nge2 c6
+8.Qb3 exd4 9.Nxd4 d5 10.cxd5 cxd5 11.exd5 Nc6 12.dxc6 Re8
+13.Kf2 Rxe3 14.Rd1 Ng4+ 15.fxg4 Bxd4 16.Rxd4 Qxd4 17.Qd5 Re2+
+18.Kxe2 Bxg4+ 19.Ke1 Re8+ 20.Be2 Rxe2+ 0-1	
+`.trim(),
+  keyMoments: [
+    {
+      index: 17,
+      question: 'Вспомни классическое правило и выбери правильный ход.',
+      correctMoveSan: 'd5',
+      points: 3,
+      options: ['Nbd7', 'd5', 'Qa5'],
+      explanations: {
+        'Nbd7': 'Не ошибка, но есть ход гораздо сильнее.',
+        'd5': 'Безусловно лучшее решение.',
+        'Qa5': 'Неплохо, но есть лучше.',
+       }
+
+    },
+   {
+      index: 21,
+      question: 'Как бы ты продолжил?',
+      correctMoveSan: 'Nc6',
+      points: 3,
+      options: ['Nc6', 'Nd5', 'Na6'],
+      explanations: {
+        'Nc6': 'Дикий и сильный ход.',
+        'Nd5': 'Не-а. Подумай еще немного.	',
+        'Na6': 'Это куда?',
+       }
+
+    },
+  {
+      index: 23,
+      question: 'Какой ход черных самый опасный?',
+      correctMoveSan: 'Re8',
+      points: 2,
+      type: 'manual',
+      explanations: {
+        'Re8': 'Конечно. Сильное давление на слона е3.'
+       }
+
+    },
+  {
+      index: 25,
+      question: 'Время фейерверка!',
+      correctMoveSan: 'Rxe3',
+      points: 3,
+      type: 'manual',
+      explanations: {
+        'Rxe3': 'Начало красивой комбинации.'
+       }
+
+    },
+{
+      index: 27,
+      question: 'Продолжай атаковать.',
+      correctMoveSan: 'Ng4+',
+      points: 3,
+      type: 'manual',
+      explanations: {
+        'Ng4+': 'Вскрываем защиту.'
+       }
+
+    },
+
+
+{
+      index: 33,
+      question: 'Выбери ход.',
+      correctMoveSan: 'Re2+',
+      points: 3,
+      options: ['Qxd5', 'Qf4+', 'Re2+'],
+      explanations: {
+        'Qxd5': 'Менять ферзей в такой позиции??',
+        'Qf4+': 'Кажется неплохой шах, но нет продолжения.',	
+        'Re2+': 'Двойной шах! Лучшее решение.'
+       }
+
+
+    },
+
+{
+      index: 35,
+      question: 'Продолжай далее.',
+      correctMoveSan: 'Bxg4+',
+      points: 1,
+      type: 'manual',
+      explanations: {
+        'Bxg4+': 'Свежая сила в атаке!'
     }
+},
+
+{
+      index: 37,
+      question: 'Продолжай далее.',
+      correctMoveSan: 'Re8+',
+      points: 1,
+      type: 'manual',
+      explanations: {
+        'Re8+': 'Вновь свежая сила в атаке!'
+    }
+},
+
+{
+      index: 39,
+      question: 'Завершите партию.',
+      correctMoveSan: 'Rxe2+',
+      points: 3,
+      type: 'manual',
+      explanations: {
+        'Rxe2+': 'Мои поздравления! Квест пройден!'
+    }
+
+
+}
+
+
+ 
+  
  ]
 }
 
