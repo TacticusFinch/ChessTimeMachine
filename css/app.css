@@ -3816,7 +3816,7 @@ h1:not(.topbar-title){
 
 /* Узкий по высоте, чуть более “стеклянный” и аккуратный */
 .site-footer{
-  margin-top: -20px;
+  margin-top: -30px;
   background: rgba(247,247,251,0.92);
   color: #111827;
   border-top: 1px solid rgba(17,24,39,.10);
