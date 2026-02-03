@@ -3100,7 +3100,7 @@ if (welcomeVideoEl) {
   if (!wrapper || !btn) return;
 
   const themes = [
-    { id: 'amber-wood',    label: 'Amber' },
+    { id: 'orange-wood',   label: 'creme' },
     { id: 'moonstone',     label: 'Moon'  },
     { id: 'evergreen',     label: 'Green' },
     { id: 'lavender-mist', label: 'Lav'   },
