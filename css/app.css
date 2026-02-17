@@ -97,7 +97,7 @@ body{
     #toc {
       width: 350px;
       text-align: left;
-      border: 1px solid #e5e7eb;
+      border: 2px solid #e5e7eb;
       border-radius: 14px;
       padding-right: 14px;
       box-sizing: border-box;
@@ -3252,7 +3252,7 @@ h1{
 .topbar{
   position: sticky;
   top: 0;
-  z-index: 10002;
+  z-index: 9998;
   background: rgba(245, 245, 247, 0.68);
   backdrop-filter: blur(10px) saturate(140%);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
@@ -3816,7 +3816,7 @@ h1:not(.topbar-title){
 
 /* Узкий по высоте, чуть более “стеклянный” и аккуратный */
 .site-footer{
-  margin-top: -30px;
+  margin-top: -10px;
   background: rgba(247,247,251,0.92);
   color: #111827;
   border-top: 1px solid rgba(17,24,39,.10);
@@ -3923,6 +3923,302 @@ h1:not(.topbar-title){
     gap: 10px;
   }
   .footer-social{ justify-content: flex-start; }
+}
+
+
+
+
+/* ===== Модальный оверлей ===== */
+/* ===== AUTH MODALS — в стиле Welcome Screen ===== */
+
+/* Оверлей: как у welcome-screen */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10001;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  /* Фон — как ::before у welcome-screen */
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.70), rgba(255,255,255,0.35) 55%, rgba(255,255,255,0.22) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.18));
+  backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
+  -webkit-backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-overlay[hidden] {
+  display: flex;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ===== Карточка: точно как .welcome-card ===== */
+.login-modal-card,
+.signup-modal-card {
+  position: relative;
+  width: min(380px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);	
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+
+  padding: 0;
+
+  transform: translateY(16px) scale(0.96);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  opacity: 0;
+}
+
+.modal-overlay.active .login-modal-card,
+.modal-overlay.active .signup-modal-card {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* ===== Форма внутри карточки ===== */
+.form-control {
+  margin: 0;
+  background-color: transparent;
+  box-shadow: none;
+  width: 100%;
+  max-width: 100%;
+  max-height: none;
+  overflow-y: visible;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 32px 36px 28px;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+/* ===== Заголовок формы — шрифт как у welcome ===== */
+.form-control .title {
+  font-family: "Cinzel", "Spectral", serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(17, 24, 39, 0.92);
+  margin-bottom: 4px;
+}
+
+/* ===== Поля ввода — мягкие, в тон карточки ===== */
+.input-field {
+  position: relative;
+  width: 100%;
+}
+
+.input-field .input {
+  margin-top: 15px;
+  width: 100%;
+  height: 48px;
+  outline: none;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(255, 255, 255, 0.80);
+  padding-left: 14px;
+  font-size: 14px;
+  font-family: "Spectral", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.input-field .input:focus {
+  border-color: rgba(10, 132, 255, 0.65);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 0 3px rgba(10, 132, 255, 0.12),
+    0 4px 14px rgba(10, 132, 255, 0.08);
+}
+
+.input-field .label {
+  position: absolute;
+  top: 27px;
+  left: 15px;
+  color: rgba(17, 24, 39, 0.42);
+  font-family: "Spectral", ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-field .input:focus ~ .label,
+.input-field .input:valid ~ .label {
+  top: 5px;
+  left: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(10, 132, 255, 0.85);
+  background-color: rgba(255,255,255,0.92);
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+/* ===== Кнопка отправки — как welcome-screen button ===== */
+.form-control .submit-btn {
+  margin-top: 20px;
+  height: 50px;
+  border-radius: 10em;
+  border: 1px solid black;
+  outline: none;
+
+  background-color: white;
+  color: black;
+
+  font-family: "Cinzel", "Spectral", serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+  box-shadow: 0 0 0 0 black;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-control .submit-btn:hover {
+  transform: translateY(-4px) translateX(-2px);
+  box-shadow: 2px 5px 0 0 black;
+  background: white;
+  color: black;}
+
+.form-control .submit-btn:active {
+  transform: translateY(2px) translateX(1px);
+  box-shadow: 0 0 0 0 black;
+}
+
+/* ===== Кнопка закрытия — прозрачная, мягкая ===== */
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  border-radius: 999px;
+
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  color: rgba(17, 24, 39, 0.55);
+  cursor: pointer;
+  z-index: 10;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(148, 163, 184, 0.70);
+  color: rgba(17, 24, 39, 0.85);
+  transform: scale(1.08);
+}
+
+/* ===== Ссылки ===== */
+.form-control a {
+  color: rgba(10, 132, 255, 0.85);
+  text-decoration: none;
+  font-size: 13px;
+  font-family: "Spectral", ui-sans-serif, system-ui, sans-serif;
+  transition: color 0.15s ease;
+}
+
+.form-control a:hover {
+  color: rgba(10, 132, 255, 1);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ===== Переключение Login ↔️ Signup ===== */
+.switch-text {
+  margin-top: 14px;
+  font-size: 13px;
+  font-family: "Spectral", ui-sans-serif, system-ui, sans-serif;
+  color: rgba(17, 24, 39, 0.58);
+  text-align: center;
+}
+
+/* ===== Ошибка ===== */
+.login-error {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  color: rgba(185, 28, 28, 0.92);
+  font-size: 13px;
+  font-family: "Spectral", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ===== Блокировка прокрутки ===== */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* ===== Мобильная адаптация ===== */
+@media (max-width: 520px) {
+  .login-modal-card,
+  .signup-modal-card {
+    width: 96vw;
+    border-radius: 14px;
+  }
+
+  .form-control {
+    padding: 24px 20px 20px;
+    gap: 6px;
+  }
+
+  .form-control .title {
+    font-size: 18px;
+  }
+
+  .input-field .input {
+    height: 44px;
+    font-size: 13px;
+  }
+
+  .form-control .submit-btn {
+    height: 46px;
+    font-size: 13px;
+  }
+
+  .modal-close-btn {
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
 }
 
 

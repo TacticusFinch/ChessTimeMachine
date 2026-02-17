@@ -3,6 +3,16 @@
 
       const game = new Chess();
 
+       // Ссылка на Supabase-клиент, созданный в auth.js
+  // Если auth.js загрузился раньше — window.supabaseDb уже есть
+  // Если нет — будет undefined, но мы проверяем в каждой функции
+  let supabase = window.supabaseDb || null;
+
+  // Текущий залогиненный пользователь (заполнится из auth.js)
+  let currentUser = null;
+
+
+
       let currentGameIndex = 0;
       let referenceGame = null;
       let movesList = [];
@@ -47,6 +57,207 @@ let savedProofMainMoveIndex = 0;
       let survivalMode = false;
       let lives = 3;
       let proMode = false;
+
+
+      // Сохраняет прогресс ТЕКУЩЕГО квеста (партии)
+async function saveGameProgress() {
+  if (!supabase) supabase = window.supabaseDb || null;
+  if (!currentUser || !supabase) return;
+
+  const userId = currentUser.id;
+
+  try {
+    const { error } = await supabase
+      .from('user_progress')
+      .upsert({
+        user_id: userId,
+        game_index: currentGameIndex,
+        current_move_index: currentMoveIndex,
+        score: score,
+        lives: lives,
+        survival_mode: survivalMode,
+        pro_mode: proMode,
+        summary_shown: summaryShown,
+        answered_moments: Array.from(answeredMoments),
+        diamond_moves: Array.from(diamondMoves),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,game_index'  // обновляем, если запись уже есть
+      });
+
+    if (error) {
+      console.warn('Ошибка сохранения прогресса:', error.message);
+    }
+  } catch (e) {
+    console.warn('saveGameProgress exception:', e);
+  }
+}
+
+// Сохраняет общее состояние (какой квест открыт, на каком ходу)
+async function saveUserState() {
+  if (!supabase) supabase = window.supabaseDb || null;
+  if (!currentUser || !supabase) return;
+
+  const userId = currentUser.id;
+
+  try {
+    const { error } = await supabase
+      .from('user_state')
+      .upsert({
+        user_id: userId,
+        last_game_index: currentGameIndex,
+        last_move_index: currentMoveIndex,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      console.warn('Ошибка сохранения состояния:', error.message);
+    }
+  } catch (e) {
+    console.warn('saveUserState exception:', e);
+  }
+}
+
+// Комбинированная функция — сохраняет и прогресс, и состояние
+async function saveAll() {
+  await saveGameProgress();
+  await saveUserState();
+}
+
+// Загружает прогресс конкретного квеста
+async function loadGameProgress(gameIndex) {
+  if (!supabase) supabase = window.supabaseDb || null;
+  if (!currentUser || !supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .eq('game_index', gameIndex)
+      .single();  // ожидаем ровно одну строку
+
+    if (error) {
+      // "PGRST116" = строка не найдена — это нормально для нового квеста
+      if (error.code !== 'PGRST116') {
+        console.warn('Ошибка загрузки прогресса:', error.message);
+      }
+      return null;
+    }
+
+    return data;
+  } catch (e) {
+    console.warn('loadGameProgress exception:', e);
+    return null;
+  }
+}
+
+// Загружает общее состояние пользователя (какой квест был последним)
+async function loadUserState() {
+  if (!supabase) supabase = window.supabaseDb || null;
+  if (!currentUser || !supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('user_state')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .single();
+
+    if (error) {
+      if (error.code !== 'PGRST116') {
+        console.warn('Ошибка загрузки состояния:', error.message);
+      }
+      return null;
+    }
+
+    return data;
+  } catch (e) {
+    console.warn('loadUserState exception:', e);
+    return null;
+  }
+}
+
+// Применяет загруженный прогресс к текущей игре
+function applyLoadedProgress(progressData) {
+  if (!progressData) return;
+
+  // Восстанавливаем очки
+  score = progressData.score || 0;
+  updateScoreDisplay(0);
+
+  // Восстанавливаем жизни и режимы
+  lives = progressData.lives || 3;
+  survivalMode = progressData.survival_mode || false;
+  proMode = progressData.pro_mode || false;
+  summaryShown = progressData.summary_shown || false;
+
+  // Восстанавливаем наборы (Set) из массивов
+  answeredMoments.clear();
+  (progressData.answered_moments || []).forEach(idx => answeredMoments.add(idx));
+
+  diamondMoves.clear();
+  (progressData.diamond_moves || []).forEach(idx => diamondMoves.add(idx));
+
+   // ЗАЩИТА: не выходить за пределы
+    const savedIndex = progressData.current_move_index || 0;
+    currentMoveIndex = Math.min(savedIndex, movesList.length);
+
+  // Обновляем UI
+  renderLives();
+  setSurvivalUIVisible(survivalMode);
+  if (survivalBtnEl) {
+    survivalBtnEl.classList.toggle('active', survivalMode);
+  }
+  if (proBtnEl) {
+    proBtnEl.classList.toggle('active', proMode);
+  }
+  updateProgress();
+  updateBoardAndNotation();
+
+  // Если квест был пройден — показываем итог
+  if (summaryShown) {
+    showFinalSummary();
+  }
+}
+
+// Вызывается когда пользователь залогинился
+// (эта функция вызывается из auth-скрипта)
+window.onUserSignedIn = async function(user) {
+  currentUser = user;
+
+  // Загружаем, какой квест был последним
+  const state = await loadUserState();
+
+  if (state) {
+    const gameIdx = state.last_game_index || 0;
+
+    // Загружаем квест ТОЛЬКО если ещё не начали играть
+        // или если это другой квест
+        if (!gameInitialized || gameIdx !== currentGameIndex) {
+            loadGame(gameIdx);
+            gameInitialized = true;
+        }
+
+    // Теперь загружаем прогресс именно для этого квеста
+    const progress = await loadGameProgress(gameIdx);
+    if (progress) {
+      applyLoadedProgress(progress);
+      wizardSay('С возвращением! Твой прогресс восстановлен.');
+    }
+  }
+};
+
+window.onUserSignedOut = function() {
+  currentUser = null;
+  // При желании можно сбросить прогресс в UI
+  // или просто оставить текущее состояние
+  wizardSay('Вы вышли из аккаунта. Прогресс не будет сохраняться.');
+};
+
+
 
       // таймер вопроса
       let questionTimerId = null;
@@ -501,6 +712,7 @@ function tryTapMove(toSquare){
 
       answeredMoments.add(activeManualMoment.index);
       updateProgress();
+      saveAll();
 
       manualQuestionActive = false;
       activeManualMoment = null;
@@ -554,6 +766,7 @@ if (proofMode) {
       updateScoreDisplay(delta);
 
       playWrongSound();
+      saveAll();
 
       const explWrong =
         activeManualMoment.explanations &&
@@ -694,6 +907,7 @@ window.addEventListener('resize', () => {
 
             answeredMoments.add(activeManualMoment.index);
             updateProgress();
+	    saveAll();
 
             manualQuestionActive = false;
             activeManualMoment = null;
@@ -749,6 +963,7 @@ if (proofMode) {
 
             playWrongSound();
 	    playWizardAnimation('no');
+	    saveAll();
 
             const explWrong =
               activeManualMoment.explanations &&
@@ -1248,6 +1463,7 @@ function startQuestionTimer() {
         if (explanationEl) explanationEl.textContent = '';
 
         wizardSay('Режим выживания: 3 ошибки — поражение. Нажми «Начать заново», чтобы попробовать ещё раз.');
+	saveAll();
       }
 
       function updateScoreDisplay(delta = 0) {
@@ -1668,6 +1884,7 @@ function startProofStep(stepIdx) {
       score += reward;
       updateScoreDisplay(reward);
     }
+    saveAll();
 
     questionActive = true;
     manualQuestionActive = false;
@@ -1858,6 +2075,7 @@ function updateWizardHintBtnVisibility() {
 function goToNextQuest() {
   const nextIndex = currentGameIndex + 1;
   if (nextIndex < gamesData.length) {
+    saveAll();
     loadGame(nextIndex);
   } else {
     // Если квестов больше нет — можно показать сообщение волшебника
@@ -1988,6 +2206,7 @@ function goToNextQuest() {
         setEraProgressForGame(index);
 
         wizardSay('Выбери партию и листай ходы кнопкой Вперед. А в ключевые моменты я буду подсказывать что делать дальше.');
+        saveAll();
       }
 
      function updateTocHighlight() {
@@ -2129,6 +2348,7 @@ if (Number.isNaN(idx)) return;
           }
 
           renderLives();
+	  saveAll();
         });
 
 if (proBtnEl) {
@@ -2165,6 +2385,7 @@ if (proBtnEl) {
       // if (survivalBtnEl) survivalBtnEl.classList.remove('active');
     }
   });
+  saveAll();
 }
 
 if (proBtnEl && angelSoundEl) {
@@ -2461,6 +2682,7 @@ if (nextIndex < gamesData.length) {
   playVictorySound();
 
   wizardSay(`Итог: ${score} / ${maxScore}. Отличная работа! Можешь перейти к следующему квесту.`);
+  saveAll();
 }
       function showQuestionForMoment(moment) {
         if (survivalMode && lives <= 0) return;
@@ -2658,6 +2880,7 @@ if (nextIndex < gamesData.length) {
 
           answeredMoments.add(moment.index);
           updateProgress();
+	  saveAll();
 
           const mv = game.move(moment.correctMoveSan);
 board.position(game.fen());
@@ -2741,6 +2964,7 @@ else {
 
           playWrongSound();
 	  playWizardAnimation('no');	  
+	  saveAll();
 
           statusEl.style.color = 'red';
 	 // Если для этого неправильного ответа предусмотрен "просмотр варианта"
@@ -2982,7 +3206,7 @@ if (lineObj && rowEl) {
       const startBtn = document.getElementById('start-quest-btn');
 
 
-
+let gameInitialized = false;
 
 startBtn.addEventListener('click', () => {
   playFullVictorySound();
@@ -3000,6 +3224,12 @@ startBtn.addEventListener('click', () => {
 
   setTimeout(() => autoFitBoard(), 0);
   board.orientation('white');
+  
+  if (!gameInitialized) {
+        loadGame(0);
+        gameInitialized = true;
+    }
+
 
   if (eraProgressEl) {
     eraProgressEl.style.display = 'block';
@@ -3022,7 +3252,7 @@ startBtn.addEventListener('click', () => {
 
       setEraProgressForGame(0);
 
-loadGame(0);
+//loadGame(0);
 setTimeout(() => autoFitBoard(), 0);
 
 window.addEventListener('resize', () => {
