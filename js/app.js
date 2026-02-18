@@ -78,6 +78,8 @@ async function saveGameProgress() {
         survival_mode: survivalMode,
         pro_mode: proMode,
         summary_shown: summaryShown,
+	completed: !!summaryShown,
+    	completed_at: summaryShown ? new Date().toISOString() : null,
         answered_moments: Array.from(answeredMoments),
         diamond_moves: Array.from(diamondMoves),
         updated_at: new Date().toISOString()
@@ -180,6 +182,56 @@ async function loadUserState() {
   }
 }
 
+
+async function loadAllProgressForUser() {
+  if (!supabase) supabase = window.supabaseDb || null;
+  if (!currentUser || !supabase) return [];
+
+  const { data, error } = await supabase
+    .from('user_progress')
+    .select('game_index, completed, summary_shown, score, answered_moments')
+    .eq('user_id', currentUser.id);
+
+  if (error) {
+    console.warn('Ошибка загрузки всех прогрессов:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+
+let allProgressMap = new Map(); // game_index -> progressRow
+
+
+
+function applyTocProgressMarks() {
+  tocButtons.forEach((btn) => {
+    const idx = parseInt(btn.dataset.gameIndex, 10);
+    if (Number.isNaN(idx)) return;
+
+    const p = allProgressMap.get(idx);
+
+    const isCompleted = !!(p && (p.completed || p.summary_shown));
+    btn.classList.toggle('is-completed', isCompleted);
+
+    // опционально: “в процессе” (есть ответы, но не completed)
+    const answeredCount = p && Array.isArray(p.answered_moments) ? p.answered_moments.length : 0;
+    const inProgress = !isCompleted && answeredCount > 0;
+    btn.classList.toggle('is-in-progress', inProgress);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
 // Применяет загруженный прогресс к текущей игре
 function applyLoadedProgress(progressData) {
   if (!progressData) return;
@@ -228,20 +280,22 @@ function applyLoadedProgress(progressData) {
 window.onUserSignedIn = async function(user) {
   currentUser = user;
 
-  // Загружаем, какой квест был последним
+  // 1) подтянуть все прогрессы для отметок в TOC
+  const all = await loadAllProgressForUser();
+  allProgressMap = new Map(all.map(row => [row.game_index, row]));
+  applyTocProgressMarks();
+
+  // 2) дальше твоя текущая логика восстановления последнего квеста
   const state = await loadUserState();
 
   if (state) {
     const gameIdx = state.last_game_index || 0;
 
-    // Загружаем квест ТОЛЬКО если ещё не начали играть
-        // или если это другой квест
-        if (!gameInitialized || gameIdx !== currentGameIndex) {
-            loadGame(gameIdx);
-            gameInitialized = true;
-        }
+    if (!gameInitialized || gameIdx !== currentGameIndex) {
+      loadGame(gameIdx);
+      gameInitialized = true;
+    }
 
-    // Теперь загружаем прогресс именно для этого квеста
     const progress = await loadGameProgress(gameIdx);
     if (progress) {
       applyLoadedProgress(progress);

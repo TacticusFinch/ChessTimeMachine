@@ -4401,4 +4401,16 @@ body.modal-open {
   }
 }
 
+#toc .toc-item.is-completed {
+  opacity: 0.75;
+  position: relative;
+}
 
+#toc .toc-item.is-completed::after {
+  content: "✓";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+}
