@@ -29,10 +29,11 @@
 <header class="topbar" role="banner">
   <div class="topbar-inner">
     <div class="topbar-left">
-      <h1 class="topbar-title">Шахматные квесты</h1>
+      <a class="topbar-title" href="https://tacticusfinch.github.io/ChessTimeMachine/index.html">Шахматные квесты</a>
+      <!-- <h1 class="">Шахматные квесты</h1> -->
     </div>
 
-    <nav class="topbar-center" aria-label="Навигация">
+<nav class="topbar-center" aria-label="Навигация">
 <!-- From Uiverse.io by Admin12121 --> 
 <div class="menu">
   <a href="#" class="link">
@@ -213,10 +214,33 @@
 
     </nav>
 
-    <nav class="topbar-right" aria-label="Аккаунт">
+    <!-- nav class="topbar-right" aria-label="Аккаунт">
     <a class="topbar-link" href="#" id="open-login-modal">Вход</a>
-    <button class="topbar-link" id="open-signup-modal" type="button">Регистрация</button>
+    <button class="topbar-link" id="open-signup-modal" type="button">Регистрация</button> -->
+
+
+
+<nav class="topbar-right"aria-label="Аккаунт">
+<div class="user-area">
+  <!-- Когда НЕ залогинен -->
+ 
+  <div id="guest-controls">
+    <button id="open-login-modal" class="topbar-link">Войти</button>
+    <button id="open-signup-modal" class="topbar-link">Регистрация</button>
+  </div>
+
+  <!-- Когда залогинен -->
+  <div id="user-controls" style="display: none;">
+    <div class="user-badge">
+      <span class="user-avatar" id="user-avatar">👤</span>
+      <span class="user-email" id="user-email-display"></span>
+    </div>
+    <button id="btn-logout" class="btn-auth btn-logout">Выйти</button>
+  </div>
+</div>
+
 </nav>
+
   </div>
 </header>
 
@@ -1009,5 +1033,10 @@
     </form>
   </div>
 </div>  
+
+<div id="toast" class="toast" hidden>
+  <span class="toast-icon">✅</span>
+  <span class="toast-text" id="toast-text"></span>
+</div>
 </body>
 </html>

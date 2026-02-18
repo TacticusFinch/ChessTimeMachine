@@ -1,110 +1,163 @@
 const SUPABASE_URL = "https://wzzhcqqtlufdsgegfemu.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_Q3EYYshP5JiOsIOtilSkgw_wx88sxVm";
 
-// 2) Создаём клиент И ДЕЛАЕМ ЕГО ГЛОБАЛЬНЫМ
-//    Именно window.supabaseDb — чтобы app.js мог обращаться к той же переменной
 window.supabaseDb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Для удобства внутри этого файла — короткая ссылка
 const supabaseDb = window.supabaseDb;
 
-// 3) Элементы UI авторизации
-const authEmailEl    = document.getElementById("auth-email");
-const authPassEl     = document.getElementById("auth-password");
-const btnSignup      = document.getElementById("btn-signup");
-const btnLogin       = document.getElementById("btn-login");
-const btnLogout      = document.getElementById("btn-logout");
-const authStatusEl   = document.getElementById("auth-status");
+// ========== ТОСТ-УВЕДОМЛЕНИЯ ==========
+function showToast(message, type = 'success', duration = 3000) {
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toast-text');
+  if (!toast || !toastText) return;
+
+  // Иконка в зависимости от типа
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️',
+    logout: '👋'
+  };
+
+  toast.querySelector('.toast-icon').textContent = icons[type] || '✅';
+  toastText.textContent = message;
+
+  // Убираем все типы, ставим нужный
+  toast.className = 'toast toast-' + type;
+  toast.removeAttribute('hidden');
+
+  // Показываем
+  requestAnimationFrame(() => {
+    toast.classList.add('show');
+  });
+
+  // Прячем через N секунд
+  clearTimeout(toast._hideTimeout);
+  toast._hideTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.setAttribute('hidden', ''), 400);
+  }, duration);
+}
+
+// ========== ПРИВЕТСТВЕННЫЙ ЭКРАН ==========
+function showWelcome(email) {
+  // Создаём оверлей
+  const overlay = document.createElement('div');
+  overlay.className = 'welcome-overlay';
+  overlay.innerHTML = `
+    <div class="welcome-card">
+      <div class="welcome-emoji">🎉</div>
+      <h2>Добро пожаловать!</h2>
+      <p>${email}</p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => overlay.classList.add('active'));
+
+  // Закрытие по клику или автоматически через 2 сек
+  const close = () => {
+    overlay.classList.remove('active');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  overlay.addEventListener('click', close);
+  setTimeout(close, 2500);
+}
+
+// ========== UI АВТОРИЗАЦИИ ==========
+const authStatusEl = document.getElementById('auth-status');
 
 function setAuthStatus(text) {
   if (authStatusEl) authStatusEl.textContent = text;
 }
 
 function setLoggedInUI(isLoggedIn, userEmail) {
-  if (btnLogout) btnLogout.style.display = isLoggedIn ? "inline-block" : "none";
-  if (btnLogin)  btnLogin.style.display  = isLoggedIn ? "none" : "inline-block";
-  if (btnSignup) btnSignup.style.display = isLoggedIn ? "none" : "inline-block";
+  const guestControls = document.getElementById('guest-controls');
+  const userControls  = document.getElementById('user-controls');
+  const emailDisplay  = document.getElementById('user-email-display');
+  const avatarEl      = document.getElementById('user-avatar');
 
-  if (isLoggedIn) {
-    setAuthStatus("Вы вошли: " + userEmail);
+  if (guestControls) guestControls.style.display = isLoggedIn ? 'none' : 'flex';
+  if (userControls)  userControls.style.display  = isLoggedIn ? 'flex' : 'none';
+
+  if (isLoggedIn && userEmail) {
+    // Показываем email или первую букву в аватаре
+    if (emailDisplay) emailDisplay.textContent = userEmail;
+    if (avatarEl) {
+      const firstLetter = userEmail.charAt(0).toUpperCase();
+      avatarEl.textContent = firstLetter;
+    }
+    setAuthStatus('Вы вошли: ' + userEmail);
   } else {
-    setAuthStatus("Вы не авторизованы");
+    setAuthStatus('');
   }
 }
 
-// 4) ЭТА ФУНКЦИЯ ВЫЗЫВАЕТСЯ ПРИ КАЖДОМ ИЗМЕНЕНИИ СЕССИИ
-//    Она "соединяет" auth.js с app.js
-function handleAuthChange(session) {
-  if (session && session.user) {
-    // Пользователь залогинен
-    setLoggedInUI(true, session.user.email);
+// ========== ОБРАБОТКА ИЗМЕНЕНИЙ АВТОРИЗАЦИИ ==========
+let previousSession = null; // Чтобы отличить «вход» от «уже был залогинен»
 
-    // Вызываем функцию из app.js, если она существует
-    // Она загрузит прогресс и восстановит состояние
+function handleAuthChange(session, isInitial = false) {
+  if (session && session.user) {
+    const email = session.user.email;
+    setLoggedInUI(true, email);
+
+    // Если это НЕ начальная загрузка — значит пользователь только что вошёл
+    if (!isInitial && !previousSession) {
+      showToast(`Вы вошли как ${email}`, 'success');
+      showWelcome(email);
+    }
+
+    previousSession = session;
+
     if (typeof window.onUserSignedIn === 'function') {
       window.onUserSignedIn(session.user);
     }
   } else {
-    // Пользователь вышел
+    // Если был залогинен и вышел — показываем тост
+    if (previousSession) {
+      showToast('Вы вышли из аккаунта', 'logout');
+    }
+
+    previousSession = null;
     setLoggedInUI(false);
 
-    // Вызываем функцию из app.js, если она существует
     if (typeof window.onUserSignedOut === 'function') {
       window.onUserSignedOut();
     }
   }
 }
 
-
-
-// 7) Выход
-if (btnLogout) {
-  btnLogout.addEventListener("click", async () => {
-    setAuthStatus("Выход...");
-
-    const { error } = await supabaseDb.auth.signOut();
-    if (error) {
-      setAuthStatus("Ошибка выхода: " + error.message);
-      return;
-    }
-
-    // handleAuthChange вызовется автоматически через onAuthStateChange ниже
-  });
-}
-
-// 8) Проверка сессии при открытии страницы
-(async () => {
-  const { data } = await supabaseDb.auth.getSession();
-  handleAuthChange(data.session);
-})();
-
-// 9) Подписка: при любом изменении авторизации — обновляем UI и app.js
-supabaseDb.auth.onAuthStateChange((_event, session) => {
-  handleAuthChange(session);
+// ========== ВЫХОД ==========
+document.getElementById('btn-logout')?.addEventListener('click', async () => {
+  setAuthStatus('Выход...');
+  const { error } = await supabaseDb.auth.signOut();
+  if (error) {
+    showToast('Ошибка выхода: ' + error.message, 'error');
+  }
 });
 
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+(async () => {
+  const { data } = await supabaseDb.auth.getSession();
+  handleAuthChange(data.session, true); // true = начальная загрузка
+})();
+
+supabaseDb.auth.onAuthStateChange((_event, session) => {
+  handleAuthChange(session, false);
+});
+
+// ========== МОДАЛКИ И ФОРМЫ ==========
 document.addEventListener('DOMContentLoaded', () => {
-  // -------- Элементы модалок --------
-  const loginModal    = document.getElementById('login-modal');
-  const signupModal   = document.getElementById('signup-modal');
-  const openLoginBtn  = document.getElementById('open-login-modal');
-  const openSignupBtn = document.getElementById('open-signup-modal');
-  const closeLoginBtn = document.getElementById('login-modal-close-btn');
-  const closeSignupBtn = document.getElementById('signup-modal-close-btn');
-  const switchToSignup = document.getElementById('switch-to-signup');
-  const switchToLogin  = document.getElementById('switch-to-login');
+  const loginModal  = document.getElementById('login-modal');
+  const signupModal = document.getElementById('signup-modal');
+  const loginForm   = document.getElementById('login-form');
+  const signupForm  = document.getElementById('signup-form');
 
-  // -------- Элементы форм --------
-  const loginForm  = document.getElementById('login-form');const signupForm = document.getElementById('signup-form');
-
-  // -------- Утилиты открытия/закрытия --------
   function openModal(modal) {
     modal.removeAttribute('hidden');
     document.body.classList.add('modal-open');
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        modal.classList.add('active');
-      });
+      requestAnimationFrame(() => modal.classList.add('active'));
     });
   }
 
@@ -117,31 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // -------- Открытие --------
-  openLoginBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal(loginModal);
+  // Открытие
+  document.getElementById('open-login-modal')?.addEventListener('click', (e) => {
+    e.preventDefault(); openModal(loginModal);
+  });
+  document.getElementById('open-signup-modal')?.addEventListener('click', (e) => {
+    e.preventDefault(); openModal(signupModal);
   });
 
-  openSignupBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal(signupModal);
-  });
+  // Закрытие
+  document.getElementById('login-modal-close-btn')?.addEventListener('click', () => closeModal(loginModal));
+  document.getElementById('signup-modal-close-btn')?.addEventListener('click', () => closeModal(signupModal));
 
-  // -------- Закрытие по кнопке ✕ --------
-  closeLoginBtn?.addEventListener('click', () => closeModal(loginModal));
-  closeSignupBtn?.addEventListener('click', () => closeModal(signupModal));
+  loginModal?.addEventListener('click', (e) => { if (e.target === loginModal) closeModal(loginModal); });
+  signupModal?.addEventListener('click', (e) => { if (e.target === signupModal) closeModal(signupModal); });
 
-  // -------- Закрытие по клику на оверлей --------
-  loginModal?.addEventListener('click', (e) => {
-    if (e.target === loginModal) closeModal(loginModal);
-  });
-
-  signupModal?.addEventListener('click', (e) => {
-    if (e.target === signupModal) closeModal(signupModal);
-  });
-
-  // -------- Закрытие по Escape --------
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (loginModal?.classList.contains('active'))  closeModal(loginModal);
@@ -149,83 +192,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // -------- Переключение между формами --------
-  switchToSignup?.addEventListener('click', (e) => {
-    e.preventDefault();
-    closeModal(loginModal);
-    setTimeout(() => openModal(signupModal), 350);
+  // Переключение
+  document.getElementById('switch-to-signup')?.addEventListener('click', (e) => {
+    e.preventDefault(); closeModal(loginModal); setTimeout(() => openModal(signupModal), 350);
+  });
+  document.getElementById('switch-to-login')?.addEventListener('click', (e) => {
+    e.preventDefault(); closeModal(signupModal); setTimeout(() => openModal(loginModal), 350);
   });
 
-  switchToLogin?.addEventListener('click', (e) => {
+  // ========== ФОРМА ВХОДА ==========
+  loginForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    closeModal(signupModal);
-    setTimeout(() => openModal(loginModal), 350);
-  });
-
-  // ========================================================
-  //  ФОРМА ВХОДА — отправка в Supabase
-  // ========================================================
- // ✅ ИСПРАВЛЕНО:
-loginForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email    = document.getElementById('login-email').value.trim();    // ← login-email
-    const password = document.getElementById('login-password').value;        // ← login-password
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
     const errorDiv = document.getElementById('login-error');
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
 
     if (errorDiv) { errorDiv.textContent = ''; errorDiv.hidden = true; }
 
-    setAuthStatus('Вход...');
+    // Показываем загрузку на кнопке
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Вход...';
+    submitBtn.disabled = true;
 
-    const { data, error } = await supabaseDb.auth.signInWithPassword({
-        email,
-        password
-    });
+    const { data, error } = await supabaseDb.auth.signInWithPassword({ email, password });
 
-    if (error) {
-        if (errorDiv) {
-            errorDiv.textContent = error.message;
-            errorDiv.hidden = false;
-        }
-        setAuthStatus('Ошибка входа: ' + error.message);
-        return;
-    }
-
-    closeModal(loginModal);
-});
-
-
-  // ========================================================
-  //  ФОРМА РЕГИСТРАЦИИ — отправка в Supabase
-  // ========================================================
-  signupForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email    = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const errorDiv = document.getElementById('signup-error');
-
-    if (errorDiv) { errorDiv.textContent = ''; errorDiv.hidden = true; }
-
-    setAuthStatus('Регистрация...');
-
-    const { data, error } = await supabaseDb.auth.signUp({
-      email,
-      password
-    });
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
 
     if (error) {
-      if (errorDiv) {
-        errorDiv.textContent = error.message;
-        errorDiv.hidden = false;
-      }
-      setAuthStatus('Ошибка регистрации: ' + error.message);
+      if (errorDiv) { errorDiv.textContent = error.message; errorDiv.hidden = false; }
+      showToast('Ошибка входа: ' + error.message, 'error');
       return;
     }
 
-    // Успех
-    closeModal(signupModal);setAuthStatus('Готово! Проверь почту (если включено подтверждение).');
+    closeModal(loginModal);
+    // Тост и приветствие покажутся из handleAuthChange
+  });
+
+  // ========== ФОРМА РЕГИСТРАЦИИ ==========
+  signupForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const errorDiv = document.getElementById('signup-error');
+    const submitBtn = signupForm.querySelector('button[type="submit"]');
+
+    if (errorDiv) { errorDiv.textContent = ''; errorDiv.hidden = true; }
+
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Регистрация...';
+    submitBtn.disabled = true;
+
+    const { data, error } = await supabaseDb.auth.signUp({ email, password });
+
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+
+    if (error) {
+      if (errorDiv) { errorDiv.textContent = error.message; errorDiv.hidden = false; }
+      showToast('Ошибка: ' + error.message, 'error');
+      return;
+    }
+
+    closeModal(signupModal);
+    showToast('Проверьте почту для подтверждения!', 'info', 5000);
   });
 });
-
-

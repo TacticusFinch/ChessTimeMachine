@@ -3288,6 +3288,7 @@ h1{
   text-transform: uppercase;
   color: rgba(17, 24, 39, 0.92);
   line-height: 1;
+  text-decoration: none;
 }
 
 /* Весь текст в том же стиле, что и h1 */
@@ -4218,6 +4219,185 @@ body.modal-open {
     width: 28px;
     height: 28px;
     font-size: 14px;
+  }
+}
+
+
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#guest-controls,
+#user-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Бейдж пользователя */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  //background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 6px 14px;
+  border-radius: 10px;
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow:
+  0 2px 8px rgba(0, 0, 0, 0.04),
+  0 12px 32px rgba(0, 0, 0, 0.08);
+
+  animation: badgeAppear 0.4s ease-out;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.user-email {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes badgeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Кнопка выхода */
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #666;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: #ff4757;
+  color: white;
+  border-color: #ff4757;
+}
+
+/* ========== ТОСТ-УВЕДОМЛЕНИЕ ========== */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: #1e1e2e;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  z-index: 10000;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              opacity 0.4s ease;
+  opacity: 0;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast.toast-success {
+  border-left: 4px solid #2ed573;
+}
+
+.toast.toast-error {
+  border-left: 4px solid #ff4757;
+}
+
+.toast.toast-info {
+  border-left: 4px solid #1e90ff;
+}
+
+.toast-icon {
+  font-size: 20px;
+}
+
+/* ========== ПРИВЕТСТВЕННЫЙ ЭКРАН (опционально) ========== */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.welcome-overlay.active {
+  opacity: 1;
+}
+
+.welcome-overlay .welcome-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 360px;
+  animation: welcomePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.welcome-card .welcome-emoji {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.welcome-card h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #1e1e2e;
+}
+
+.welcome-card p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+@keyframes welcomePop {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
