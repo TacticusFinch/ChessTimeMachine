@@ -325,6 +325,30 @@ body{
       color: #ffffff;
     }
 
+/* toc-item становится контейнером для "заливки" */
+#toc .toc-group{
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;          /* под твой дизайн */
+  background: rgba(255,255,255,0.06);
+}
+
+/* заливка прогресса (берёт процент из CSS-переменной) */
+#toc .toc-group::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--chapter-pct, 0%);
+  background: rgba(55, 65, 81, 0.12);
+  pointer-events: none;
+  transition: width 220ms ease;
+}
+
+/* текст/иконки поверх заливки */
+#toc .toc-group > *{
+  position: relative;
+  z-index: 1;
+}
 
 
 

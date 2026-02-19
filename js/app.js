@@ -223,6 +223,82 @@ function applyTocProgressMarks() {
 
 
 
+function ensureChapterProgressUi(groupEl) {
+  const titleEl = groupEl.querySelector('.toc-group-title');
+  if (!titleEl) return null;
+
+  let wrap = titleEl.querySelector('.chapter-progress');
+  if (wrap) return wrap;
+
+  wrap = document.createElement('span');
+  wrap.className = 'chapter-progress';
+
+  const label = document.createElement('span');
+  label.className = 'cp-label';
+  label.textContent = '0/0';
+
+  const bar = document.createElement('span');
+  bar.className = 'cp-bar';
+
+  const fill = document.createElement('span');
+  fill.className = 'cp-fill';
+
+  bar.appendChild(fill);
+  wrap.appendChild(label);
+  wrap.appendChild(bar);
+
+  titleEl.appendChild(wrap);
+  return wrap;
+}
+
+function applyChapterProgressMarks() {
+  const groups = document.querySelectorAll('#toc .toc-group');
+  groups.forEach(groupEl => {
+    const items = Array.from(groupEl.querySelectorAll('.toc-item'));
+    const total = items.length;
+    if (total === 0) return;
+
+    let completed = 0;
+    let inProgress = 0;
+
+    items.forEach(btn => {
+      const idx = parseInt(btn.dataset.gameIndex, 10);
+      if (Number.isNaN(idx)) return;
+
+      const p = allProgressMap.get(idx);
+      const isCompleted = !!(p && (p.completed || p.summary_shown));
+      const answeredCount = p && Array.isArray(p.answered_moments) ? p.answered_moments.length : 0;
+      const isInProgress = !isCompleted && answeredCount > 0;
+
+      if (isCompleted) completed++;
+      if (isInProgress) inProgress++;
+    });
+
+    const pct = Math.round((completed / total) * 100);
+
+    // NEW: прокидываем процент прогресса главы
+    groupEl.style.setProperty('--chapter-pct', pct + '%');
+
+    // Вариант A (рекомендую): заливка у каждого toc-item берёт переменную у родителя
+    // (в CSS выше переменная читается прямо на .toc-item, но она наследуется)
+    // Ничего больше не нужно.
+
+    // Вариант B (если хочешь жестко на каждый item):
+    // items.forEach(btn => btn.style.setProperty('--chapter-pct', pct + '%'));
+
+    const ui = ensureChapterProgressUi(groupEl);
+    if (!ui) return;
+
+    const labelEl = ui.querySelector('.cp-label');
+    const fillEl = ui.querySelector('.cp-fill');
+
+    if (labelEl) labelEl.textContent = completed + '/' + total;
+    if (fillEl) fillEl.style.width = pct + '%';
+
+    groupEl.classList.toggle('is-completed', completed === total);
+    groupEl.classList.toggle('has-in-progress', inProgress > 0 && completed < total);
+  });
+}
 
 
 
@@ -284,6 +360,7 @@ window.onUserSignedIn = async function(user) {
   const all = await loadAllProgressForUser();
   allProgressMap = new Map(all.map(row => [row.game_index, row]));
   applyTocProgressMarks();
+  applyChapterProgressMarks();
 
   // 2) дальше твоя текущая логика восстановления последнего квеста
   const state = await loadUserState();
@@ -767,6 +844,9 @@ function tryTapMove(toSquare){
       answeredMoments.add(activeManualMoment.index);
       updateProgress();
       saveAll();
+      applyTocProgressMarks();
+      applyChapterProgressMarks();
+
 
       manualQuestionActive = false;
       activeManualMoment = null;
@@ -821,6 +901,10 @@ if (proofMode) {
 
       playWrongSound();
       saveAll();
+      applyTocProgressMarks();
+      applyChapterProgressMarks();
+
+
 
       const explWrong =
         activeManualMoment.explanations &&
@@ -962,6 +1046,9 @@ window.addEventListener('resize', () => {
             answeredMoments.add(activeManualMoment.index);
             updateProgress();
 	    saveAll();
+ 	    applyTocProgressMarks();
+	    applyChapterProgressMarks();
+	    
 
             manualQuestionActive = false;
             activeManualMoment = null;
@@ -1018,6 +1105,8 @@ if (proofMode) {
             playWrongSound();
 	    playWizardAnimation('no');
 	    saveAll();
+	    applyTocProgressMarks();
+	    applyChapterProgressMarks();
 
             const explWrong =
               activeManualMoment.explanations &&
@@ -1518,6 +1607,9 @@ function startQuestionTimer() {
 
         wizardSay('Режим выживания: 3 ошибки — поражение. Нажми «Начать заново», чтобы попробовать ещё раз.');
 	saveAll();
+        applyTocProgressMarks();
+	applyChapterProgressMarks();
+
       }
 
       function updateScoreDisplay(delta = 0) {
@@ -1939,6 +2031,8 @@ function startProofStep(stepIdx) {
       updateScoreDisplay(reward);
     }
     saveAll();
+    applyTocProgressMarks();
+    applyChapterProgressMarks();
 
     questionActive = true;
     manualQuestionActive = false;
@@ -2130,6 +2224,9 @@ function goToNextQuest() {
   const nextIndex = currentGameIndex + 1;
   if (nextIndex < gamesData.length) {
     saveAll();
+    applyTocProgressMarks();
+    applyChapterProgressMarks();
+
     loadGame(nextIndex);
   } else {
     // Если квестов больше нет — можно показать сообщение волшебника
@@ -2261,6 +2358,9 @@ function goToNextQuest() {
 
         wizardSay('Выбери партию и листай ходы кнопкой Вперед. А в ключевые моменты я буду подсказывать что делать дальше.');
         saveAll();
+	applyTocProgressMarks();
+	applyChapterProgressMarks();
+
       }
 
      function updateTocHighlight() {
@@ -2403,6 +2503,9 @@ if (Number.isNaN(idx)) return;
 
           renderLives();
 	  saveAll();
+	  applyTocProgressMarks();
+	  applyChapterProgressMarks();
+
         });
 
 if (proBtnEl) {
@@ -2440,6 +2543,9 @@ if (proBtnEl) {
     }
   });
   saveAll();
+  applyTocProgressMarks();
+  applyChapterProgressMarks();
+
 }
 
 if (proBtnEl && angelSoundEl) {
@@ -2737,6 +2843,9 @@ if (nextIndex < gamesData.length) {
 
   wizardSay(`Итог: ${score} / ${maxScore}. Отличная работа! Можешь перейти к следующему квесту.`);
   saveAll();
+  applyTocProgressMarks();
+  applyChapterProgressMarks();
+
 }
       function showQuestionForMoment(moment) {
         if (survivalMode && lives <= 0) return;
@@ -2935,6 +3044,8 @@ if (nextIndex < gamesData.length) {
           answeredMoments.add(moment.index);
           updateProgress();
 	  saveAll();
+          applyTocProgressMarks();
+	  applyChapterProgressMarks();
 
           const mv = game.move(moment.correctMoveSan);
 board.position(game.fen());
@@ -3019,6 +3130,8 @@ else {
           playWrongSound();
 	  playWizardAnimation('no');	  
 	  saveAll();
+	  applyTocProgressMarks();
+	  applyChapterProgressMarks();
 
           statusEl.style.color = 'red';
 	 // Если для этого неправильного ответа предусмотрен "просмотр варианта"
