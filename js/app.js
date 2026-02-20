@@ -370,6 +370,7 @@ window.onUserSignedIn = async function(user) {
 
     if (!gameInitialized || gameIdx !== currentGameIndex) {
       loadGame(gameIdx);
+      updateTocHighlight();
       gameInitialized = true;
     }
 
@@ -2357,8 +2358,7 @@ function goToNextQuest() {
         setEraProgressForGame(index);
 
         wizardSay('Выбери партию и листай ходы кнопкой Вперед. А в ключевые моменты я буду подсказывать что делать дальше.');
-        saveAll();
-	applyTocProgressMarks();
+      	applyTocProgressMarks();
 	applyChapterProgressMarks();
 
       }
@@ -3393,7 +3393,6 @@ startBtn.addEventListener('click', () => {
   board.orientation('white');
   
   if (!gameInitialized) {
-        loadGame(0);
         gameInitialized = true;
     }
 
@@ -3501,7 +3500,16 @@ if (welcomeVideoEl) {
     { id: 'moonstone',     label: 'Moon'  },
     { id: 'evergreen',     label: 'Green' },
     { id: 'lavender-mist', label: 'Lav'   },
-    { id: 'sage-sand',      label: 'Sage'   }
+    { id: 'sage-sand',      label: 'Sage'   },
+    { id: 'graphite-pencil', label: 'graphite'},
+    { id: 'fog-ink', 	   label: 'fog'},
+    { id: 'arctic-glass',  label: 'arctic'},
+    { id: 'blueberry-cream',  label: 'blueberry'},
+    { id: 'rose-quartz',  label: 'rose'},
+    { id: 'cocoa-milk',  label: 'cocoa-milk'},
+    { id: 'seafoam-calm',  label: 'seafoam'},
+    { id: 'olive-linen',  label: 'olive'},
+    { id: 'sandstone-sky',  label: 'sky'}
   ];
 
   const STORAGE_KEY = 'boardTheme';

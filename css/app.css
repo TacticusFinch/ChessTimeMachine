@@ -313,12 +313,18 @@ body{
       color: #1d4ed8;
     }
 
-    #toc .toc-item.active {
-      background: #dbeafe;
-      box-shadow:
-        0 0 0 1px rgba(59, 130, 246, 0.6),
-        0 3px 10px rgba(59, 130, 246, 0.35);
-    }
+    #toc .toc-item.active{
+  background: rgba(99, 102, 241, 0.18); /* мягкая заливка */
+  border-left: 4px solid #6366f1;
+  padding-left: 10px; /* чтобы текст не "прыгнул" из-за бордера */
+  color: #111827;
+  font-weight: 700;
+}
+
+#toc .toc-group.has-active .toc-group-title{
+  color: #111827;
+}
+
 
     #toc .toc-item.active .toc-item-number {
       background: #3b82f6;
@@ -2495,15 +2501,22 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
   color: rgba(10,132,255,0.95);
 }
 
-/* Группа с активным элементом: лучше не подсвечивать всю группу */
+/* базово: у группы должна быть ЛЕВАЯ граница всегда (прозрачная/нейтральная) */
+.toc-group{
+  border-left: 3px solid transparent;
+}
+
+/* активная группа: меняем только цвет левой границы */
 .toc-group.has-active{
-  border-color: transparent;
+  border-left-color: #6366F1; /* indigo */
+  background: transparent;
 }
 
 .toc-group.has-active .toc-group-title{
   color: rgba(0,0,0,0.65);
   background: transparent;
 }
+
 
 
 /* =========================
@@ -2737,15 +2750,18 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
 }
 
 
-#toc .toc-group.has-active{
-  background: rgba(255,255,255,0.06) !important;
-  border-radius: 12px;
+.toc-group{
+  border: 1px solid transparent; /* или твой базовый цвет */
 }
-#toc .toc-group.has-active .toc-group-title{
-  color: rgba(47, 52, 49,0.78) !important;
+
+.toc-group.has-active{
+  border-color: black;
+  background: transparent;
 }
-#toc .toc-group.has-active{
-  outline: 2px solid rgba(47, 52, 49,0.18);
+
+.toc-group.has-active .toc-group-title{
+  color: rgba(0,0,0,0.65);
+  background: transparent;
 }
 
 
@@ -3758,6 +3774,102 @@ h1:not(.topbar-title){
   --glow-sun:  rgba(255, 205, 135, 0.18);
   --glow-leaf: rgba(140, 210, 160, 0.12);
 }
+
+/* 6) Graphite Light Pencil (графитово‑светлый, “карандашный”) */
+#board-wrapper[data-board-theme="graphite-pencil"]{
+  /* Светлая клетка — почти как бумага с лёгким холодным серым */
+  --sq-light: #f5f5f7;
+
+  /* Тёмная клетка — светлый графит (без сильного контраста) */
+  --sq-dark:  #cfd4dd;
+
+  /* Линии сетки — как карандашный штрих */
+  --grid-line: rgba(31, 41, 55, 0.10);
+
+  /* Свечение — очень деликатное, холодное */
+  --glow-sun:  rgba(148, 163, 184, 0.16); /* slate */
+  --glow-leaf: rgba(59, 130, 246, 0.10);  /* лёгкий blue */
+}
+
+/* =========================
+   EXTRA BOARD THEMES (soft / eye-friendly)
+   Add these after your existing 1–6 themes
+   ========================= */
+
+/* 7) Fog & Ink (туманно‑серый + мягкий “чернильный”) */
+#board-wrapper[data-board-theme="fog-ink"]{
+  --sq-light: #f3f4f6;
+  --sq-dark:  #b8c0cc;
+  --grid-line: rgba(17, 24, 39, 0.10);
+  --glow-sun:  rgba(148, 163, 184, 0.16);
+  --glow-leaf: rgba(59, 130, 246, 0.10);
+}
+
+/* 8) Arctic Glass (очень светлый холодный, “стеклянный”) */
+#board-wrapper[data-board-theme="arctic-glass"]{
+  --sq-light: #f6faff;
+  --sq-dark:  #c7d6ea;
+  --grid-line: rgba(15, 23, 42, 0.09);
+  --glow-sun:  rgba(191, 219, 254, 0.18);
+  --glow-leaf: rgba(99, 102, 241, 0.10);
+}
+
+/* 9) Blueberry Cream (сливки + черничный пастельный) */
+#board-wrapper[data-board-theme="blueberry-cream"]{
+  --sq-light: #fbfbfd;
+  --sq-dark:  #c4c9ef;
+  --grid-line: rgba(30, 27, 75, 0.09);
+  --glow-sun:  rgba(165, 180, 252, 0.16);
+  --glow-leaf: rgba(96, 165, 250, 0.12);
+}
+
+/* 10) Rose Quartz (припылённая роза, очень мягко) */
+#board-wrapper[data-board-theme="rose-quartz"]{
+  --sq-light: #fbf6f7;
+  --sq-dark:  #e2bcc6;
+  --grid-line: rgba(80, 20, 35, 0.08);
+  --glow-sun:  rgba(251, 182, 206, 0.18);
+  --glow-leaf: rgba(147, 197, 253, 0.10);
+}
+
+/* 11) Cocoa Milk (какао с молоком — тёплый, не “оранжевый”) */
+#board-wrapper[data-board-theme="cocoa-milk"]{
+  --sq-light: #f7f1ea;
+  --sq-dark:  #d6c2b3;
+  --grid-line: rgba(60, 40, 25, 0.09);
+  --glow-sun:  rgba(252, 211, 163, 0.18);
+  --glow-leaf: rgba(96, 165, 250, 0.10);
+}
+
+/* 12) Seafoam Calm (мята + песок, приглушённо) */
+#board-wrapper[data-board-theme="seafoam-calm"]{
+  --sq-light: #f3f1e8;
+  --sq-dark:  #b7d6cf;
+  --grid-line: rgba(20, 40, 35, 0.08);
+  --glow-sun:  rgba(253, 230, 138, 0.14);
+  --glow-leaf: rgba(45, 212, 191, 0.12);
+}
+
+/* 13) Olive Linen (лён + оливковый, “натурально”) */
+#board-wrapper[data-board-theme="olive-linen"]{
+  --sq-light: #f2efe7;
+  --sq-dark:  #c6cfad;
+  --grid-line: rgba(35, 28, 18, 0.07);
+  --glow-sun:  rgba(255, 205, 135, 0.14);
+  --glow-leaf: rgba(132, 204, 22, 0.10);
+}
+
+/* 14) Sandstone Sky (песчаник + нежный небесный) */
+#board-wrapper[data-board-theme="sandstone-sky"]{
+  --sq-light: #f3ede3;
+  --sq-dark:  #c5d5e6;
+  --grid-line: rgba(15, 23, 42, 0.08);
+  --glow-sun:  rgba(253, 186, 116, 0.14);
+  --glow-leaf: rgba(56, 189, 248, 0.12);
+}
+
+
+
 
 /* Применяем новые переменные к твоим клеткам (у тебя уже есть !important) */
 .white-1e1d7{
