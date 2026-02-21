@@ -331,30 +331,40 @@ body{
       color: #ffffff;
     }
 
-/* toc-item становится контейнером для "заливки" */
+/* toc-group становится контейнером для "заливки" */
 #toc .toc-group{
   position: relative;
   overflow: hidden;
-  border-radius: 10px;          /* под твой дизайн */
+  border-radius: 10px;
   background: rgba(255,255,255,0.06);
 }
 
-/* заливка прогресса (берёт процент из CSS-переменной) */
 #toc .toc-group::before{
+  content: none !important;
+}
+
+/* И рисуем прогресс только под заголовком группы */
+#toc .toc-group-title{
+  position: relative;
+  overflow: hidden;
+}
+
+#toc .toc-group-title::before{
   content: "";
   position: absolute;
   inset: 0;
-  width: var(--chapter-pct, 0%);
+  width: var(--group-chapter-pct, 0%);
   background: rgba(55, 65, 81, 0.12);
   pointer-events: none;
   transition: width 220ms ease;
+  z-index: 0;
 }
 
-/* текст/иконки поверх заливки */
-#toc .toc-group > *{
+#toc .toc-group-title > *{
   position: relative;
   z-index: 1;
 }
+
 
 
 
@@ -2429,7 +2439,9 @@ backdrop-filter: blur(10px) saturate(140%) brightness(1.08);
   padding: 8px 10px;
   gap: 10px;
 
-  background: transparent;
+  background: rgba(255,255,255,0.06); /* как у .toc-group */
+  position: relative;
+  z-index: 1; /* на всякий случай */
   box-shadow: none;
   transform: none;
 
@@ -3103,8 +3115,8 @@ h1{
   bottom: 52px;     /* <– вынесено "ниже" доски: меняешь это число */
   display: flex;
   justify-content: space-between;
- // gap: 32px;
- // padding: 0 6px;    /* отступ от краёв */
+ /* gap: 32px; */
+ /* padding: 0 6px; */   /* отступ от краёв */
 }
 
 /* Цифры справа */
@@ -3117,7 +3129,7 @@ h1{
   flex-direction: column-reverse;  /* 1 внизу, 8 вверху */
 
   justify-content: space-between;
- // padding: 4px 0;
+ /* padding: 4px 0; */
 }
 
 /* Оформление самих символов */
@@ -4378,7 +4390,7 @@ body.modal-open {
   display: flex;
   align-items: center;
   gap: 8px;
-  //background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   padding: 6px 14px;
   border-radius: 10px;
   color: black;
@@ -4550,3 +4562,5 @@ body.modal-open {
   transform: translateY(-50%);
   font-weight: 700;
 }
+
+

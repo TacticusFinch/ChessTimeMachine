@@ -277,14 +277,7 @@ function applyChapterProgressMarks() {
     const pct = Math.round((completed / total) * 100);
 
     // NEW: прокидываем процент прогресса главы
-    groupEl.style.setProperty('--chapter-pct', pct + '%');
-
-    // Вариант A (рекомендую): заливка у каждого toc-item берёт переменную у родителя
-    // (в CSS выше переменная читается прямо на .toc-item, но она наследуется)
-    // Ничего больше не нужно.
-
-    // Вариант B (если хочешь жестко на каждый item):
-    // items.forEach(btn => btn.style.setProperty('--chapter-pct', pct + '%'));
+    groupEl.style.setProperty('--group-chapter-pct', pct + '%');
 
     const ui = ensureChapterProgressUi(groupEl);
     if (!ui) return;
@@ -308,32 +301,32 @@ function applyChapterProgressMarks() {
 
 
 
-// Применяет загруженный прогресс к текущей игре
+/* Применяет загруженный прогресс к текущей игре */
 function applyLoadedProgress(progressData) {
   if (!progressData) return;
 
-  // Восстанавливаем очки
+  /* Восстанавливаем очки */
   score = progressData.score || 0;
   updateScoreDisplay(0);
 
-  // Восстанавливаем жизни и режимы
+  /* Восстанавливаем жизни и режимы */
   lives = progressData.lives || 3;
   survivalMode = progressData.survival_mode || false;
   proMode = progressData.pro_mode || false;
   summaryShown = progressData.summary_shown || false;
 
-  // Восстанавливаем наборы (Set) из массивов
+  /* Восстанавливаем наборы (Set) из массивов */
   answeredMoments.clear();
   (progressData.answered_moments || []).forEach(idx => answeredMoments.add(idx));
 
   diamondMoves.clear();
   (progressData.diamond_moves || []).forEach(idx => diamondMoves.add(idx));
 
-   // ЗАЩИТА: не выходить за пределы
+   /* ЗАЩИТА: не выходить за пределы */
     const savedIndex = progressData.current_move_index || 0;
     currentMoveIndex = Math.min(savedIndex, movesList.length);
 
-  // Обновляем UI
+  /* Обновляем UI */
   renderLives();
   setSurvivalUIVisible(survivalMode);
   if (survivalBtnEl) {
@@ -345,24 +338,24 @@ function applyLoadedProgress(progressData) {
   updateProgress();
   updateBoardAndNotation();
 
-  // Если квест был пройден — показываем итог
+  /* Если квест был пройден — показываем итог */
   if (summaryShown) {
     showFinalSummary();
   }
 }
 
-// Вызывается когда пользователь залогинился
-// (эта функция вызывается из auth-скрипта)
+/* Вызывается когда пользователь залогинился */
+/* (эта функция вызывается из auth-скрипта) */
 window.onUserSignedIn = async function(user) {
   currentUser = user;
 
-  // 1) подтянуть все прогрессы для отметок в TOC
+  /* 1) подтянуть все прогрессы для отметок в TOC */
   const all = await loadAllProgressForUser();
   allProgressMap = new Map(all.map(row => [row.game_index, row]));
   applyTocProgressMarks();
   applyChapterProgressMarks();
 
-  // 2) дальше твоя текущая логика восстановления последнего квеста
+  /* 2) дальше твоя текущая логика восстановления последнего квеста */
   const state = await loadUserState();
 
   if (state) {
@@ -384,17 +377,17 @@ window.onUserSignedIn = async function(user) {
 
 window.onUserSignedOut = function() {
   currentUser = null;
-  // При желании можно сбросить прогресс в UI
-  // или просто оставить текущее состояние
+  /* При желании можно сбросить прогресс в UI */
+  /* или просто оставить текущее состояние */
   wizardSay('Вы вышли из аккаунта. Прогресс не будет сохраняться.');
 };
 
 
 
-      // таймер вопроса
+      /* таймер вопроса */
       let questionTimerId = null;
       let questionTimeLeftMs = 0;
-      const PRO_QUESTION_TIME_MS = 2 * 60 * 1000; // 2 минуты
+      const PRO_QUESTION_TIME_MS = 2 * 60 * 1000; /* 2 минуты */
 
 
       const board = Chessboard('board', {
@@ -409,7 +402,7 @@ window.onUserSignedOut = function() {
 
 const boardWrapperEl = document.getElementById('board-wrapper');
 
-// ==== КООРДИНАТЫ: снизу (файлы) и справа (ранги) ====
+/* ==== КООРДИНАТЫ: снизу (файлы) и справа (ранги) ==== */
 const boardCoordsEl = document.getElementById('board-coords');
 const filesBottomEl = boardCoordsEl.querySelector('.board-files.bottom');
 const ranksRightEl  = boardCoordsEl.querySelector('.board-ranks.right');
@@ -436,7 +429,7 @@ function renderBoardCoords() {
     ranksRightEl.appendChild(span);
   });
 }
-// первый рендер
+/* первый рендер */
 renderBoardCoords();
 
 
@@ -490,7 +483,7 @@ const WIZARD_NO_FILES = [
   'animations/wizard_no_8.mp4'
 ];
 
-function playWizardAnimation(kind){ // kind: 'yes' | 'no'
+function playWizardAnimation(kind){ /* kind: 'yes' | 'no' */
   if (!wizardMediaEl || !wizardVideoEl || !wizardImgEl) return;
 
   const pool = kind === 'yes' ? WIZARD_YES_FILES : WIZARD_NO_FILES;
@@ -1765,6 +1758,22 @@ function startQuestionTimer() {
 
 
 
+function updateAllProgressMapForCurrentGameLocal() {
+  allProgressMap.set(currentGameIndex, {
+    game_index: currentGameIndex,
+    completed: !!summaryShown,
+    summary_shown: !!summaryShown,
+    score: score,
+    answered_moments: Array.from(answeredMoments)
+  });
+}
+
+async function saveAllAndRefreshProgressMarks() {
+  await saveAll(); // важно!
+  updateAllProgressMapForCurrentGameLocal();
+  applyTocProgressMarks();
+  applyChapterProgressMarks();
+}
 
 
 
@@ -2765,7 +2774,7 @@ if (survivalBtnEl && heartSoundEl) {
         } catch (e) {}
       }
 
-function showFinalSummary() {
+async function showFinalSummary() {
   summaryShown = true;
 
   stopQuestionTimer();
@@ -2842,9 +2851,7 @@ if (nextIndex < gamesData.length) {
   playVictorySound();
 
   wizardSay(`Итог: ${score} / ${maxScore}. Отличная работа! Можешь перейти к следующему квесту.`);
-  saveAll();
-  applyTocProgressMarks();
-  applyChapterProgressMarks();
+  await saveAllAndRefreshProgressMarks();
 
 }
       function showQuestionForMoment(moment) {
